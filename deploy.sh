@@ -69,6 +69,27 @@ case $TERM in
 		;;
 esac
 
+# Need to have Distro testing here
+
+# Check for Package Manager installation
+if haveProg apt-get; then
+	log "#### CHECKING FOR PACKAGE MANAGER: APT INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
+	pkginstall='DEBIAN_FRONTEND=noninteractive sudo apt -y'
+elif haveProg dnf; then
+	log "#### CHECKING FOR PACKAGE MANAGER: DNF INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
+	pkginstall='sudo dnf -y'
+elif haveProg yum; then
+	log "#### CHECKING FOR PACKAGE MANAGER: YUM INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
+	pkginstall='sudo yum -y'
+elif haveProg up2date; then
+	log "#### CHECKING FOR PACKAGE MANAGER: UP2DATE INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
+	pkginstall='sudo up2date -y'
+else
+	log "#### CHECKING FOR PACKAGE MANAGER: NO PACKAGE MANAGER FOUND `date '+%m-%d-%Y %I:%M:%S'` ####"
+	# Consider installing and configuring everything without a package manager
+	exit 100
+fi
+
 #######################################
 # variables - assign variables for script
 # Globals:
@@ -80,6 +101,8 @@ esac
 #   None
 #######################################
 variables() {
+	trap quitscript SIGINT SIGQUIT SIGTSTP
+	trap finish EXIT
 	if [[ "$1" == "set" ]]; then
 		# Set the variables for this script
 		BLACK="\033[0;30m"
@@ -172,6 +195,17 @@ output() {
 		echo -e $WHITE"   APPLICATIONS"
 		echo ""
 		# FIND WAYS TO CHECK TO SEE IF THIS IS A NEW SYSTEM, THEN GIVE THE USER TO ABORT
+	fi
+	if [ "$1" == "instructions" ]; then
+		echo -e $COLOR_NONE"  Please answer the questions below to configure your"
+		echo -e $COLOR_NONE"  web server to your specific needs. Some defaults are"
+		echo -e $COLOR_NONE"  assumed from system variables."
+		echo ""
+		echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating Installation Log File: $logfile "$LIGHT_RED"==="$COLOR_NONE
+		echo -e $YELLOW"(you may watch the progress by running 'tail -f $logfile')"$COLOR_NONE
+	fi
+	if [ "$1" == "questions" ]; then
+
 	fi
 }
 #######################################
@@ -290,8 +324,6 @@ checkinet() {
 #   None
 #######################################
 checkversion() {
-	trap quitscript SIGINT SIGQUIT SIGTSTP
-	trap finish EXIT
 	[[ -d $steplogdir ]] || sudo mkdir -p $steplogdir
 	log "#### CHECKING FOR INTERNET `date '+%m-%d-%Y %I:%M:%S'` ####"
 
@@ -303,27 +335,6 @@ checkversion() {
 		echo -e "It seems that internet is not available, this script requires internet to update, upgrade and install packages"
 		echo -e "Please resolve internet issue and rerun this script"
 		exit 125
-	fi
-
-	# Need to have Distro testing here
-
-	# Check for Package Manager installation
-	if haveProg apt-get; then
-		log "#### CHECKING FOR PACKAGE MANAGER: APT INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
-		pkginstall='DEBIAN_FRONTEND=noninteractive sudo apt -y'
-	elif haveProg dnf; then
-		log "#### CHECKING FOR PACKAGE MANAGER: DNF INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
-		pkginstall='sudo dnf -y'
-	elif haveProg yum; then
-		log "#### CHECKING FOR PACKAGE MANAGER: YUM INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
-		pkginstall='sudo yum -y'
-	elif haveProg up2date; then
-		log "#### CHECKING FOR PACKAGE MANAGER: UP2DATE INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
-		pkginstall='sudo up2date -y'
-	else
-		log "#### CHECKING FOR PACKAGE MANAGER: NO PACKAGE MANAGER FOUND `date '+%m-%d-%Y %I:%M:%S'` ####"
-		# Consider installing and configuring everything without a package manager
-		exit 100
 	fi
 
 	# Check to see if this is the latest version of the script
@@ -458,26 +469,33 @@ managehost() {
 	fi
 }
 
+# Setup all the variables to be used "unset" is calling in the finish function
 variables "set"
+
+# Output the header of the script to the screen. I put this in a function for
+# future use, this may be used to have different outputs depending on screen
+# size, or to send other output to the terminal. But for now it is just the
+# really large header that I spent allot of time on to make it look pretty!
 output 'header'
 
+# Start the output to the /var/log/rasp* log file
 log "################### INSTALLATION STARTED ON `date '+%m-%d-%Y %I:%M:%S'` ###################"
+
+# Update, Auto Remove, and Upgrade System and check to see if the latest 
+# version is being used of the script since I moved everything to GitHub, 
+# I will probably check there to see if the version is the latest.
+log "#### CHECKING THE INSTALLER FOR LATEST VERSIONS `date '+%m-%d-%Y %I:%M:%S'` ####"
 checkversion
 
-echo -e $COLOR_NONE"  Please answer the questions below to configure your"
-echo -e $COLOR_NONE"  web server to your specific needs. Some defaults are"
-echo -e $COLOR_NONE"  assumed from system variables."
-echo ""
-echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating Installation Log File: $logfile "$LIGHT_RED"==="$COLOR_NONE
-echo -e $YELLOW"(you may watch the progress by running 'tail -f $logfile')"$COLOR_NONE
-
-# Update, Auto Remove, and Upgrade System
 log "#### UPDATING SYSTEM TO LATEST VERSIONS `date '+%m-%d-%Y %I:%M:%S'` ####"
 echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Updating system to latest versions "$LIGHT_RED"==="$COLOR_NONE
 echo -e $YELLOW"(this may take a long time)"$COLOR_NONE
 evallog "$pkginstall autoremove" & pid=$!
 evallog "$pkginstall update && $pkginstall upgrade" & pid=$!
 progress
+
+# Output the instructions to the screen
+output 'instructions'
 
 shopt -u nocasematch
 
@@ -626,18 +644,24 @@ log "#### INSTALLING APACHE, PHP 7, AND DEPENDANCIES `date '+%m-%d-%Y %I:%M:%S'`
 evallog "$pkginstall install apache2 php7.0 php7.0-curl php7.0-gd php7.0-imap php7.0-json php7.0-mcrypt php7.0-mysql php7.0-opcache php7.0-xmlrpc libapache2-mod-php7.0 apache2-utils nfs-common python-certbot-apache postfix dovecot-common dovecot-imapd telnet" & pid=$!
 progress
 
+# Enable the modules
 echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Enabling Web Modules "$LIGHT_RED"==="$COLOR_NONE
 log "#### ENABLING WEB MODULES `date '+%m-%d-%Y %I:%M:%S'` ####"
 evallog "a2enmod rewrite"
 evallog "phpenmod mcrypt"
 evallog "phpenmod mbstring"
 
+# Create a virtual host file
 echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating Virtual Host File "$LIGHT_RED"==="$COLOR_NONE
 log "#### CREATING VIRTUAL HOST FILE '/etc/apache2/sites-available/$fqdn.conf `date '+%m-%d-%Y %I:%M:%S'` ####"
 setvhdebian
 
+# Restart APACHE2
 echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Restarting Apache "$LIGHT_RED"==="$COLOR_NONE
 log "#### RESTARTING APACHE2 `date '+%m-%d-%Y %I:%M:%S'` ####"
 evallog "service apache2 restart"
 
+# Clean up the system of any files needed
 echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Cleaning System from unused files and folders "$LIGHT_RED"==="$COLOR_NONE
+
+# Check for any errors generated
