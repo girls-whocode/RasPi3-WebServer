@@ -71,25 +71,6 @@ esac
 
 # Need to have Distro testing here
 
-# Check for Package Manager installation
-if haveProg apt-get; then
-	log "#### CHECKING FOR PACKAGE MANAGER: APT INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
-	pkginstall='DEBIAN_FRONTEND=noninteractive sudo apt -y'
-elif haveProg dnf; then
-	log "#### CHECKING FOR PACKAGE MANAGER: DNF INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
-	pkginstall='sudo dnf -y'
-elif haveProg yum; then
-	log "#### CHECKING FOR PACKAGE MANAGER: YUM INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
-	pkginstall='sudo yum -y'
-elif haveProg up2date; then
-	log "#### CHECKING FOR PACKAGE MANAGER: UP2DATE INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
-	pkginstall='sudo up2date -y'
-else
-	log "#### CHECKING FOR PACKAGE MANAGER: NO PACKAGE MANAGER FOUND `date '+%m-%d-%Y %I:%M:%S'` ####"
-	# Consider installing and configuring everything without a package manager
-	exit 100
-fi
-
 #######################################
 # variables - assign variables for script
 # Globals:
@@ -208,7 +189,7 @@ output() {
 		echo -e $YELLOW"(you may watch the progress by running 'tail -f $logfile')"$COLOR_NONE
 	fi
 	if [ "$1" == "questions" ]; then
-
+		echo ""
 	fi
 }
 #######################################
@@ -500,7 +481,26 @@ managehost() {
 	fi
 }
 
-# Setup all the variables to be used "unset" is calling in the finish function
+# Check for Package Manager installation
+if haveProg apt-get; then
+	log "#### CHECKING FOR PACKAGE MANAGER: APT INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
+	pkginstall='DEBIAN_FRONTEND=noninteractive sudo apt -y'
+elif haveProg dnf; then
+	log "#### CHECKING FOR PACKAGE MANAGER: DNF INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
+	pkginstall='sudo dnf -y'
+elif haveProg yum; then
+	log "#### CHECKING FOR PACKAGE MANAGER: YUM INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
+	pkginstall='sudo yum -y'
+elif haveProg up2date; then
+	log "#### CHECKING FOR PACKAGE MANAGER: UP2DATE INSTALLED `date '+%m-%d-%Y %I:%M:%S'` ####"
+	pkginstall='sudo up2date -y'
+else
+	log "#### CHECKING FOR PACKAGE MANAGER: NO PACKAGE MANAGER FOUND `date '+%m-%d-%Y %I:%M:%S'` ####"
+	# Consider installing and configuring everything without a package manager
+	exit 100
+fi
+
+# Setup all the variables to be used, "unset" is called in the finish function
 variables "set"
 
 # Output the header of the script to the screen. I put this in a function for
