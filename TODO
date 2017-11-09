@@ -1,0 +1,14 @@
+1. Find, create and move public_html folder, database folder, and email folder to USB drive
+2. Install Dovecot and Postfix
+3. Install Webanalyzer
+4. Install cPanel or some type of Web Panel interface
+5. Install firewall, add open ports 22, 443, 80, 8080, 9000
+6. Install Webmail system
+7. Install phpMyAdmin
+8. Install RKHunter and other security utilities
+9. Install Spam Assassin
+10. Create web scripts (startweb.sh, stopweb.sh, reloadweb.sh, emailpurge.sh, etc)
+11. Create cron jobs for auto update cert from let's encrypt'
+12. Create menu system in case of failure of install
+13. Create system for managing web server
+14. Create deploy system from fresh install of Raspberian to setup ssh keys, boot options, localisation options, etc

@@ -1,56 +1,27 @@
 #!/bin/bash
-######################################################
-#            Raspberry Pi 3 Web Server               #
-#         Script created by Jessica Brown            #
-#              jessica@jbrowns.com                   #
-#                                                    #
-# DESCRIPTION:                                       #
-# This script is just to help streamline the install #
-# process for Raspberry Pi 3 web and email servers.  #
-# You assume all responsibility of this script and   #
-# understand there is no warranties, liabilities, or #
-# guarentees on this script. This script assumes a   #
-# fresh OS install.                                  #
-#                                                    #
-# I used Geany IDE to create this script with tab    #
-# stops at 4 characters.                             #
-#                                                    #
-# Feel free to modify, but please give credit where  #
-# it's due. Thanks!                                  #
-#                                                    #
-# UID: root GROUP: root                              #
-#                                                    #
-######################################################
-# Errors:                                            #
-#                                                    #
-#   100 - Package manager was not found              #
-#   110 - Early exit status from script              #
-#   112 - Script requires to be run as su            #
-#   125 - Internet connection issue                  #
-#   150 - xterm or rxvt was not detected             #
-#   151 - tputs column width is less than 150        #
-#                                                    #
-######################################################
-# Change Log:                                        #
-#                                                    #
-#   1.0.1                                            #
-#      Added Change Log to file                      #
-#      Added managehost function                     #
-#      Added screen resize message to forcewidth     #
-#      Moved all variables to it's own function      #
-#      Added set and unset to variables function     #
-#                                                    #
-#   1.0.0                                            #
-#      Script comments added                         #
-#      Init script                                   #
-#                                                    #
-#   0.5.0                                            #
-#      Proof of concept                              #
-#                                                    #
-#   0.1.0                                            #
-#      Manual creation documents                     #
-#                                                    #
-######################################################
+########################################################################
+#                    Raspberry Pi 3 Web Server                         #
+#                 Script created by Jessica Brown                      #
+#                       jessica@jbrowns.com                            #
+#                                                                      #
+# DESCRIPTION: https://github.com/jessicakennedy1028/RasPi3-WebServer  #
+#                                                                      #
+# I used Geany IDE to create this script with tab stops at 4           #
+# characters.                                                          #
+#                                                                      #
+# Feel free to modify, but please give credit where it's due. Thanks!  #
+#                                                                      #
+########################################################################
+# Errors:                                                              #
+#                                                                      #
+#   100 - Package manager was not found                                #
+#   110 - Early exit status from script                                #
+#   112 - Script requires to be run as su                              #
+#   125 - Internet connection issue                                    #
+#   150 - xterm or rxvt was not detected                               #
+#   151 - tputs column width is less than 150                          #
+#                                                                      #
+########################################################################
 
 # Make sure the display gets updated when the terminal window is resized
 shopt -s checkwinsize on
@@ -129,12 +100,10 @@ variables() {
 		WHITE="\033[1;37m"
 		LIGHT_GRAY="\033[0;37m"
 		COLOR_NONE="\e[0m"
-
 		spin[0]=$LIGHT_RED"-"
 		spin[1]=$WHITE"\\"
 		spin[2]=$YELLOW"|"
 		spin[3]=$LIGHT_GREEN"/"
-
 		IP="127.0.0.1"
 		ETC_HOSTS=/etc/hosts
 		version="1.0"
