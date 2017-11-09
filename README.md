@@ -2,6 +2,8 @@
 ##          Script created by Jessica Brown
 ###               jessica@jbrowns.com
 
+[![Join the chat at https://gitter.im/RasPi3-WebServer/Lobby](https://badges.gitter.im/RasPi3-WebServer/Lobby.svg)](https://gitter.im/RasPi3-WebServer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
   DESCRIPTION:
   This script is just to help streamline the install process for Raspberry Pi 3 web and email servers. You assume all responsibility of this script and understand there is no warranties, liabilities, or guarentees on this script. This script assumes a fresh OS install.
 
