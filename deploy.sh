@@ -129,7 +129,7 @@ variables() {
 		spin[3]=$LIGHT_GREEN"/"
 		IP="127.0.0.1"
 		ETC_HOSTS=/etc/hosts
-		version="1.0"
+		version="1.0a"
 		verbose="false"
 		fqdn="$(hostname --fqdn)"
 		name=$USER
@@ -142,6 +142,9 @@ variables() {
 		steplogfile=raspconfig.dat
 		webserverdir=/mnt/media/drive0/www/
 		touch $logfile
+		DISTRO=$( lsb_release -is ) # Reports Raspbian
+		CODENAME=$( lsb_release -cs ) # Reports stretch
+		DISTVERSION=$( lsb_release -rs ) # Reports 9.1
 	elif [[ "$1" == "unset" ]]; then
 		# Free up used memory for all of the variables created by this script
 		for i in $(env | awk -F"=" '{print $1}') ; do
@@ -244,7 +247,7 @@ progress() {
 #   None
 #######################################
 steps() {
-	echo ""
+	step="$1"
     # An internal step counter and error checking
     # Create the file if it doesn't exist
     # If the file does exist, show menu which shows successful and error indicators
@@ -337,7 +340,8 @@ checkversion() {
 		exit 125
 	fi
 
-	# Check to see if this is the latest version of the script
+	# Check to see if this is the latest version of the script, notice the $version variable in the URL
+	# Download location: https://github.com/jessicakennedy1028/RasPi3-WebServer/releases/download/$version/deploy.sh
 }
 #######################################
 # setvhdebian - 
@@ -378,6 +382,33 @@ setvhdebian() {
     evallog "sudo mv ~/index.php $phfolder"
     evallog "sudo replace '/var/www/' '$webserverdir' -- /etc/apache2/apache2.conf"
     evallog "service apache2 restart"
+}
+#######################################
+# setvhcentos - 
+# Globals:
+#   
+#   
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+setvhcentos () {
+    apachefile=/etc/httpd/conf.d/$name.conf
+    {
+        echo "<VirtualHost *:80>"
+        echo "ServerAdmin webmaster@localhost"
+        echo "    <Directory $webdir/$name/public>"
+        echo "        Allow From All"
+        echo "        AllowOverride All"
+        echo "        Options +Indexes"
+        echo "   </Directory>"
+        echo "    DocumentRoot $webdir/$name/public"
+        echo "    ServerName $fqdn"
+        echo "        ErrorLog /var/log/httpd/snipeIT.error.log"
+        echo "        CustomLog /var/log/access.log combined"
+        echo "</VirtualHost>"
+    } >> "$apachefile"
 }
 #######################################
 # quitscript - If CTRL-C is pressed
@@ -478,8 +509,9 @@ variables "set"
 # really large header that I spent allot of time on to make it look pretty!
 output 'header'
 
-# Start the output to the /var/log/rasp* log file
+# Start the output to the /var/log/rasp* log file and add distro information
 log "################### INSTALLATION STARTED ON `date '+%m-%d-%Y %I:%M:%S'` ###################"
+log "#### DISTRO: $DISTRO CODENAME: $CODENAME VERSION: $VERSION ####"
 
 # Update, Auto Remove, and Upgrade System and check to see if the latest 
 # version is being used of the script since I moved everything to GitHub, 
@@ -655,6 +687,12 @@ evallog "phpenmod mbstring"
 echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating Virtual Host File "$LIGHT_RED"==="$COLOR_NONE
 log "#### CREATING VIRTUAL HOST FILE '/etc/apache2/sites-available/$fqdn.conf `date '+%m-%d-%Y %I:%M:%S'` ####"
 setvhdebian
+
+# Install other packages after web server has been established
+echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Installing additional web applications and dependencies "$LIGHT_RED"==="$COLOR_NONE
+log "#### INSTALLING Webalizer, RKHunter, phpMyAdmin, AND DEPENDANCIES `date '+%m-%d-%Y %I:%M:%S'` ####"
+evallog "$pkginstall install webalizer rkhunter phpmyadmin"
+progress
 
 # Restart APACHE2
 echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Restarting Apache "$LIGHT_RED"==="$COLOR_NONE
