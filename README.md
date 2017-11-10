@@ -1,5 +1,5 @@
 [![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/RasPi3-WebServer-Logo.png)](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer)<br />
-[![Gitter](https://badges.gitter.im/RasPi3-WebServer/Lobby.svg)](https://gitter.im/RasPi3-WebServer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)  [![HitCount](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer.svg)](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer)
+[![Gitter](https://badges.gitter.im/RasPi3-WebServer/Lobby.svg)](https://gitter.im/RasPi3-WebServer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)  [![HitCount](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer.svg)](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer)  [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
   DESCRIPTION:
   This script is just to help streamline the install process for Raspberry Pi 3 web and email servers. You assume all responsibility of this script and understand there is no warranties, liabilities, or guarentees on this script. This script assumes a fresh OS install.
