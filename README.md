@@ -1,18 +1,47 @@
 [![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/RasPi3-WebServer-Logo.png)](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer)<br />
 [![Gitter](https://badges.gitter.im/RasPi3-WebServer/Lobby.svg)](https://gitter.im/RasPi3-WebServer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)  [![HitCount](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer.svg)](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer)  [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
-  DESCRIPTION:
-  This script is just to help streamline the install process for Raspberry Pi 3 web and email servers. You assume all responsibility of this script and understand there is no warranties, liabilities, or guarentees on this script. This script assumes a fresh OS install.
+## Description
 
-  I used Geany IDE to create this script with tab stops at 4 characters.
+This script is just to help streamline the install process for Raspberry Pi 3 web and email servers. You assume all responsibility of this script and understand there is no warranties, liabilities, or guarentees on this script. This script assumes a fresh OS install.
 
-  Feel free to modify, but please give credit where it's due. Thanks!
+I used Geany IDE to create this script with tab stops at 4 characters.
+
+Feel free to modify, but please give credit where it's due. Thanks!
   
-  If you wish to see the progress and TODO's please click here: https://github.com/jessicakennedy1028/RasPi3-WebServer/projects/1
+If you wish to see the progress and TODO's please click here: https://github.com/jessicakennedy1028/RasPi3-WebServer/projects/1
 
-  UID: root GROUP: root
+## Installation
 
+1. Download or clone into your home folder
+2. chmod +x deploy.sh
+3. sudo ~/.deploy.sh
 
+## Usage
+
+Deploy script manages many mundane file changes automatically for you from questions that is given.
+
+## Contributing
+
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request :D
+
+## History
+
+TBD
+
+## Credits
+
+So far: Jessica Brown
+
+## License
+
+GPL 3.0
+
+## Other Information
   Errors:
 
     100 - Package manager was not found
