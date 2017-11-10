@@ -1,4 +1,4 @@
-![alt text](https://raw.githubusercontent.com/jessicakennedy1028//RasPi3-WebServer/master/RasPi3-WebServer-Logo.png)
+![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/RasPi3-WebServer-Logo.png)
 
 [![Build Status](https://github.com/jessicakennedy1028/RasPi3-WebServer.git?branch=master)](https://github.com/jessicakennedy1028/RasPi3-WebServer) 
 [![Gitter](https://badges.gitter.im/RasPi3-WebServer/Lobby.svg)](https://gitter.im/RasPi3-WebServer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
