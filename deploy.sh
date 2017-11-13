@@ -187,18 +187,6 @@ output() {
 		echo ""
 		# FIND WAYS TO CHECK TO SEE IF THIS IS A NEW SYSTEM, THEN GIVE THE USER TO ABORT
 	fi
-	if [ "$1" == "instructions" ]; then
-		echo -e $COLOR_NONE"  Please answer the questions below to configure your"
-		echo -e $COLOR_NONE"  web server to your specific needs. Some defaults are"
-		echo -e $COLOR_NONE"  assumed from system variables. Just press enter for"
-		echo -e $COLOR_NONE"  the default value."
-		echo ""
-		echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating Installation Log File: $logfile "$LIGHT_RED"==="$COLOR_NONE
-		echo -e $YELLOW"(you may watch the progress by running 'tail -f $logfile')"$COLOR_NONE
-	fi
-	if [ "$1" == "questions" ]; then
-		echo ""
-	fi
 }
 #######################################
 # Progress - creates a spinner for script
@@ -292,6 +280,7 @@ checkinet() {
 	*) inet="The network is down or very slow";;
     esac
 }
+
 #######################################
 # checkversion - 
 # Globals:
@@ -432,6 +421,7 @@ finish() {
 	variables "unset"
 	exit 0
 }
+
 #######################################
 # managehost - Manage hostnames
 #     to the /etc/hosts file
@@ -634,7 +624,53 @@ config() {
 			;;
 	esac
 }
+form_webserver() {
+	exec 3>&1
+	pagetitle="Raspberry Pi 3 Web Server Configuration"
+	dialogtitle="Server Settings"
+	instructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	oklabel="Submit"
+	cancellabel="Back"
+	
+	# Store data to $VALUES variable
+	VALUES=$(dialog --ok-label "${oklabel}" --cancel-label "${cancellabel}" --backtitle "${pagetitle}" --title "${dialogtitle}" --form "${instructions}" 15 70 0 \
+		"       Domain Name :"	1 1	"$fqdn"			1 22 42 0 \
+		"         User Name :"	2 1	"$user"			2 22 42 0 \
+		"Public HTML folder :"	3 1	"$webserverdir"	3 22 42 0 \
+		"             Email :"	4 1	"$email"		4 22 42 0 \
+	2>&1 1>&3)
 
+	# close fd
+	exec 3>&-
+
+	# display values just entered
+	echo "$VALUES"
+}
+form_databaseserver() {
+	exec 3>&1
+	pagetitle="Raspberry Pi 3 Web Server Configuration"
+	dialogtitle="Server Settings"
+	instructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	oklabel="Submit"
+	cancellabel="Back"
+	dialogheight="15"
+	dialogwidth="70"
+	
+	# Store data to $VALUES variable
+	VALUES=$(dialog --ok-label "${oklabel}" --cancel-label "${cancellabel}" --backtitle "${pagetitle}" --title "${dialogtitle}" --form "${instructions}" 15 70 0 \
+		"       Domain Name :"	1 1	"$fqdn"			1 22 42 0 \
+		"         User Name :"	2 1	"$user"			2 22 42 0 \
+		"Public HTML folder :"	3 1	"$webserverdir"	3 22 42 0 \
+		"             Email :"	4 1	"$email"		4 22 42 0 \
+	2>&1 1>&3)
+
+	# close fd
+	exec 3>&-
+
+	# display values just entered
+	echo "$VALUES"
+}
+		
 # Setup all the variables to be used, "unset" is called in the finish function
 variables "set"
 
@@ -853,63 +889,11 @@ if [ $inifileexists == false ]; then
 	evallog "$pkginstall update && $pkginstall upgrade" & pid=$!
 	progress
 
-	# Output the instructions to the screen
-	output 'instructions'
-
 	shopt -u nocasematch
+	form_webserver
+	form_databaseserver
 
-	echo -ne " Enter the domain name for this server ($fqdn): "
-	read -r readfqdn
-
-	if [ -z "$readfqdn" ]; then
-		readfqdn=$fqdn
-	else
-		readfqdn=$readfqdn
-	fi
-
-	log "#### SETTING FQDN TO $readfqdn `date '+%m-%d-%Y %I:%M:%S'` ####"
-	config "change_value" "fqdn" $readfqdn
-	echo -e $COLOR_NONE"     Setting host to $WHITE$readfqdn"
-	echo -e $COLOR_NONE""
-
-	echo -ne $COLOR_NONE" What is the username for your domain ($user): "
-	read -r readuser
-
-	if [ -z "$readuser" ]; then
-		readuser=$user
-	else
-		readuser=$readuser
-	fi
-	log "#### SETTING USER TO $readuser `date '+%m-%d-%Y %I:%M:%S'` ####"
-	config "change_value" "user" $readuser
-	echo -e $COLOR_NONE"     User is set to $WHITE$readuser"
-	echo -e $COLOR_NONE""
-
-	echo -ne $COLOR_NONE" Default public_html folder ($webserverdir): "
-	read -r readwebserverdir
-
-	if [ -z "$readwebserverdir" ]; then
-		readwebserverdir=$webserverdir
-	else
-		readwebserverdir=$readwebserverdir
-	fi
-	log "#### SETTING DEFAULT WEB FOLDER TO $readwevserverdir `date '+%m-%d-%Y %I:%M:%S'` ####"
-	config "change_value" "webserverdir" $readwebserverdir
-	echo -e $COLOR_NONE"     Public HTML folder is set to $WHITE$readwebserverdir"
-	echo -e $COLOR_NONE""
-
-	echo -ne $COLOR_NONE" Working Email address ($email): "
-	read -r reademail
-
-	if [ -z "$reademail" ]; then
-		reademail=$email
-	else
-		reademail=$reademail
-	fi
-	log "#### SETTING EMAIL ADDRESS TO $reademail `date '+%m-%d-%Y %I:%M:%S'` ####"
-	config "change_value" "email" $reademail
-	echo -e $COLOR_NONE"     User email is set to $WHITE$reademail"
-	echo -e $COLOR_NONE""
+	exit 0
 
 	log "#### ARE WE MOUNTING AN EXTERNAL DRIVE ####"
 	if [ "$usbdrv" == "true" ]; then
@@ -1058,8 +1042,32 @@ if [ $inifileexists == false ]; then
 	evallog "service apache2 restart"
 else
 	if haveProg dialog; then
-		# Dialog was found, start it and make the menu system
-		dialog --title "Dialog message box" --msgbox "\n Start Menu System Here" 6 25
+		HEIGHT=15
+		WIDTH=40
+		CHOICE_HEIGHT=4
+		BACKTITLE="Raspberry Pi 3 Web Server Auto Configuration"
+		TITLE="Options Menu"
+		MENU="Choose one of the following options:"
+		OPTIONS=(1 "Web Server Configuration" 2 "Email Configuration" 3 "Database Configuration" 4 "Drive Configuration")
+		CHOICE=$(dialog --clear --backtitle "$BACKTITLE" --title "$TITLE" --menu "$MENU" $HEIGHT $WIDTH $CHOICE_HEIGHT "${OPTIONS[@]}" 2>&1 >/dev/tty)
+		clear
+		case $CHOICE in
+			1)
+				form_webserver
+				;;
+			2)
+				echo "You chose Option 2"
+				;;
+			3)
+				echo "You chose Option 3"
+				;;
+			4)
+				echo "You chose Option 4"
+				;;
+			255)
+				echo "ESC pressed"
+				;;
+		esac
 	else
 		# Config file exists, so let' now just show the menu since the questions were already answered
 		log "#### INI file already exists, just show the menu `date '+%m-%d-%Y %I:%M:%S'` ####"
