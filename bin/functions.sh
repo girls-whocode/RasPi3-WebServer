@@ -15,7 +15,6 @@
 # Set mode for script [development, production]
 environment="production"
 
-########################################################################
 # variables- Defines default variables                                 #
 # Globals:                                                             #
 #                                                                      #
@@ -23,7 +22,6 @@ environment="production"
 #   "set" "unset"                                                      #
 # Returns:                                                             #
 #   None                                                               #
-########################################################################
 variables() {
 	if [[ "$1" == "set" ]]; then
 		# define and set the ANSI colors
@@ -101,7 +99,6 @@ variables() {
 	fi
 }
 
-########################################################################
 # trap_with_arg- Capture exit signal and send value                    #
 # Globals:                                                             #
 #                                                                      #
@@ -109,7 +106,6 @@ variables() {
 #   None                                                               #
 # Returns:                                                             #
 #   Signal code of exit status                                         #
-########################################################################
 trap_with_arg() {
     func="$1" ; shift
     for sig ; do
@@ -117,7 +113,6 @@ trap_with_arg() {
     done
 }
 
-########################################################################
 # evallog- Execute and send argument to the log file                   #
 # Globals:                                                             #
 #                                                                      #
@@ -125,7 +120,6 @@ trap_with_arg() {
 #   Value to execute and record to log file                            #
 # Returns:                                                             #
 #   If verbose is true, return the argument to the screen              #
-########################################################################
 evallog() {
     if [ "$verbose" = true ]; then
         eval "$@"
@@ -134,7 +128,6 @@ evallog() {
     fi
 }
 
-########################################################################
 # log- Send argument to the log file                                   #
 # Globals:                                                             #
 #                                                                      #
@@ -142,7 +135,6 @@ evallog() {
 #   Value to record to log file                                        #
 # Returns:                                                             #
 #   None                                                               #
-########################################################################
 log() {
 	if [ "$verbose" = true ]; then
 		echo "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
@@ -151,7 +143,6 @@ log() {
 	fi
 }
 
-########################################################################
 # haveprog- Function to test if program is already installed on system #
 # Globals:                                                             #
 #                                                                      #
@@ -159,12 +150,10 @@ log() {
 #   program name                                                       #
 # Returns:                                                             #
 #   true or false                                                      #
-########################################################################
 haveprog() {
     [ -x "$(which $1)" ]
 }
 
-########################################################################
 # isalpha- Tests whether *entire string* is alphabetic.                #
 # Globals:                                                             #
 #                                                                      #
@@ -172,7 +161,6 @@ haveprog() {
 #   string to process                                                  #
 # Returns:                                                             #
 #   true or false                                                      #
-########################################################################
 isalpha () {
 	[ $# -eq 1 ] || return $FAILURE
 
@@ -186,7 +174,6 @@ isalpha () {
 		esac
 }
 
-########################################################################
 # tolower- Converts string(s) passed as argument(s) to lowercase       #
 # Globals:                                                             #
 #                                                                      #
@@ -194,7 +181,6 @@ isalpha () {
 #   string to process                                                  #
 # Returns:                                                             #
 #   string in all lowercase                                            #
-########################################################################
 tolower () {
 	if [ -z "$1" ]; then
 		echo "(null)"
@@ -206,7 +192,6 @@ tolower () {
 	return
 }
 
-########################################################################
 # checkinet- Checks for internet connection                            #
 # Globals:                                                             #
 #                                                                      #
@@ -214,7 +199,6 @@ tolower () {
 #   None                                                               #
 # Returns:                                                             #
 #   true or false                                                      #
-########################################################################
 checkinet() {
     case "$(curl -s --max-time 2 -I http://google.com | sed 's/^[^ ]*  *\([0-9]\).*/\1/; 1q')" in
 	[23]) 
@@ -232,7 +216,6 @@ checkinet() {
     esac
 }
 
-########################################################################
 # checkversion- Checks for the latest version of this script           #
 # Globals:                                                             #
 #                                                                      #
@@ -240,7 +223,6 @@ checkinet() {
 #   None                                                               #
 # Returns:                                                             #
 #   If new version is found, download and re-run                       #
-########################################################################
 checkversion() {
 	# Check for Internet Connection
 	if checkinet; then
@@ -256,7 +238,6 @@ checkversion() {
 	# Download location: https://github.com/jessicakennedy1028/RasPi3-WebServer/releases/download/$version/deploy.sh
 }
 
-########################################################################
 # progress- Creates a spinner effeect for processing the script        #
 # Globals:                                                             #
 #                                                                      #
@@ -264,7 +245,6 @@ checkversion() {
 #   None                                                               #
 # Returns:                                                             #
 #   None                                                               #
-########################################################################
 progress() {
     echo -n " "
     tput civis
@@ -279,7 +259,6 @@ progress() {
     tput cnorm
 }
 
-########################################################################
 # quitscript- Finalize script on all types of exit                     #
 # Globals:                                                             #
 #                                                                      #
@@ -287,7 +266,6 @@ progress() {
 #   "abort" "complete"                                                 #
 # Returns:                                                             #
 #   None                                                               #
-########################################################################
 quitscript() {
 	tput cnorm
 	log "quit signal: $1"
@@ -373,7 +351,6 @@ quitscript() {
 	esac
 }
 
-########################################################################
 # managehost- Modify the /etc/hosts file automagically                 #
 # Globals:                                                             #
 #                                                                      #
@@ -381,7 +358,6 @@ quitscript() {
 #   "remove" "add" "find"                                              #
 # Returns:                                                             #
 #   None                                                               #
-########################################################################
 managehost() {
 	OPTION=$1
 	HOSTNAME=$2
@@ -422,7 +398,6 @@ managehost() {
 	fi
 }
 
-########################################################################
 # managehost- Modify the /etc/hosts file automagically                 #
 # Globals:                                                             #
 #                                                                      #
@@ -431,7 +406,6 @@ managehost() {
 #   "remove_value" "sanitize_value" "verify_write" "write_value"       #
 # Returns:                                                             #
 #   None                                                               #
-########################################################################
 config() {
 	option=$1
 	option_mode=ini
@@ -782,25 +756,32 @@ checkcfg() {
 	# Option number 1
 	# Default the fail test to false
 	opt1menufailtest="false"
+	faileditems1=""
 	
 	if [ $(config "read_value" "fqdn") == "false" ] || [ $(config "read_value" "fqdn") == "null" ]; then
 		log "tested fqdn returned "$fqdn
 		# Activate the fail test since fqdn was false or null
 		opt1menufailtest="true"
+		faileditems1="$faileditems1 \Zb\Z1Domain Name\Zn - Is not read from the configuration file\n"
 		opt1menuitem="\Zb\Z1*\Zn"
+		domainchk="\Zb\Z1*\Zn"
 	else
 		# Test if FQDN really works
 		whois "$fqdn" | egrep -q '^No match|^NOT FOUND|^Not fo|AVAILABLE|^No Data Fou|has not been regi|No entri'
 		if [ $? -eq 0 ]; then
 			# The whois test came back with NOT FOUND
 			opt1menufailtest="true"
+			faileditems1="$faileditems1 \Zb\Z1Domain Name\Zn - Can not be resolved\n"
 			opt1menuitem="\Zb\Z1*\Zn"
+			domainchk="\Zb\Z1*\Zn"
 		else
 			if [ $opt1menufailtest != "true" ]; then
 				opt1menuitem="\Zb\Z1*\Zn"
+				domainchk="\Zb\Z1*\Zn"
 			else
 				opt1menufailtest="false"
 				opt1menuitem="\Zb\Z2*\Zn"
+				domainchk="\Zb\Z2*\Zn"
 			fi
 		fi
 	fi
@@ -821,6 +802,7 @@ checkcfg() {
 		opt1menufailtest="true"
 		opt1menuitem="\Zb\Z1*\Zn"
 	else
+		# Detecting the Apache web root folder may deem more difficult then anticipated, we also have to consider nGinX
 		if [ $opt1menufailtest != "true" ]; then
 			opt1menufailtest="false"
 			opt1menuitem="\Zb\Z2*\Zn"
@@ -828,14 +810,25 @@ checkcfg() {
 	fi
 	if [ $(config "read_value" "email") == "false" ] || [ $(config "read_value" "email") == "null" ] || [ $(config "read_value" "email") == "noone@nowhere.com" ]; then
 		log "tested email returned "config "read_value" "email"
+		faileditems1="$faileditems1 \Zb\Z1Email\Zn - Is not read from the configuration file\n"
 		# Activate the fail test since email was false or null or invalid
 		# Next we will actually do a test on the email to make sure the email is valid
+		
 		opt1menufailtest="true"
 		opt1menuitem="\Zb\Z1*\Zn"
 	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menufailtest="false"
-			opt1menuitem="\Zb\Z2*\Zn"
+		echo "$email" | egrep -q "^([A-Za-z]+[A-Za-z0-9]*((\.|\-|\_)?[A-Za-z]+[A-Za-z0-9]*){1,})@(([A-Za-z]+[A-Za-z0-9]*)+((\.|\-|\_)?([A-Za-z]+[A-Za-z0-9]*)+){1,})+\.([A-Za-z]{2,})+"
+		if [ $? -eq 0 ]; then
+			# Email regex check passed
+			if [ $opt1menufailtest != "true" ]; then
+				opt1menufailtest="false"
+				opt1menuitem="\Zb\Z2*\Zn"
+			fi
+		else
+			# Email regex check failed
+			faileditems1="$faileditems1 \Zb\Z1Email\Zn - Is not valid\n"
+			opt1menufailtest="true"
+			opt1menuitem="\Zb\Z1*\Zn"
 		fi
 	fi
 	if [ $(config "read_value" "ownergroup") == "false" ] || [ $(config "read_value" "ownergroup") == "null" ]; then
@@ -906,7 +899,10 @@ checkcfg() {
 
 webserverform() {
 	dialogtitle="Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from the system configuration."
+	if [ $opt1menufailtest == "true" ]; then
+		dialoginstructions="$dialoginstructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
+	fi
 	log "${dialogtitle} Dialog Form called"
 	returncode=0
 
@@ -919,13 +915,13 @@ webserverform() {
 		exec 3>&1
 	
 		# Store data to $VALUES variable
-		VALUES=$(dialog --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --form "$dialoginstructions" 15 70 0 \
-			"       Domain Name :"	1 1	"$fqdn"			1 22 42 0 \
-			"         User Name :"	2 1	"$user"			2 22 42 0 \
-			"Public HTML folder :"	3 1	"$webserverdir"	3 22 42 0 \
-			"             Email :"	4 1	"$email"		4 22 42 0 \
-			"    File ownership :"  5 1 "$ownergroup"	5 22 42 0 \
-			"                IP :"	6 1	"$IP"			6 22 42 0 \
+		VALUES=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --form "$dialoginstructions" 20 55 0 \
+			"       Domain Name :"	1 1	"$fqdn"			1 22 27 0 \
+			"         User Name :"	2 1	"$user"			2 22 27 0 \
+			"Public HTML folder :"	3 1	"$webserverdir"	3 22 27 0 \
+			"             Email :"	4 1	"$email"		4 22 27 0 \
+			"    File ownership :"  5 1 "$ownergroup"	5 22 27 0 \
+			"                IP :"	6 1	"$IP"			6 22 27 0 \
 		2>&1 1>&3)
 		
 		returncode=$?
@@ -1005,13 +1001,11 @@ installedappsform() {
 
 servertypeform() {
 	ServerTypeMenuOptions=(1 "\Zn[${opt11menuitem}] Web Server" 2 "\Zn[${opt12menuitem}] Database Server" 3 "\Zn[${opt13menuitem}] Application Server" 4 "\Zn[${opt14menuitem}] File Server" 5 "\Zn[${opt15menuitem}] Email Server" 6 "\Zn[${opt16menuitem}] Message Server" 7 "\Zn[${opt17menuitem}] Proxy Server")
-	WebChoices=(1 "Apache on" 2 "nGinX off")
-	DatabaseChoices=(1 "MySQL off" 2 "MariaDB on" 3 "PostSQL")
-	ApplicationChoices=(1 "PHP on" 2 "Java on" 3 "Tomcat off" 4 "Open Source Application off" 5 "Mobile Application off")
-	FileChoices=(1 "FTP on" 2 "NFS on" 3 "SMB off" 4 "NAS off")
-	EmailChoices=(1 "Postfix on" 2 "Citadel off" 3 "Sendmail off" 4 "Exim off" 5 "Courier off")
-
-
+	WebChoices=(1 "Apache" "on" 2 "nGinX" "off" 3 "LightSpeed Web Server" "off")
+	DatabaseChoices=(1 "MySQL" "off" 2 "MariaDB" "on" 3 "PostSQL" "off")
+	ApplicationChoices=(1 "PHP" "on" 2 "Java" "on" 3 "Tomcat" "off" 4 "Open Source Application" "off" 5 "Mobile Application" "off")
+	FileChoices=(1 "FTP" "on" 2 "NFS" "on" 3 "SMB" "off" 4 "NAS" "off")
+	EmailChoices=(1 "Postfix" "on" 2 "Citadel" "off" 3 "Sendmail" "off" 4 "Exim" "off" 5 "Courier" "off")
 }
 
 systeminfodialog() {
