@@ -12,6 +12,8 @@
 # Feel free to modify, but please give credit where it's due. Thanks!  #
 #                                                                      #
 ########################################################################
+# Set mode for script [development, production]
+environment="production"
 
 ########################################################################
 # variables- Defines default variables                                 #
@@ -43,6 +45,8 @@ variables() {
 		LIGHTCYAN="\033[1;36m"
 		WHITE="\033[1;37m"
 
+		DIALOGRC=./.dialogrc
+
 		# Since this script was ran with sudo, it will always return root,
 		# this method will look for the normal privileged user first, if it
 		# does exists or is blank, then default to the current user which is
@@ -54,7 +58,10 @@ variables() {
 
 		# Define paths and files
 		hosts="/etc/hosts"
-		logfile=/var/log/raspy3-install.log #_`date +'%m-%d-%Y_%H%M%S'`.log
+		logfolder="/var/log/"
+		
+		[[ $environment = 'development' ]] && logfile="${logfolder}"raspy3-install.log || logfile="${logfolder}"raspy3-install_`date +'%m-%d-%Y_%H%M%S'`.log
+		
 		if [ -f $logfile ]; then
 			sudo rm $logfile
 		fi
@@ -62,7 +69,8 @@ variables() {
 
 		# Set program specific values
 		version="2.0.0a"
-		verbose=false
+		
+		[[ $environment = 'development' ]] && verbose=true || verbose=false
 
 		# Input error in dialog box.
 		E_INPUT=65
@@ -136,7 +144,11 @@ evallog() {
 #   None                                                               #
 ########################################################################
 log() {
-	echo "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
+	if [ "$verbose" = true ]; then
+		echo "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
+	else
+		echo "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
+	fi
 }
 
 ########################################################################
@@ -278,7 +290,7 @@ progress() {
 ########################################################################
 quitscript() {
 	tput cnorm
-	echo "quit signal: $1"
+	log "quit signal: $1"
 
 	case "$1" in
 		"HUP")
@@ -313,6 +325,12 @@ quitscript() {
 			echo "`date '+%m-%d-%Y [%I:%M:%S]'` | Script ended ###############################################################" |& tee -a $logfile >/dev/null 2>&1
 			variables "unset"
 			exit 113
+			;;
+		"EXIT")
+			# Standard Exit from script
+			echo "`date '+%m-%d-%Y [%I:%M:%S]'` | [113] - Script quit script was performed, attempting cleanup" |& tee -a $logfile >/dev/null 2>&1
+			echo "`date '+%m-%d-%Y [%I:%M:%S]'` | Script ended ###############################################################" |& tee -a $logfile >/dev/null 2>&1
+			variables "unset"
 			;;
 		"ILL")
 			# When Illegal instruction is sent
@@ -556,7 +574,7 @@ config() {
 	esac
 }
 
-readcfg() {
+loadcfg() {
 	if [[ -f $configfile ]]; then
 		# The configuration file exists, now let test to make sure the parameter exists
 		# Had to make a decision here, if the config file exists and there are missing
@@ -710,7 +728,7 @@ readcfg() {
 		ownergroup="www-data:www-data"
 		tzone="$(cat /etc/timezone)"
 		webserverdir="/var/www/"
-		email="noone@nowhere.com"
+		email=""
 		usbdrv="false"
 		mountpoint="false"
 
@@ -751,44 +769,195 @@ readcfg() {
 	fi
 }
 
-dialogform() {
-	log "Dialog Form called"
+display_result() {
+	dialog --title "$1" \
+	--no-collapse \
+	--msgbox "$result" 0 0
 }
 
-dialogmenu() {
-	log "Dialog Menu called"
-	HEIGHT=15
-	WIDTH=40
-	CHOICE_HEIGHT=4
-	BACKTITLE="Raspberry Pi 3 Web Server Auto Configuration"
-	TITLE="Options Menu"
-	MENU="Choose one of the following options:"
-	OPTIONS=(1 "Web Server Configuration" 2 "Email Configuration" 3 "Database Configuration" 4 "Drive Configuration")
-	CHOICE=$(dialog --clear --nocancel --nook --backtitle "$BACKTITLE" --title "$TITLE" --menu "$MENU" $HEIGHT $WIDTH $CHOICE_HEIGHT "${OPTIONS[@]}" 2>&1 >/dev/tty)
-	clear
-	case $CHOICE in
-		1)
-			form_webserver
-			;;
-		2)
-			echo "You chose Option 2"
-			;;
-		3)
-			echo "You chose Option 3"
-			;;
-		4)
-			echo "You chose Option 4"
-			;;
-		255)
-			echo "ESC pressed"
-			;;
-	esac
+webserverform() {
+	webservertitle="Server Settings"
+	webserverinstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	log "${title} Dialog Form called"
+	returncode=0
+
+	while test $returncode != 1 && test $returncode != 250
+	do
+		# Reassigning the variables from the config file because they are cleared if ESC is pressed
+		if [ $(config "read_value" "fqdn") != "false" ] || [ $(config "read_value" "fqdn") != "null" ]; then
+			fqdn="$(config "read_value" "fqdn")"
+		fi
+		if [ $(config "read_value" "user") != "false" ] || [ $(config "read_value" "user") != "null" ]; then
+			user="$(config "read_value" "user")"
+		fi
+		if [ $(config "read_value" "webserverdir") != "false" ] || [ $(config "read_value" "webserverdir") != "null" ]; then
+			webserverdir="$(config "read_value" "webserverdir")"
+		fi
+		if [ $(config "read_value" "email") != "false" ] || [ $(config "read_value" "email") != "null" ]; then
+			email="$(config "read_value" "email")"
+		fi
+		if [ $(config "read_value" "ownergroup") != "false" ] || [ $(config "read_value" "ownergroup") != "null" ]; then
+			ownergroup="$(config "read_value" "ownergroup")"
+		fi
+		if [ $(config "read_value" "ip") != "false" ] || [ $(config "read_value" "ip") != "null" ]; then
+			IP="$(config "read_value" "ip")"
+		fi
+
+		exec 3>&1
+	
+		# Store data to $VALUES variable
+		VALUES=$(dialog --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$webservertitle" --form "$webserverinstructions" 15 70 0 \
+			"       Domain Name :"	1 1	"$fqdn"			1 22 42 0 \
+			"         User Name :"	2 1	"$user"			2 22 42 0 \
+			"Public HTML folder :"	3 1	"$webserverdir"	3 22 42 0 \
+			"             Email :"	4 1	"$email"		4 22 42 0 \
+			"    File ownership :"  5 1 "$ownergroup"	5 22 42 0 \
+			"                IP :"	6 1	"$IP"			6 22 42 0 \
+		2>&1 1>&3)
+		
+		returncode=$?
+		exec 3>&-
+
+		# Assign the variables to an array
+		webservervars=($VALUES)
+		show=`echo "$VALUES" |sed -e 's/^/ /'`
+
+		case $returncode in
+			1|255) # If back or ESC was pressed
+				dialog --clear --backtitle "$SCREENTITLE" --yesno "Really quit?" 10 30
+				case $? in
+					0) # If submit or <ENTER> was pressed
+						# Yes was pressed
+						break
+						;;
+					1)
+						# No was pressed, so return back to the form
+						returncode=99
+						;;
+				esac
+				;;
+			0) # If submit or <ENTER> was pressed
+				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
+				case $? in
+					0)
+						# Check that all fields are filled before writing record, or give an error message
+						# Create the record string from $value, deleting the last #
+						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
+
+						# Count the number of fields
+						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
+
+						if [ $NUMFLDS -lt 6 ]; then
+							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
+							case $? in
+								0)
+									return
+									;;
+								255)
+									return
+									;;
+							esac
+						else
+							config "write_value" "fqdn" "${webservervars[0]}"
+							config "write_value" "user" "${webservervars[1]}"
+							config "write_value" "webserverdir" "${webservervars[2]}"
+							config "write_value" "email" "${webservervars[3]}"
+							config "write_value" "ownergroup" "${webservervars[4]}"
+							config "write_value" "ip" "${webservervars[5]}"
+						fi
+						return
+						;;
+					1)
+						return
+						;;
+					255)
+						return
+						;;
+				esac
+				;;
+		esac
+	done
 }
 
-dialogmsg() {
-	log "Dialog Message Box called"
+checkcfg() {
+	# Option number 1
+	# Default the fail test to false
+	opt1menufailtest="false"
+	
+	if [ $(config "read_value" "fqdn") == "false" ] || [ $(config "read_value" "fqdn") == "null" ]; then
+		log "tested fqdn returned "$fqdn
+		# Activate the fail test since fqdn was false or null
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "user") == "false" ] || [ $(config "read_value" "user") == "null" ]; then
+		log "tested user returned "config "read_value" "user"
+		# Activate the fail test since user was false or null
+		# Next we need to create the user and set a password
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "webserverdir") == "false" ] || [ $(config "read_value" "webserverdir") == "null" ]; then
+		log "tested webserverdir returned "config "read_value" "webserverdir"
+		# Activate the fail test since webserverdir was false or null
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "email") == "false" ] || [ $(config "read_value" "email") == "null" ] || [ $(config "read_value" "email") == "noone@nowhere.com" ]; then
+		log "tested email returned "config "read_value" "email"
+		# Activate the fail test since email was false or null or invalid
+		# Next we will actually do a test on the email to make sure the email is valid
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "ownergroup") == "false" ] || [ $(config "read_value" "ownergroup") == "null" ]; then
+		log "tested ownergroup returned "config "read_value" "ownergroup"
+		# Activate the fail test since ownergroup was false or null
+		# Add the user to the ownergroup
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "ip") == "false" ] && [ $(config "read_value" "ip") == "null" ]; then
+		log "tested ip returned "config "read_value" "ip"
+		# Activate the fail test since ip was false or null
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+
+	# Option number 6
+	programs="apache2 php certbot postfix dovecot telnet"
+	for i in $programs; do
+		if haveprog $i; then
+			log "tested $i exist"
+			opt6menuitem="\Zb\Z2*\Zn"
+		else
+			log "tested $i doesn't exist"
+			opt6menuitem="\Zb\Z1*\Zn"
+		fi
+	done
 }
 
-dialogradio() {
-	log "Dialog Radio Called"
-}
