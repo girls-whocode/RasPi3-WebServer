@@ -574,6 +574,7 @@ config() {
 	esac
 }
 
+
 loadcfg() {
 	if [[ -f $configfile ]]; then
 		# The configuration file exists, now let test to make sure the parameter exists
@@ -585,6 +586,13 @@ loadcfg() {
 		inifileexists=true
 		log "$configfile exist"
 
+		if [ $(config "read_value" "servetype") == 'false' ]; then
+			SERVETYPE=$(config "read_value" "servetype")
+			log "DISTRO parameter does not exist - set to default value"
+			config "write_value" "servetype" "none"
+		else
+			SERVETYPE=$(config "read_value" "servetype")
+		fi
 		if [ $(config "read_value" "distro") == 'false' ]; then
 			DISTRO=$( lsb_release -is )
 			log "DISTRO parameter does not exist - set to default value"
@@ -769,44 +777,149 @@ loadcfg() {
 	fi
 }
 
-display_result() {
-	dialog --title "$1" \
-	--no-collapse \
-	--msgbox "$result" 0 0
+
+checkcfg() {
+	# Option number 1
+	# Default the fail test to false
+	opt1menufailtest="false"
+	
+	if [ $(config "read_value" "fqdn") == "false" ] || [ $(config "read_value" "fqdn") == "null" ]; then
+		log "tested fqdn returned "$fqdn
+		# Activate the fail test since fqdn was false or null
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		# Test if FQDN really works
+		whois "$fqdn" | egrep -q '^No match|^NOT FOUND|^Not fo|AVAILABLE|^No Data Fou|has not been regi|No entri'
+		if [ $? -eq 0 ]; then
+			# The whois test came back with NOT FOUND
+			opt1menufailtest="true"
+			opt1menuitem="\Zb\Z1*\Zn"
+		else
+			if [ $opt1menufailtest != "true" ]; then
+				opt1menuitem="\Zb\Z1*\Zn"
+			else
+				opt1menufailtest="false"
+				opt1menuitem="\Zb\Z2*\Zn"
+			fi
+		fi
+	fi
+	if [ $(config "read_value" "user") == "false" ] || [ $(config "read_value" "user") == "null" ]; then
+		log "tested user returned "config "read_value" "user"
+		# Activate the fail test since user was false or null
+		# Next we need to create the user and set a password
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "webserverdir") == "false" ] || [ $(config "read_value" "webserverdir") == "null" ]; then
+		log "tested webserverdir returned "config "read_value" "webserverdir"
+		# Activate the fail test since webserverdir was false or null
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menufailtest="false"
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "email") == "false" ] || [ $(config "read_value" "email") == "null" ] || [ $(config "read_value" "email") == "noone@nowhere.com" ]; then
+		log "tested email returned "config "read_value" "email"
+		# Activate the fail test since email was false or null or invalid
+		# Next we will actually do a test on the email to make sure the email is valid
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menufailtest="false"
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "ownergroup") == "false" ] || [ $(config "read_value" "ownergroup") == "null" ]; then
+		log "tested ownergroup returned "config "read_value" "ownergroup"
+		# Activate the fail test since ownergroup was false or null
+		# Add the user to the ownergroup
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menufailtest="false"
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+	if [ $(config "read_value" "ip") == "false" ] && [ $(config "read_value" "ip") == "null" ]; then
+		log "tested ip returned "config "read_value" "ip"
+		# Activate the fail test since ip was false or null
+		opt1menufailtest="true"
+		opt1menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt1menufailtest != "true" ]; then
+			opt1menufailtest="false"
+			opt1menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+
+	# Option number 2
+	opt2menuitem="\Zb\Z1*\Zn"
+	
+	# Option number 3
+	opt3menuitem="\Zb\Z1*\Zn"
+
+	# Option number 4
+	opt4menuitem="\Zb\Z1*\Zn"
+
+	# Option number 5
+	opt5menuitem="\Zb\Z1*\Zn"
+	programs="apache2 php certbot postfix dovecot telnet"
+	for i in $programs; do
+		if haveprog $i; then
+			log "tested $i exist"
+			opt5menufailtest="false"
+			opt5menuitem="\Zb\Z2*\Zn"
+		else
+			log "tested $i doesn't exist"
+			opt5menuitem="\Zb\Z1*\Zn"
+		fi
+	done
+	
+	# Option number 6
+	opt6menuitem="\Zb\Z1*\Zn"
+	if [ $(config "read_value" "servetype") == "false" ] || [ $(config "read_value" "servetype") == "null" ] || [ $(config "read_value" "servetype") == "none" ]; then
+		log "tested servetype returned "config "read_value" "servetype"
+		# Activate the fail test since servetype was false or null or none
+		opt6menufailtest="true"
+		opt6menuitem="\Zb\Z1*\Zn"
+	else
+		if [ $opt6menufailtest != "true" ]; then
+			opt6menufailtest="false"
+			opt6menuitem="\Zb\Z2*\Zn"
+		fi
+	fi
+
+	# Option number 7
+	opt7menuitem="\Zb\Z1*\Zn"
 }
 
+
 webserverform() {
-	webservertitle="Server Settings"
-	webserverinstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${title} Dialog Form called"
+	dialogtitle="Server Settings"
+	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	log "${dialogtitle} Dialog Form called"
 	returncode=0
 
-	while test $returncode != 1 && test $returncode != 250
-	do
-		# Reassigning the variables from the config file because they are cleared if ESC is pressed
-		if [ $(config "read_value" "fqdn") != "false" ] || [ $(config "read_value" "fqdn") != "null" ]; then
-			fqdn="$(config "read_value" "fqdn")"
-		fi
-		if [ $(config "read_value" "user") != "false" ] || [ $(config "read_value" "user") != "null" ]; then
-			user="$(config "read_value" "user")"
-		fi
-		if [ $(config "read_value" "webserverdir") != "false" ] || [ $(config "read_value" "webserverdir") != "null" ]; then
-			webserverdir="$(config "read_value" "webserverdir")"
-		fi
-		if [ $(config "read_value" "email") != "false" ] || [ $(config "read_value" "email") != "null" ]; then
-			email="$(config "read_value" "email")"
-		fi
-		if [ $(config "read_value" "ownergroup") != "false" ] || [ $(config "read_value" "ownergroup") != "null" ]; then
-			ownergroup="$(config "read_value" "ownergroup")"
-		fi
-		if [ $(config "read_value" "ip") != "false" ] || [ $(config "read_value" "ip") != "null" ]; then
-			IP="$(config "read_value" "ip")"
-		fi
-
+	while test $returncode != 1 && test $returncode != 250; do
+		# Place the loadcfg and checkcfg here so it is rechecked on each menu load
+		loadcfg
+		checkcfg
+	
+		# Redirect stream 3 to the stream 1 (STDOUT)
 		exec 3>&1
 	
 		# Store data to $VALUES variable
-		VALUES=$(dialog --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$webservertitle" --form "$webserverinstructions" 15 70 0 \
+		VALUES=$(dialog --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --form "$dialoginstructions" 15 70 0 \
 			"       Domain Name :"	1 1	"$fqdn"			1 22 42 0 \
 			"         User Name :"	2 1	"$user"			2 22 42 0 \
 			"Public HTML folder :"	3 1	"$webserverdir"	3 22 42 0 \
@@ -816,6 +929,8 @@ webserverform() {
 		2>&1 1>&3)
 		
 		returncode=$?
+		
+		# Close the stream
 		exec 3>&-
 
 		# Assign the variables to an array
@@ -824,10 +939,10 @@ webserverform() {
 
 		case $returncode in
 			1|255) # If back or ESC was pressed
-				dialog --clear --backtitle "$SCREENTITLE" --yesno "Really quit?" 10 30
+				dialog --clear --backtitle "$SCREENTITLE" --yesno "Return to Main Menu?" 10 30
 				case $? in
-					0) # If submit or <ENTER> was pressed
-						# Yes was pressed
+					0)
+						# If Yes was pressed
 						break
 						;;
 					1)
@@ -879,85 +994,30 @@ webserverform() {
 	done
 }
 
-checkcfg() {
-	# Option number 1
-	# Default the fail test to false
-	opt1menufailtest="false"
-	
-	if [ $(config "read_value" "fqdn") == "false" ] || [ $(config "read_value" "fqdn") == "null" ]; then
-		log "tested fqdn returned "$fqdn
-		# Activate the fail test since fqdn was false or null
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
-	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
-	fi
-	if [ $(config "read_value" "user") == "false" ] || [ $(config "read_value" "user") == "null" ]; then
-		log "tested user returned "config "read_value" "user"
-		# Activate the fail test since user was false or null
-		# Next we need to create the user and set a password
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
-	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
-	fi
-	if [ $(config "read_value" "webserverdir") == "false" ] || [ $(config "read_value" "webserverdir") == "null" ]; then
-		log "tested webserverdir returned "config "read_value" "webserverdir"
-		# Activate the fail test since webserverdir was false or null
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
-	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
-	fi
-	if [ $(config "read_value" "email") == "false" ] || [ $(config "read_value" "email") == "null" ] || [ $(config "read_value" "email") == "noone@nowhere.com" ]; then
-		log "tested email returned "config "read_value" "email"
-		# Activate the fail test since email was false or null or invalid
-		# Next we will actually do a test on the email to make sure the email is valid
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
-	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
-	fi
-	if [ $(config "read_value" "ownergroup") == "false" ] || [ $(config "read_value" "ownergroup") == "null" ]; then
-		log "tested ownergroup returned "config "read_value" "ownergroup"
-		# Activate the fail test since ownergroup was false or null
-		# Add the user to the ownergroup
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
-	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
-	fi
-	if [ $(config "read_value" "ip") == "false" ] && [ $(config "read_value" "ip") == "null" ]; then
-		log "tested ip returned "config "read_value" "ip"
-		# Activate the fail test since ip was false or null
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
-	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
-	fi
 
-	# Option number 6
-	programs="apache2 php certbot postfix dovecot telnet"
-	for i in $programs; do
-		if haveprog $i; then
-			log "tested $i exist"
-			opt6menuitem="\Zb\Z2*\Zn"
-		else
-			log "tested $i doesn't exist"
-			opt6menuitem="\Zb\Z1*\Zn"
-		fi
-	done
+installedappsform() {
+	dialogtitle="Installed Applications"
+	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	log "${dialogtitle} Dialog Form called"
+	returncode=0
+}
+
+
+servertypeform() {
+	ServerTypeMenuOptions=(1 "\Zn[${opt11menuitem}] Web Server" 2 "\Zn[${opt12menuitem}] Database Server" 3 "\Zn[${opt13menuitem}] Application Server" 4 "\Zn[${opt14menuitem}] File Server" 5 "\Zn[${opt15menuitem}] Email Server" 6 "\Zn[${opt16menuitem}] Message Server" 7 "\Zn[${opt17menuitem}] Proxy Server")
+	WebChoices=(1 "Apache on" 2 "nGinX off")
+	DatabaseChoices=(1 "MySQL off" 2 "MariaDB on" 3 "PostSQL")
+	ApplicationChoices=(1 "PHP on" 2 "Java on" 3 "Tomcat off" 4 "Open Source Application off" 5 "Mobile Application off")
+	FileChoices=(1 "FTP on" 2 "NFS on" 3 "SMB off" 4 "NAS off")
+	EmailChoices=(1 "Postfix on" 2 "Citadel off" 3 "Sendmail off" 4 "Exim off" 5 "Courier off")
+
+
+}
+
+systeminfodialog() {
+	result=$(df -h)
+	dialog --title "Disk Information" \
+	--no-collapse \
+	--msgbox "$result" 0 0
 }
 

@@ -72,6 +72,7 @@ log "Script started ############################################################
 log "Start installation script"
 
 loadcfg
+checkcfg
 
 if haveprog dialog; then
 	log "Dialog is already installed"
@@ -84,23 +85,31 @@ else
 	progress
 fi
 
+if haveprog whois; then
+	log "Whois is already installed"
+else
+	echo -e $LIGHTRED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Starting Application and checking dependancies "$LIGHTRED"==="$COLOR_NONE
+	evallog "sudo apt install -y whois" & pid=$!
+	progress
+fi
+
 # Set the defaults for the dialog environment
 SCREENTITLE="Raspberry Pi 3 Web Server Auto Configuration"
-HEIGHT=18
+HEIGHT=19
 WIDTH=45
 CHOICE_HEIGHT=10
-DIALOG_CANCEL=1
-DIALOG_ESC=255
 OKLABEL="Submit"
 CANCELLABEL="Back"
 CREDITS="Jessica Brown"
 
+
 # Main Menu Options List
 title="Main Menu"
-instructions="Choose one of the following options:\n\Zn[\Zb\Z1*\Zn] - Item incomplete\n\Zn[\Zb\Z2*\Zn] - Item completed\n\n"
+instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n\Zn[\Zb\Z1*\Zn/\Z2*\Zn] - Invalid/Valid Settings Detected\n\n"
 
 while true; do
-	# Place the checkcfg here so it is rechecked on each menu load
+	# Place the loadcfg and checkcfg here so it is rechecked on each menu load
+	loadcfg
 	checkcfg
 
 	# This line sets a path to tempfile. The $$ is the current shell ID.
@@ -118,19 +127,19 @@ while true; do
 			# Raid drive mounting and configuration
 			# Uninstall different type of apps
 		# Move the Drive information inside the Drive Configuration
-	MainMenuOptions=(1 "\Zn[${opt1menuitem}] Web Server Configuration" 2 "\Zn[${opt6menuitem}] Email Server Configuration" 3 "\Zn[${opt6menuitem}] Database Server Configuration" 4 "\Zn[${opt6menuitem}] Drive Configuration" 5 "\Zn[${opt6menuitem}] Drive Information" 6 "\Zn[${opt6menuitem}] Installed Programs" "ESC" "Exit Configuration Utility")
+	MainMenuOptions=(1 "\Zn[${opt1menuitem}] Web Server Configuration" 2 "\Zn[${opt2menuitem}] Email Server Configuration" 3 "\Zn[${opt3menuitem}] Database Server Configuration" 4 "\Zn[${opt4menuitem}] Drive Configuration" 5 "\Zn[${opt5menuitem}] Installed Programs" 6 "\Zn[${opt6menuitem}] Change Server Type" 7 "\Zn[${opt7menuitem}] System Information")
 
 	exec 3>&1
 	CHOICE=$(dialog --clear --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${MainMenuOptions[@]}" 2>&1 1>&3)
 	exit_status=$?
 
 	case $exit_status in
-		$DIALOG_CANCEL)
+		1)
 			clear
 			echo "Program terminated."
 			exit
 			;;
-		$DIALOG_ESC)
+		255)
 			clear
 			echo "Program aborted." >&2
 			exit 1
@@ -138,31 +147,13 @@ while true; do
 	esac
 
 	case $CHOICE in
-		0)
-			clear
-			exit 0
-			;;
-		1)
-			webserverform
-			;;
-		2)
-			echo "You chose Option 2"
-			;;
-		3)
-			echo "You chose Option 3"
-			;;
-		4)
-			echo "You chose Option 4"
-			;;
-		5)
-			result=$(df -h)
-			display_result "Disk Space"
-			;;
-		6)
-			echo "You chose Option 6"
-			;;
-		255)
-			echo "WTF"
-			;;
+		1) webserverform;;
+		2) echo "You chose Option 2";;
+		3) echo "You chose Option 3";;
+		4) echo "You chose Option 4";;
+		5) echo "You chose Option 5";;
+		6) echo "You chose Option 6";;
+		7) echo "You chose Option 7";;
+		255) echo "WTF";;
 	esac
 done
