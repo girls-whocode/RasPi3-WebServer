@@ -12,3 +12,7 @@
 12. Create menu system in case of failure of install
 13. Create system for managing web server
 14. Create deploy system from fresh install of Raspberian to setup ssh keys, boot options, localisation options, etc
+15. Have ability for multiple choice applications and file server
+16. Research message server applications
+17. Research proxy server applications
+

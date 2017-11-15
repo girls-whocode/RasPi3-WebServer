@@ -127,7 +127,7 @@ variables() {
 		spin[3]=$LIGHT_GREEN"/"
 		ETC_HOSTS=/etc/hosts
 		hosts=/etc/hosts
-		version="1.0a"
+		version="1.0.1a"
 		verbose="false"
 		logfile=/var/log/raspy3-install_`date +'%m-%d-%Y_%H%M%S'`.log
 		steplogdir=/home/pi/.config/raspi/
@@ -186,17 +186,6 @@ output() {
 		echo -e $WHITE"   APPLICATIONS"
 		echo ""
 		# FIND WAYS TO CHECK TO SEE IF THIS IS A NEW SYSTEM, THEN GIVE THE USER TO ABORT
-	fi
-	if [ "$1" == "instructions" ]; then
-		echo -e $COLOR_NONE"  Please answer the questions below to configure your"
-		echo -e $COLOR_NONE"  web server to your specific needs. Some defaults are"
-		echo -e $COLOR_NONE"  assumed from system variables."
-		echo ""
-		echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating Installation Log File: $logfile "$LIGHT_RED"==="$COLOR_NONE
-		echo -e $YELLOW"(you may watch the progress by running 'tail -f $logfile')"$COLOR_NONE
-	fi
-	if [ "$1" == "questions" ]; then
-		echo ""
 	fi
 }
 #######################################
@@ -291,6 +280,7 @@ checkinet() {
 	*) inet="The network is down or very slow";;
     esac
 }
+
 #######################################
 # checkversion - 
 # Globals:
@@ -398,6 +388,10 @@ setvhcentos () {
 quitscript() {
 	tput cnorm
 	log "Exit script was performed, attempting cleanup"
+	if [ -f $configfile ]; then
+		log "Removing config file"
+		rm -f $configfile
+	fi
 	echo -en $RED"\n\nScript was aborted\n\n"$COLOR_NONE
 	echo -en "Cleaning up please wait\n"
 	# Honestly, currently there is nothing to clean up since pretty much
@@ -420,10 +414,14 @@ finish() {
 	echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Installation Script has Completed "$LIGHT_RED"==="$COLOR_NONE
 	log "################################################################################################################"
 	echo -e $YELLOW"(visit $fqdn to see if your site is active. errors may be found in $logfile)"$COLOR_NONE
+	echo -e $WHITE"If you wish to make any changes to your web server or look at the configuration run: ${GREEN}sudo ./deploy.sh"
+	echo -e $WHITE"again and a menu system will guide you to make any changes."
+	echo ""
 	tput cnorm
 	variables "unset"
 	exit 0
 }
+
 #######################################
 # managehost - Manage hostnames
 #     to the /etc/hosts file
@@ -626,9 +624,60 @@ config() {
 			;;
 	esac
 }
+form_webserver() {
+	exec 3>&1
+	pagetitle="Raspberry Pi 3 Web Server Configuration"
+	dialogtitle="Server Settings"
+	instructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	oklabel="Submit"
+	cancellabel="Back"
+	
+	# Store data to $VALUES variable
+	VALUES=$(dialog --ok-label "${oklabel}" --cancel-label "${cancellabel}" --backtitle "${pagetitle}" --title "${dialogtitle}" --form "${instructions}" 15 70 0 \
+		"       Domain Name :"	1 1	"$fqdn"			1 22 42 0 \
+		"         User Name :"	2 1	"$user"			2 22 42 0 \
+		"Public HTML folder :"	3 1	"$webserverdir"	3 22 42 0 \
+		"             Email :"	4 1	"$email"		4 22 42 0 \
+	2>&1 1>&3)
 
+	# close fd
+	exec 3>&-
+
+	# display values just entered
+	echo "$VALUES"
+}
+form_databaseserver() {
+	exec 3>&1
+	pagetitle="Raspberry Pi 3 Web Server Configuration"
+	dialogtitle="Server Settings"
+	instructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	oklabel="Submit"
+	cancellabel="Back"
+	dialogheight="15"
+	dialogwidth="70"
+	
+	# Store data to $VALUES variable
+	VALUES=$(dialog --ok-label "${oklabel}" --cancel-label "${cancellabel}" --backtitle "${pagetitle}" --title "${dialogtitle}" --form "${instructions}" 15 70 0 \
+		"       Domain Name :"	1 1	"$fqdn"			1 22 42 0 \
+		"         User Name :"	2 1	"$user"			2 22 42 0 \
+		"Public HTML folder :"	3 1	"$webserverdir"	3 22 42 0 \
+		"             Email :"	4 1	"$email"		4 22 42 0 \
+	2>&1 1>&3)
+
+	# close fd
+	exec 3>&-
+
+	# display values just entered
+	echo "$VALUES"
+}
+		
 # Setup all the variables to be used, "unset" is called in the finish function
 variables "set"
+
+# Since the application dialog is used, let's see if it can be installed
+echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Starting Application and checking dependancies "$LIGHT_RED"==="$COLOR_NONE
+evallog "sudo apt install -y dialog" & pid=$!
+progress
 
 if [[ -f $configfile ]]; then
 	# The configuration file exists, now let test to make sure the parameter exists
@@ -637,6 +686,8 @@ if [[ -f $configfile ]]; then
 	
 	# For now, let's try to fix it, if this turns to be a problem, we'll delete it
 	# and then rebuild it.
+	inifileexists=true
+
 	if [ $(config "read_value" "distro") == 'false' ]; then
 		DISTRO=$( lsb_release -is )
 		config "write_value" "distro" $DISTRO
@@ -747,17 +798,28 @@ if [[ -f $configfile ]]; then
 		mountpoint=$(config "read_value" "mountpoint")
 	fi
 else
-	# Config does not exist, let's create it here with default values
-	# Need to have Distro testing here
+	# Config does not exist, let's create it here with default values.
+	inifileexists=false
+
+	# Need to have Distro testing here.
 	DISTRO=$( lsb_release -is ) # Reports Raspbian
 	CODENAME=$( lsb_release -cs ) # Reports stretch
 	DISTVERSION=$( lsb_release -rs ) # Reports 9.1
 
-	# Set custom variables
+	# Set custom default variables
 	IP="127.0.0.1"
 	fqdn="$(hostname --fqdn)"
-	user=$USER
-	ownergroup=www-data:www-data
+	
+	# Since this script was ran with sudo, it will always return root,
+	# this method will look for the normal privileged user first, if it
+	# does exists or is blank, then default to the current user which is
+	# probably root. We'll ask later anyways.
+	user="$(awk -F'[/:]' '{if ($3 >= 1000 && $3 != 65534) print $1}' /etc/passwd)"
+	if [ -z $user ]; then
+		user=$USER
+	fi
+
+	ownergroup="www-data:www-data"
 	tzone="$(cat /etc/timezone)"
 	webserverdir="/var/www/"
 	email="noone@nowhere.com"
@@ -800,220 +862,218 @@ else
 	fi
 fi
 
-# Output the header of the script to the screen. I put this in a function for
-# future use, this may be used to have different outputs depending on screen
-# size, or to send other output to the terminal. But for now it is just the
-# really large header that I spent allot of time on to make it look pretty!
-output 'header'
+# Did the INI file exists, if not then let's get the default questions answered
+if [ $inifileexists == false ]; then
+	# Output the header of the script to the screen. I put this in a function for
+	# future use, this may be used to have different outputs depending on screen
+	# size, or to send other output to the terminal. But for now it is just the
+	# really large header that I spent allot of time on to make it look pretty!
+	output 'header'
 
-# Start the output to the /var/log/rasp* log file and add distro information
-log "################### INSTALLATION STARTED ON `date '+%m-%d-%Y %I:%M:%S'` ###################"
-log "#### DISTRO: $DISTRO CODENAME: $CODENAME VERSION: $VERSION ####"
+	# Start the output to the /var/log/rasp* log file and add distro information
+	log "################### INSTALLATION STARTED ON `date '+%m-%d-%Y %I:%M:%S'` ###################"
+	log "#### DISTRO: $DISTRO CODENAME: $CODENAME VERSION: $VERSION ####"
 
-# Update, Auto Remove, and Upgrade System and check to see if the latest 
-# version is being used of the script since I moved everything to GitHub, 
-# I will probably check there to see if the version is the latest.
-log "#### CHECKING THE INSTALLER FOR LATEST VERSIONS `date '+%m-%d-%Y %I:%M:%S'` ####"
-checkversion
+	# Update, Auto Remove, and Upgrade System and check to see if the latest 
+	# version is being used of the script since I moved everything to GitHub, 
+	# I will probably check there to see if the version is the latest.
+	log "#### CHECKING THE INSTALLER FOR LATEST VERSIONS `date '+%m-%d-%Y %I:%M:%S'` ####"
 
-log "#### UPDATING SYSTEM TO LATEST VERSIONS `date '+%m-%d-%Y %I:%M:%S'` ####"
-echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Updating system to latest versions "$LIGHT_RED"==="$COLOR_NONE
-echo -e $YELLOW"(this may take a long time)"$COLOR_NONE
-evallog "$pkginstall autoremove" & pid=$!
-evallog "$pkginstall update && $pkginstall upgrade" & pid=$!
-progress
+	# Not yet developed, this will probably be the last thing I do
+	checkversion
 
-# Output the instructions to the screen
-output 'instructions'
+	log "#### UPDATING SYSTEM TO LATEST VERSIONS `date '+%m-%d-%Y %I:%M:%S'` ####"
+	echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Updating system to latest versions "$LIGHT_RED"==="$COLOR_NONE
+	echo -e $YELLOW"(this may take a long time)"$COLOR_NONE
+	evallog "$pkginstall autoremove" & pid=$!
+	evallog "$pkginstall update && $pkginstall upgrade" & pid=$!
+	progress
 
-shopt -u nocasematch
+	shopt -u nocasematch
+	form_webserver
+	form_databaseserver
 
-echo -ne " What is the domain name of your server ($fqdn): "
-read -r readfqdn
+	exit 0
 
-if [ -z "$readfqdn" ]; then
-    readfqdn=$fqdn
+	log "#### ARE WE MOUNTING AN EXTERNAL DRIVE ####"
+	if [ "$usbdrv" == "true" ]; then
+		usbdrvTF="Y/n"
+		# if the config was found and Y was the default
+		defaultusbdrv="y"
+	else
+		usbdrvTF="y/N"
+		# if the config was found and N was the default
+		defaultusbdrv="n"
+	fi
+	echo -ne "     Do you have an external USB drive installed? ($usbdrvTF) "
+	read -r readusbdrv
+
+	# Need to re-define the default since enter was pressed, had to get whatever
+	# the default was to send to the case statement.
+	if [ -z readusbdrv ]; then
+		readusbdrv=$defaultusbdrv
+	fi
+
+	case $readusbdrv in
+		[yY] | [yY][Ee][Ss] )
+			log "#### EXTERNAL USB DRIVE SETUP SELECTED `date '+%m-%d-%Y %I:%M:%S'` ####"
+			config "change_value" "usbdrv" "true"
+			echo ""
+
+			log "#### ENTER MOUNT POINT FOR THE DRIVE `date '+%m-%d-%Y %I:%M:%S'` ####"
+			echo "Enter mount point for drive :"
+			read -r readmountpoint
+			config "change_value" "mountpoint" $readmountpoint
+			;;
+		*)
+			config "change_value" "usbdrv" "false"
+			echo ""
+			;;
+	esac
+
+	echo -ne $COLOR_NONE" Do you want to install a database server? (Y/n) "
+	read -r readnewdb
+
+	case $readnewdb in
+		[nN] | [nN][O|o] )
+			log "#### DATABASE SERVER INSTALLATION NOT SELECTED `date '+%m-%d-%Y %I:%M:%S'` ####"
+			echo ""
+			;;
+		* )
+			log "#### DATABASE SERVER INSTALLATION SELECTED `date '+%m-%d-%Y %I:%M:%S'` ####"
+			echo -n " Do you want to automatically create the database user password? (y/N) "
+			read -r readsetpw
+
+			case $readsetpw in
+				[yY] | [yY][Ee][Ss] )
+					mysqluserpw="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c16; echo)"
+				log "#### RANDOM PASSWORD FOR ROOT '$mysqluserpw' `date '+%m-%d-%Y %I:%M:%S'` ####"
+					echo "Root password is set to '$mysqluserpw'"
+					;;
+				* )
+				log "#### USER DEFINED PASSWORD FOR ROOT '$mysqluserpw' `date '+%m-%d-%Y %I:%M:%S'` ####"
+					echo -n  " What do you want your password to be?"
+					read -rs mysqluserpw
+					echo ""
+					;;
+			esac
+
+			echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Installing Database Server and Dependancies "$LIGHT_RED"==="$COLOR_NONE
+			log "#### INSTALLING MYSQL SERVER AND DEPENDANCIES `date '+%m-%d-%Y %I:%M:%S'` ####"
+			evallog "$pkginstall install mysql-server mysql-client mysql-common"
+			progress
+
+			echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Securing Database "$LIGHT_RED"==="$COLOR_NONE
+			log "#### SECURING MYSQL INSTALLATION `date '+%m-%d-%Y %I:%M:%S'` ####"
+			/usr/bin/mysql_secure_installation
+
+			echo -n " Do you want to create a new database? (y/N) "
+			read -r createdb
+
+			case $createdb in
+				[yY] | [yY][Ee][Ss] )
+					echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating MariaDB Database and Default User "$LIGHT_RED"==="$COLOR_NONE
+					echo -n " Give your new database a name :"
+					read -r dbname
+					echo ""
+
+					echo -n " Give $dbname a new user name :"
+					read -r dbuser
+					echo ""
+
+					echo -n " Enter the password for $dbuser "
+					read -rs dbpass
+					echo ""
+
+					echo -ne "To create a new database, please enter the ROOT password from above "
+					mysql -u root -p --execute="CREATE DATABASE $dbname;GRANT ALL PRIVILEGES ON $dbname.* TO $dbuser@localhost IDENTIFIED BY '$mysqluserpw';"
+					log "#### CREATED NEW DATABASE: '$dbname' FOR USER '$dbuser' USING PASSWORD '$dbpass' `date '+%m-%d-%Y %I:%M:%S'` ####"
+					;;
+				* )
+					echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Database not created, you may manually create a database using mysql -u root -p "$LIGHT_RED"==="$COLOR_NONE
+					log "#### USER DATABASE WAS NOT CREATED `date '+%m-%d-%Y %I:%M:%S'` ####"
+					echo ""
+					;;
+			esac
+			;;
+	esac
+
+	# While testing don't allow the script to actually change and files just yet, this will be removed once it is ready for production.
+	exit 0
+
+	# Create the Hosts file with the FQDN
+	echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Adding '127.0.0.1 ${DOMAIN}' to hosts file "$LIGHT_RED"==="$COLOR_NONE
+	log "#### CREATING HOSTNAME FILE `date '+%m-%d-%Y %I:%M:%S'` ####"
+	if managehost "find" "localhost"; then
+		managehost "remove" "localhost"
+	fi
+	if managehost "find" "$fqdn"; then
+		managehost "add" "$fqdn"
+	fi
+
+	# Install the required software - Database server was already installed, let's get the rest
+	echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Installing required applications and dependencies "$LIGHT_RED"==="$COLOR_NONE
+	echo -e $YELLOW"(this may take a long time)"$COLOR_NONE
+	log "#### INSTALLING APACHE, PHP 7, AND DEPENDANCIES `date '+%m-%d-%Y %I:%M:%S'` ####"
+	evallog "$pkginstall install apache2 php7.0 php7.0-curl php7.0-gd php7.0-imap php7.0-json php7.0-mcrypt php7.0-mysql php7.0-opcache php7.0-xmlrpc libapache2-mod-php7.0 apache2-utils nfs-common python-certbot-apache postfix dovecot-common dovecot-imapd telnet" & pid=$!
+	progress
+
+	# Enable the modules
+	echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Enabling Web Modules "$LIGHT_RED"==="$COLOR_NONE
+	log "#### ENABLING WEB MODULES `date '+%m-%d-%Y %I:%M:%S'` ####"
+	evallog "a2enmod rewrite"
+	evallog "phpenmod mcrypt"
+	evallog "phpenmod mbstring"
+
+	# Create a virtual host file
+	echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating Virtual Host File "$LIGHT_RED"==="$COLOR_NONE
+	log "#### CREATING VIRTUAL HOST FILE '/etc/apache2/sites-available/$fqdn.conf `date '+%m-%d-%Y %I:%M:%S'` ####"
+	setvhdebian
+
+	# Install other packages after web server has been established
+	echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Installing additional web applications and dependencies "$LIGHT_RED"==="$COLOR_NONE
+	log "#### INSTALLING Webalizer, RKHunter, phpMyAdmin, AND DEPENDANCIES `date '+%m-%d-%Y %I:%M:%S'` ####"
+	evallog "$pkginstall install webalizer rkhunter phpmyadmin"
+	progress
+
+	# Restart APACHE2
+	echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Restarting Apache "$LIGHT_RED"==="$COLOR_NONE
+	log "#### RESTARTING APACHE2 `date '+%m-%d-%Y %I:%M:%S'` ####"
+	evallog "service apache2 restart"
 else
-	readfqdn=$readfqdn
-fi
-log "#### SETTING FQDN TO $readfqdn `date '+%m-%d-%Y %I:%M:%S'` ####"
-config "change_value" "fqdn" $readfqdn
-echo -e $COLOR_NONE"     Setting host to $WHITE$readfqdn"
-echo -e $COLOR_NONE""
-
-echo -ne $COLOR_NONE" What is the username for your domain ($user): "
-read -r readuser
-
-if [ -z "$readuser" ]; then
-    readuser=$user
-else
-	readuser=$readuser
-fi
-log "#### SETTING USER TO $readuser `date '+%m-%d-%Y %I:%M:%S'` ####"
-config "change_value" "user" $readuser
-echo -e $COLOR_NONE"     User is set to $WHITE$readuser"
-echo -e $COLOR_NONE""
-
-echo -ne $COLOR_NONE" Default public_html folder ($webserverdir): "
-read -r readwebserverdir
-
-if [ -z "$readwebserverdir" ]; then
-    readwebserverdir=$webserverdir
-else
-	readwebserverdir=$readwebserverdir
-fi
-log "#### SETTING DEFAULT WEB FOLDER TO $readwevserverdir `date '+%m-%d-%Y %I:%M:%S'` ####"
-config "change_value" "webserverdir" $readwebserverdir
-echo -e $COLOR_NONE"     Public HTML folder is set to $WHITE$readwebserverdir"
-echo -e $COLOR_NONE""
-
-echo -ne $COLOR_NONE" Working Email address ($email): "
-read -r reademail
-
-if [ -z "$reademail" ]; then
-    reademail=$email
-else
-	reademail=$reademail
-fi
-log "#### SETTING EMAIL ADDRESS TO $reademail `date '+%m-%d-%Y %I:%M:%S'` ####"
-config "change_value" "email" $reademail
-echo -e $COLOR_NONE"     User email is set to $WHITE$reademail"
-echo -e $COLOR_NONE""
-
-log "#### ARE WE MOUNTING AN EXTERNAL DRIVE ####"
-if [ "$usbdrv" == "true" ]; then
-	usbdrvTF="Y/n"
-else
-	usbdrvTF="y/N"
-fi
-echo -ne "     Do you have an external USB drive installed? ($usbdrvTF) "
-read -r readusbdrv
-
-case $readusbdrv in
-	[yY] | [yY][Ee][Ss] )
-		log "#### EXTERNAL USB DRIVE SETUP SELECTED `date '+%m-%d-%Y %I:%M:%S'` ####"
-		config "change_value" "usbdrv" "true"
-		echo ""
-
-		log "#### ENTER MOUNT POINT FOR THE DRIVE `date '+%m-%d-%Y %I:%M:%S'` ####"
-		echo "Enter mount point for drive :"
-		read -r readmountpoint
-		config "change_value" "mountpoint" $readmountpoint
-		;;
-	*)
-		config "change_value" "usbdrv" "false"
-		echo ""
-		;;
-esac
-
-echo -ne $COLOR_NONE" Do you want to install a database server? (Y/n) "
-read -r readnewdb
-
-case $readnewdb in
-    [nN] | [nN][O|o] )
-		log "#### DATABASE SERVER INSTALLATION NOT SELECTED `date '+%m-%d-%Y %I:%M:%S'` ####"
-		echo ""
-		;;
-    * )
-		log "#### DATABASE SERVER INSTALLATION SELECTED `date '+%m-%d-%Y %I:%M:%S'` ####"
-		echo -n " Do you want to automatically create the database user password? (y/N) "
-		read -r readsetpw
-
-		case $readsetpw in
-			[yY] | [yY][Ee][Ss] )
-				mysqluserpw="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c16; echo)"
-			log "#### RANDOM PASSWORD FOR ROOT '$mysqluserpw' `date '+%m-%d-%Y %I:%M:%S'` ####"
-				echo "Root password is set to '$mysqluserpw'"
+	if haveProg dialog; then
+		HEIGHT=15
+		WIDTH=40
+		CHOICE_HEIGHT=4
+		BACKTITLE="Raspberry Pi 3 Web Server Auto Configuration"
+		TITLE="Options Menu"
+		MENU="Choose one of the following options:"
+		OPTIONS=(1 "Web Server Configuration" 2 "Email Configuration" 3 "Database Configuration" 4 "Drive Configuration")
+		CHOICE=$(dialog --clear --backtitle "$BACKTITLE" --title "$TITLE" --menu "$MENU" $HEIGHT $WIDTH $CHOICE_HEIGHT "${OPTIONS[@]}" 2>&1 >/dev/tty)
+		clear
+		case $CHOICE in
+			1)
+				form_webserver
 				;;
-			* )
-			log "#### USER DEFINED PASSWORD FOR ROOT '$mysqluserpw' `date '+%m-%d-%Y %I:%M:%S'` ####"
-				echo -n  " What do you want your password to be?"
-				read -rs mysqluserpw
-				echo ""
+			2)
+				echo "You chose Option 2"
+				;;
+			3)
+				echo "You chose Option 3"
+				;;
+			4)
+				echo "You chose Option 4"
+				;;
+			255)
+				echo "ESC pressed"
 				;;
 		esac
-
-		echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Installing Database Server and Dependancies "$LIGHT_RED"==="$COLOR_NONE
-		log "#### INSTALLING MYSQL SERVER AND DEPENDANCIES `date '+%m-%d-%Y %I:%M:%S'` ####"
-		evallog "$pkginstall install mysql-server mysql-client mysql-common"
-		progress
-
-		echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Securing Database "$LIGHT_RED"==="$COLOR_NONE
-		log "#### SECURING MYSQL INSTALLATION `date '+%m-%d-%Y %I:%M:%S'` ####"
-		/usr/bin/mysql_secure_installation
-
-		echo -n " Do you want to create a new database? (y/N) "
-		read -r createdb
-
-        case $createdb in
-            [yY] | [yY][Ee][Ss] )
-				echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating MariaDB Database and Default User "$LIGHT_RED"==="$COLOR_NONE
-				echo -n " Give your new database a name :"
-				read -r dbname
-				echo ""
-
-				echo -n " Give $dbname a new user name :"
-				read -r dbuser
-				echo ""
-
-				echo -n " Enter the password for $dbuser "
-				read -rs dbpass
-				echo ""
-
-				echo -ne "To create a new database, please enter the ROOT password from above "
-				mysql -u root -p --execute="CREATE DATABASE $dbname;GRANT ALL PRIVILEGES ON $dbname.* TO $dbuser@localhost IDENTIFIED BY '$mysqluserpw';"
-				log "#### CREATED NEW DATABASE: '$dbname' FOR USER '$dbuser' USING PASSWORD '$dbpass' `date '+%m-%d-%Y %I:%M:%S'` ####"
-				;;
-			* )
-				echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Database not created, you may manually create a database using mysql -u root -p "$LIGHT_RED"==="$COLOR_NONE
-				log "#### USER DATABASE WAS NOT CREATED `date '+%m-%d-%Y %I:%M:%S'` ####"
-				echo ""
-				;;
-		esac
-		;;
-esac
-
-exit 0
-
-# Create the Hosts file with the FQDN
-echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Adding '127.0.0.1 ${DOMAIN}' to hosts file "$LIGHT_RED"==="$COLOR_NONE
-log "#### CREATING HOSTNAME FILE `date '+%m-%d-%Y %I:%M:%S'` ####"
-if managehost "find" "localhost"; then
-	managehost "remove" "localhost"
+	else
+		# Config file exists, so let' now just show the menu since the questions were already answered
+		log "#### INI file already exists, just show the menu `date '+%m-%d-%Y %I:%M:%S'` ####"
+		echo "Dialog was not found or enabled so old menu will be shown here!"
+	fi
 fi
-if managehost "find" "$fqdn"; then
-	managehost "add" "$fqdn"
-fi
-
-# Install the required software - Database server was already installed, let's get the rest
-echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Installing required applications and dependencies "$LIGHT_RED"==="$COLOR_NONE
-echo -e $YELLOW"(this may take a long time)"$COLOR_NONE
-log "#### INSTALLING APACHE, PHP 7, AND DEPENDANCIES `date '+%m-%d-%Y %I:%M:%S'` ####"
-evallog "$pkginstall install apache2 php7.0 php7.0-curl php7.0-gd php7.0-imap php7.0-json php7.0-mcrypt php7.0-mysql php7.0-opcache php7.0-xmlrpc libapache2-mod-php7.0 apache2-utils nfs-common python-certbot-apache postfix dovecot-common dovecot-imapd telnet" & pid=$!
-progress
-
-# Enable the modules
-echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Enabling Web Modules "$LIGHT_RED"==="$COLOR_NONE
-log "#### ENABLING WEB MODULES `date '+%m-%d-%Y %I:%M:%S'` ####"
-evallog "a2enmod rewrite"
-evallog "phpenmod mcrypt"
-evallog "phpenmod mbstring"
-
-# Create a virtual host file
-echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Creating Virtual Host File "$LIGHT_RED"==="$COLOR_NONE
-log "#### CREATING VIRTUAL HOST FILE '/etc/apache2/sites-available/$fqdn.conf `date '+%m-%d-%Y %I:%M:%S'` ####"
-setvhdebian
-
-# Install other packages after web server has been established
-echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Installing additional web applications and dependencies "$LIGHT_RED"==="$COLOR_NONE
-log "#### INSTALLING Webalizer, RKHunter, phpMyAdmin, AND DEPENDANCIES `date '+%m-%d-%Y %I:%M:%S'` ####"
-evallog "$pkginstall install webalizer rkhunter phpmyadmin"
-progress
-
-# Restart APACHE2
-echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Restarting Apache "$LIGHT_RED"==="$COLOR_NONE
-log "#### RESTARTING APACHE2 `date '+%m-%d-%Y %I:%M:%S'` ####"
-evallog "service apache2 restart"
 
 # Clean up the system of any files needed
 echo -e $LIGHT_RED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Cleaning System from unused files and folders "$LIGHT_RED"==="$COLOR_NONE
