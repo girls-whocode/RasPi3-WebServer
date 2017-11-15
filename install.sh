@@ -127,22 +127,16 @@ while true; do
 			# Raid drive mounting and configuration
 			# Uninstall different type of apps
 		# Move the Drive information inside the Drive Configuration
-	MainMenuOptions=(1 "\Zn[${opt1menuitem}] Web Server Configuration" 2 "\Zn[${opt2menuitem}] Email Server Configuration" 3 "\Zn[${opt3menuitem}] Database Server Configuration" 4 "\Zn[${opt4menuitem}] Drive Configuration" 5 "\Zn[${opt5menuitem}] Installed Programs" 6 "\Zn[${opt6menuitem}] Change Server Type" 7 "\Zn[${opt7menuitem}] System Information")
+	MainMenuOptions=(1 "\Zn[${opt1menuitem}] Web Server Configuration" 2 "\Zn[${opt2menuitem}] Email Server Configuration" 3 "\Zn[${opt3menuitem}] Database Server Configuration" 4 "\Zn[${opt4menuitem}] Drive Configuration" 5 "\Zn[${opt5menuitem}] Installed Programs" 6 "\Zn[${opt6menuitem}] Change Server Type" 7 "\Zn[${opt7menuitem}] System Information" 8 "\Zn[${opt1menuitem}] Installation Logs")
 
 	exec 3>&1
 	CHOICE=$(dialog --clear --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${MainMenuOptions[@]}" 2>&1 1>&3)
 	exit_status=$?
 
 	case $exit_status in
-		1)
-			clear
-			echo "Program terminated."
-			exit
-			;;
 		255)
 			clear
-			echo "Program aborted." >&2
-			exit 1
+			exit 0
 			;;
 	esac
 
@@ -152,8 +146,9 @@ while true; do
 		3) echo "You chose Option 3";;
 		4) echo "You chose Option 4";;
 		5) echo "You chose Option 5";;
-		6) echo "You chose Option 6";;
+		6) servertypemenu;;
 		7) echo "You chose Option 7";;
-		255) echo "WTF";;
+		8) echo "You chose Option 8";;
+		255) exit;;
 	esac
 done

@@ -57,8 +57,9 @@ variables() {
 		# Define paths and files
 		hosts="/etc/hosts"
 		logfolder="/var/log/"
+		logfile="${logfolder}"raspy3-install.log
 		
-		[[ $environment = 'development' ]] && logfile="${logfolder}"raspy3-install.log || logfile="${logfolder}"raspy3-install_`date +'%m-%d-%Y_%H%M%S'`.log
+		# [[ $environment = 'development' ]] && logfile="${logfolder}"raspy3-install.log || logfile="${logfolder}"raspy3-install_`date +'%m-%d-%Y_%H%M%S'`.log
 		
 		if [ -f $logfile ]; then
 			sudo rm $logfile
@@ -548,7 +549,14 @@ config() {
 	esac
 }
 
-
+# loadcfg - Load the $configfile and read default values, if any       #
+# configuration items are missing try to correct them                  #
+# Globals:                                                             #
+#                                                                      #
+# Arguments:                                                           #
+#   None                                                               #
+# Returns:                                                             #
+#   variables from the config                                          #
 loadcfg() {
 	if [[ -f $configfile ]]; then
 		# The configuration file exists, now let test to make sure the parameter exists
@@ -562,10 +570,59 @@ loadcfg() {
 
 		if [ $(config "read_value" "servetype") == 'false' ]; then
 			SERVETYPE=$(config "read_value" "servetype")
-			log "DISTRO parameter does not exist - set to default value"
-			config "write_value" "servetype" "none"
+			log "servetype parameter does not exist - set to default value"
+			config "write_value" "servetype" "disabled"
 		else
 			SERVETYPE=$(config "read_value" "servetype")
+		fi
+		if [ $(config "read_value" "webserver") == 'false' ]; then
+			SERVETYPE=$(config "read_value" "webserver")
+			log "webserver parameter does not exist - set to default value"
+			config "write_value" "webserver" "disabled"
+		else
+			SERVETYPE=$(config "read_value" "webserver")
+		fi
+		if [ $(config "read_value" "databaseserver") == 'false' ]; then
+			SERVETYPE=$(config "read_value" "databaseserver")
+			log "databaseserver parameter does not exist - set to default value"
+			config "write_value" "databaseserver" "disabled"
+		else
+			SERVETYPE=$(config "read_value" "databaseserver")
+		fi
+		if [ $(config "read_value" "appserver") == 'false' ]; then
+			SERVETYPE=$(config "read_value" "appserver")
+			log "appserver parameter does not exist - set to default value"
+			config "write_value" "appserver" "disabled"
+		else
+			SERVETYPE=$(config "read_value" "appserver")
+		fi
+		if [ $(config "read_value" "fileserver") == 'false' ]; then
+			SERVETYPE=$(config "read_value" "fileserver")
+			log "fileserver parameter does not exist - set to default value"
+			config "write_value" "fileserver" "disabled"
+		else
+			SERVETYPE=$(config "read_value" "fileserver")
+		fi
+		if [ $(config "read_value" "msgserver") == 'false' ]; then
+			SERVETYPE=$(config "read_value" "msgserver")
+			log "msgserver parameter does not exist - set to default value"
+			config "write_value" "msgserver" "disabled"
+		else
+			SERVETYPE=$(config "read_value" "msgserver")
+		fi
+		if [ $(config "read_value" "proxyserver") == 'false' ]; then
+			SERVETYPE=$(config "read_value" "proxyserver")
+			log "proxyserver parameter does not exist - set to default value"
+			config "write_value" "proxyserver" "disabled"
+		else
+			SERVETYPE=$(config "read_value" "proxyserver")
+		fi
+		if [ $(config "read_value" "emailserver") == 'false' ]; then
+			SERVETYPE=$(config "read_value" "emailserver")
+			log "emailserver parameter does not exist - set to default value"
+			config "write_value" "emailserver" "disabled"
+		else
+			SERVETYPE=$(config "read_value" "emailserver")
 		fi
 		if [ $(config "read_value" "distro") == 'false' ]; then
 			DISTRO=$( lsb_release -is )
@@ -751,7 +808,14 @@ loadcfg() {
 	fi
 }
 
-
+# checkcfg - Check the $configfile and set the values for the * in the #
+# menus to determine if the value was set or needs configured.         #
+# Globals:                                                             #
+#                                                                      #
+# Arguments:                                                           #
+#   None                                                               #
+# Returns:                                                             #
+#   variables from the config                                          #
 checkcfg() {
 	# Option number 1
 	# Default the fail test to false
@@ -759,7 +823,7 @@ checkcfg() {
 	faileditems1=""
 	
 	if [ $(config "read_value" "fqdn") == "false" ] || [ $(config "read_value" "fqdn") == "null" ]; then
-		log "tested fqdn returned "$fqdn
+		log "tested fqdn returned $(config "read_value" "fqdn")"
 		# Activate the fail test since fqdn was false or null
 		opt1menufailtest="true"
 		faileditems1="$faileditems1 \Zb\Z1Domain Name\Zn - Is not read from the configuration file\n"
@@ -785,8 +849,8 @@ checkcfg() {
 			fi
 		fi
 	fi
-	if [ $(config "read_value" "user") == "false" ] || [ $(config "read_value" "user") == "null" ]; then
-		log "tested user returned "config "read_value" "user"
+	if [ $(config "read_value" "user") == "false" ] || [ $(config "read_value" "user") == "null" ] || [ $(config "read_value" "user") == "disabled" ]; then
+		log "tested user returned $(config "read_value" "user")"
 		# Activate the fail test since user was false or null
 		# Next we need to create the user and set a password
 		opt1menufailtest="true"
@@ -796,7 +860,7 @@ checkcfg() {
 			opt1menuitem="\Zb\Z2*\Zn"
 		fi
 	fi
-	if [ $(config "read_value" "webserverdir") == "false" ] || [ $(config "read_value" "webserverdir") == "null" ]; then
+	if [ $(config "read_value" "webserverdir") == "false" ] || [ $(config "read_value" "webserverdir") == "null" ] || [ $(config "read_value" "webserverdir") == "disabled" ]; then
 		log "tested webserverdir returned "config "read_value" "webserverdir"
 		# Activate the fail test since webserverdir was false or null
 		opt1menufailtest="true"
@@ -809,7 +873,7 @@ checkcfg() {
 		fi
 	fi
 	if [ $(config "read_value" "email") == "false" ] || [ $(config "read_value" "email") == "null" ] || [ $(config "read_value" "email") == "noone@nowhere.com" ]; then
-		log "tested email returned "config "read_value" "email"
+		log "tested email returned $(config "read_value" "email")"
 		faileditems1="$faileditems1 \Zb\Z1Email\Zn - Is not read from the configuration file\n"
 		# Activate the fail test since email was false or null or invalid
 		# Next we will actually do a test on the email to make sure the email is valid
@@ -844,7 +908,7 @@ checkcfg() {
 		fi
 	fi
 	if [ $(config "read_value" "ip") == "false" ] && [ $(config "read_value" "ip") == "null" ]; then
-		log "tested ip returned "config "read_value" "ip"
+		log "tested ip returned $(config "read_value" "ip")"
 		# Activate the fail test since ip was false or null
 		opt1menufailtest="true"
 		opt1menuitem="\Zb\Z1*\Zn"
@@ -880,20 +944,124 @@ checkcfg() {
 	
 	# Option number 6
 	opt6menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "servetype") == "false" ] || [ $(config "read_value" "servetype") == "null" ] || [ $(config "read_value" "servetype") == "none" ]; then
-		log "tested servetype returned "config "read_value" "servetype"
-		# Activate the fail test since servetype was false or null or none
+	if [ $(config "read_value" "servetype") == "false" ] || [ $(config "read_value" "servetype") == "null" ] || [ $(config "read_value" "servetype") == "disabled" ]; then
+		log "tested servetype returned $(config "read_value" "servetype")"
+		# Activate the fail test since servetype was false, null or none
 		opt6menufailtest="true"
 		opt6menuitem="\Zb\Z1*\Zn"
 	else
-		if [ $opt6menufailtest != "true" ]; then
-			opt6menufailtest="false"
-			opt6menuitem="\Zb\Z2*\Zn"
-		fi
+		opt6menufailtest="false"
+		opt6menuitem="\Zb\Z2*\Zn"
 	fi
 
-	# Option number 7
-	opt7menuitem="\Zb\Z1*\Zn"
+	# Option number 7 - No configuration is really needed since this is just a dialog
+	opt7menuitem="\Zb\Z2*\Zn"
+
+	# Option number 8 - No configuration is really needed since this is just a report
+	opt8menuitem="\Zb\Z2*\Zn"
+	
+	# Option number 11 - Server Type/Web Server
+	opt11menuitem="\Zb\Z1*\Zn"
+	if [ $(config "read_value" "webserver") == "false" ] || [ $(config "read_value" "webserver") == "null" ] || [ $(config "read_value" "webserver") == "disabled" ]; then
+		log "tested webserver returned $(config "read_value" "webserver")"
+		# Activate the fail test since webserver was false or null
+		opt11menufailtest="true"
+		opt11menuitem="\Zb\Z1*\Zn"
+	else
+		opt11menufailtest="false"
+		opt11menuitem="\Zb\Z2*\Zn"
+	fi
+
+	# Option number 12 - Server Type/Database Server
+	opt12menuitem="\Zb\Z1*\Zn"
+	if [ $(config "read_value" "databaseserver") == "false" ] || [ $(config "read_value" "databaseserver") == "null" ] || [ $(config "read_value" "databaseserver") == "disabled" ]; then
+		log "tested databaseserver returned $(config "read_value" "databaseserver")"
+		# Activate the fail test since databaseserver was false or null
+		opt12menufailtest="true"
+		opt12menuitem="\Zb\Z1*\Zn"
+	else
+		opt12menufailtest="false"
+		opt12menuitem="\Zb\Z2*\Zn"
+	fi
+
+	# Option number 13 - Server Type/Application Server
+	opt13menuitem="\Zb\Z1*\Zn"
+	if [ $(config "read_value" "appserver") == "false" ] || [ $(config "read_value" "appserver") == "null" ] || [ $(config "read_value" "appserver") == "disabled" ]; then
+		log "tested appserver returned $(config "read_value" "appserver")"
+		# Activate the fail test since appserver was false or null
+		opt13menufailtest="true"
+		opt13menuitem="\Zb\Z1*\Zn"
+	else
+		opt13menufailtest="false"
+		opt13menuitem="\Zb\Z2*\Zn"
+	fi
+
+	# Option number 14 - Server Type/File Server
+	opt14menuitem="\Zb\Z1*\Zn"
+	if [ $(config "read_value" "fileserver") == "false" ] || [ $(config "read_value" "fileserver") == "null" ] || [ $(config "read_value" "fileserver") == "disabled" ]; then
+		log "tested fileserver returned $(config "read_value" "fileserver")"
+		# Activate the fail test since fileserver was false or null
+		opt14menufailtest="true"
+		opt14menuitem="\Zb\Z1*\Zn"
+	else
+		opt14menufailtest="false"
+		opt14menuitem="\Zb\Z2*\Zn"
+	fi
+
+	# Option number 15 - Server Type/Message Server
+	opt15menuitem="\Zb\Z1*\Zn"
+	if [ $(config "read_value" "msgserver") == "false" ] || [ $(config "read_value" "msgserver") == "null" ] || [ $(config "read_value" "msgserver") == "disabled" ]; then
+		log "tested msgserver returned $(config "read_value" "msgserver")"
+		# Activate the fail test since msgserver was false or null
+		opt15menufailtest="true"
+		opt15menuitem="\Zb\Z1*\Zn"
+	else
+		opt15menufailtest="false"
+		opt15menuitem="\Zb\Z2*\Zn"
+	fi
+
+	# Option number 16 - Server Type/Proxy Server
+	opt16menuitem="\Zb\Z1*\Zn"
+	if [ $(config "read_value" "proxyserver") == "false" ] || [ $(config "read_value" "proxyserver") == "null" ] || [ $(config "read_value" "proxyserver") == "disabled" ]; then
+		log "tested proxyserver returned $(config "read_value" "proxyserver")"
+		# Activate the fail test since proxyserver was false or null
+		opt16menufailtest="true"
+		opt16menuitem="\Zb\Z1*\Zn"
+	else
+		opt16menufailtest="false"
+		opt16menuitem="\Zb\Z2*\Zn"
+	fi
+	
+	# Option number 17 - Server Type/Email Server
+	opt17menuitem="\Zb\Z1*\Zn"
+	if [ $(config "read_value" "emailserver") == "false" ] || [ $(config "read_value" "emailserver") == "null" ] || [ $(config "read_value" "emailserver") == "disabled" ]; then
+		log "tested emailserver returned $(config "read_value" "emailserver")"
+		# Activate the fail test since emailserver was false or null
+		opt17menufailtest="true"
+		opt17menuitem="\Zb\Z1*\Zn"
+	else
+		opt17menufailtest="false"
+		opt17menuitem="\Zb\Z2*\Zn"
+	fi
+}
+
+
+chkserverconfig() {
+	# We need to check for other server types, then set the servetype to true or false accordingly
+	webservertype=$(config "read_value" "webserver")
+	databaseservertype=$(config "read_value" "databaseserver")
+	appservertype=$(config "read_value" "appserver")
+	fileservertype=$(config "read_value" "fileserver")
+	msgservertype=$(config "read_value" "msgserver")
+	proxyservertype=$(config "read_value" "proxyserver")
+	emailservertype=$(config "read_value" "emailserver")
+
+	if [ $webservertype == "disabled" ] && [ $databaseservertype == "disabled" ] && [ $appservertype == "disabled" ] && [ $fileservertype == "disabled" ] && [ $msgservertype == "disabled" ] && [ $proxyservertype == "disabled" ] && [ $emailservertype == "disabled" ]; then
+		config "write_value" "servetype" "disabled"
+	else
+		config "write_value" "servetype" "true"
+
+	fi
 }
 
 
@@ -999,14 +1167,306 @@ installedappsform() {
 }
 
 
-servertypeform() {
-	ServerTypeMenuOptions=(1 "\Zn[${opt11menuitem}] Web Server" 2 "\Zn[${opt12menuitem}] Database Server" 3 "\Zn[${opt13menuitem}] Application Server" 4 "\Zn[${opt14menuitem}] File Server" 5 "\Zn[${opt15menuitem}] Email Server" 6 "\Zn[${opt16menuitem}] Message Server" 7 "\Zn[${opt17menuitem}] Proxy Server")
-	WebChoices=(1 "Apache" "on" 2 "nGinX" "off" 3 "LightSpeed Web Server" "off")
-	DatabaseChoices=(1 "MySQL" "off" 2 "MariaDB" "on" 3 "PostSQL" "off")
-	ApplicationChoices=(1 "PHP" "on" 2 "Java" "on" 3 "Tomcat" "off" 4 "Open Source Application" "off" 5 "Mobile Application" "off")
-	FileChoices=(1 "FTP" "on" 2 "NFS" "on" 3 "SMB" "off" 4 "NAS" "off")
-	EmailChoices=(1 "Postfix" "on" 2 "Citadel" "off" 3 "Sendmail" "off" 4 "Exim" "off" 5 "Courier" "off")
+servertypemenu() {
+	# Place the loadcfg and checkcfg here so it is rechecked on each menu load
+	loadcfg
+	checkcfg
+
+	$title="Server Type Configuration"
+	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n\Zn[\Zb\Z1*\Zn/\Z2*\Zn] - Invalid/Valid Settings Detected\n\n"
+
+	ServerTypeMenuOptions=(1 "\Zn[${opt11menuitem}] Web Server" 2 "\Zn[${opt12menuitem}] Database Server" 3 "\Zn[${opt13menuitem}] Application Server" 4 "\Zn[${opt14menuitem}] File Server" 5 "\Zn[${opt15menuitem}] Message Server" 6 "\Zn[${opt16menuitem}] Proxy Server" 7 "\Zn[${opt17menuitem}] Email Server")
+	exec 3>&1
+	CHOICE=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${ServerTypeMenuOptions[@]}" 2>&1 1>&3)
+	exit_status=$?
+
+	case $exit_status in
+		255) return;;
+	esac
+
+	case $CHOICE in
+		1) # Web Server
+			servertype=$(config "read_value" "webserver")
+			case $servertype in
+				"apache")
+					WebChoices=(1 "Apache" on 2 "nGinX" off 3 "LightSpeed" off 4 "Disable Server" off)
+					;;
+				"nginx")
+					WebChoices=(1 "Apache" off 2 "nGinX" on 3 "LightSpeed" off 4 "Disable Server" off)
+					;;
+				"lightspeed")
+					WebChoices=(1 "Apache" off 2 "nGinX" off 3 "LightSpeed" on 4 "Disable Server" off)
+					;;
+				"disabled")
+					WebChoices=(1 "Apache" off 2 "nGinX" off 3 "LightSpeed" off 4 "Disable Server" on)
+					;;
+			esac
+			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a web server" 0 0 0)
+			
+			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
+			for choice in $choices; do
+				case $choice in
+					1)
+						config "write_value" "webserver" "apache"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					2)
+						config "write_value" "webserver" "nginx"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					3)
+						config "write_value" "webserver" "lightspeed"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					4)
+						config "write_value" "webserver" "disabled"
+						chkserverconfig
+						servertypemenu
+						;;
+				esac
+			done
+			;;
+		2) # Database Server
+			servertype=$(config "read_value" "databaseserver")
+			case $servertype in
+				"mysql")
+					WebChoices=(1 "mySQL" on 2 "MariaDB" off 3 "PostgreSQL" off 4 "Disable Server" off)
+					;;
+				"mariadb")
+					WebChoices=(1 "mySQL" off 2 "MariaDB" on 3 "PostgreSQL" off 4 "Disable Server" off)
+					;;
+				"postgresql")
+					WebChoices=(1 "mySQL" off 2 "MariaDB" off 3 "PostgreSQL" on 4 "Disable Server" off)
+					;;
+				"disabled")
+					WebChoices=(1 "mySQL" off 2 "MariaDB" off 3 "PostgreSQL" off 4 "Disable Server" on)
+					;;
+			esac
+			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a database server" 0 0 0)
+			
+			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
+			for choice in $choices; do
+				case $choice in
+					1)
+						config "write_value" "databaseserver" "mysql"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					2)
+						config "write_value" "databaseserver" "mariadb"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					3)
+						config "write_value" "databaseserver" "postgresql"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					4)
+						config "write_value" "databaseserver" "disabled"
+						chkserverconfig
+						servertypemenu
+						;;
+				esac
+			done
+			;;
+		3) # Application Server
+			servertype=$(config "read_value" "appserver")
+			echo $servertype
+			case $servertype in
+				"php")
+					WebChoices=(1 "PHP" on 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
+					;;
+				"java")
+					WebChoices=(1 "PHP" off 2 "Java" on 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
+					;;
+				"tomcat")
+					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" on 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
+					;;
+				"osa")
+					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" on 5 "Mobile Application" off 6 "Disable Server" off)
+					;;
+				"mobile")
+					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" on 6 "Disable Server" off)
+					;;
+				"disabled")
+					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" on)
+					;;
+			esac
+			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a application server" 0 0 0)
+			
+			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
+			for choice in $choices; do
+				case $choice in
+					1)
+						config "write_value" "appserver" "php"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					2)
+						config "write_value" "appserver" "java"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					3)
+						config "write_value" "appserver" "tomcat"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					4)
+						config "write_value" "appserver" "osa"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					5)
+						config "write_value" "appserver" "mobile"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					6)
+						config "write_value" "appserver" "disabled"
+						chkserverconfig
+						servertypemenu
+						;;
+				esac
+			done
+			;;
+		4) # FileServer
+			servertype=$(config "read_value" "fileserver")
+			echo $servertype
+			case $servertype in
+				"ftp")
+					WebChoices=(1 "FTP" on 2 "NFS" off 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
+					;;
+				"nfs")
+					WebChoices=(1 "FTP" off 2 "NFS" on 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
+					;;
+				"smb")
+					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" on 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
+					;;
+				"nas")
+					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" on 5 "Boot Image" off 6 "Disable Server" off)
+					;;
+				"bootimg")
+					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" on 5 "Boot Image" on 6 "Disable Server" off)
+					;;
+				"disabled")
+					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" on)
+					;;
+			esac
+			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a file server" 0 0 0)
+			
+			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
+			for choice in $choices; do
+				case $choice in
+					1)
+						config "write_value" "fileserver" "ftp"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					2)
+						config "write_value" "fileserver" "nfs"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					3)
+						config "write_value" "fileserver" "smb"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					4)
+						config "write_value" "fileserver" "nas"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					5)
+						config "write_value" "fileserver" "bootimg"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					6)
+						config "write_value" "fileserver" "disabled"
+						chkserverconfig
+						servertypemenu
+						;;
+				esac
+			done
+			;;
+		5) # Message Server
+			servertype=$(config "read_value" "fileserver")
+			echo "Option 5"
+			;;
+		6) # Proxy Server
+			echo "Option 6"
+			;;
+		7) # Email server
+			EmailChoices=(1 "Postfix" "on" 2 "Citadel" "off" 3 "Sendmail" "off" 4 "Exim" "off" 5 "Courier" "off")
+			servertype=$(config "read_value" "emailserver")
+			echo $servertype
+			case $servertype in
+				"postfix")
+					WebChoices=(1 "Postfix" on 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
+					;;
+				"citadel")
+					WebChoices=(1 "Postfix" off 2 "Citadel" on 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
+					;;
+				"sendmail")
+					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" on 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
+					;;
+				"exim")
+					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" on 5 "Courier" off 6 "Disable Server" off)
+					;;
+				"courier")
+					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" on)
+					;;
+				"disabled")
+					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" on)
+					;;
+			esac
+			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a email server" 0 0 0)
+			
+			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
+			for choice in $choices; do
+				case $choice in
+					1)
+						config "write_value" "emailserver" "postfix"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					2)
+						config "write_value" "emailserver" "citadel"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					3)
+						config "write_value" "emailserver" "sendmail"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					4)
+						config "write_value" "emailserver" "exim"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					5)
+						config "write_value" "emailserver" "courier"
+						config "write_value" "servetype" "true"
+						servertypemenu
+						;;
+					6)
+						config "write_value" "fileserver" "disabled"
+						chkserverconfig
+						servertypemenu
+						;;
+				esac
+			done
+			;;
+	esac
 }
+
 
 systeminfodialog() {
 	result=$(df -h)
@@ -1015,3 +1475,5 @@ systeminfodialog() {
 	--msgbox "$result" 0 0
 }
 
+# RasPi-3 Server Auto Configuration
+# [![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/RasPi3-WebServer-Logo.png)](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer)<br />
