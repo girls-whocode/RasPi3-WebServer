@@ -15,15 +15,15 @@ If you wish to see the progress and TODO's please click here: https://github.com
 
 ## Screenshots
 
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-mainmenu.png)]
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver.png)]
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-servertype.png)]
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-fileserver.png)]
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-appserver.png)]
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-databaseserver.png)]
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-emailserver.png)]
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver-settings.png)]
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver-settings-errors.png)]
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-mainmenu.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-servertype.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-fileserver.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-appserver.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-databaseserver.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-emailserver.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver-settings.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver-settings-errors.png)
 
 ## Installation
 
@@ -34,6 +34,140 @@ If you wish to see the progress and TODO's please click here: https://github.com
 ## Usage
 
 RasPi-3 Server Configuration manages many mundane file changes automatically for you from questions that is given. Although this has been built on Ubuntu 17.10, I have tested on Raspberry 3 with Rasberian Stretch.
+
+### Menu System
+
+	Server Type
+	1. Web Server
+		1. Apache
+			1. Apache Configuration
+			2. Apache Restart
+			3. Apache Start
+			4. Apache Stop
+		2. nGinX
+			1. nGinx Configuration
+			2. nGinX Restart
+			3. nGinX Start
+			4. nGinX Stop
+		3. Lightspeed
+			1. Lightspeed Configuration
+			2. Lightspeed Restart
+			3. Lightspeed Start
+			4. Lightspeed Stop
+		4. SSL Setup
+			1. Let's Encrypt Settings
+			2. Renew Certification
+			3. Revoke Certification
+		5. Disabled
+
+	2. Database Server
+		1. mySQL
+			1. mySQL Configuration
+			2. mySQL Restart
+			3. mySQL Start
+			4. mySQL Stop
+		2. MariaDB
+			1. MariaDB Configuration
+			2. MariaDB Restart
+			3. MariaDB Start
+			4. MariaDB Stop
+		3. PostgreSQL
+			1. PostgreSQL Configuration
+			2. PostgreSQL Restart
+			3. PostgreSQL Start
+			4. PostgreSQL Stop
+
+	3. Application Server
+		1. PHP
+			1. PHP Configuration
+			2. PHP Restart
+			3. PHP Start
+			4. PHP Stop
+		2. Java
+			1. Java Configuration
+			2. Java Restart
+			3. Java Start
+			4. Java Stop
+		3. Tomcat
+			1. Tomcat Configuration
+			2. Tomcat Restart
+			3. Tomcat Start
+			4. Tomcat Stop
+		4. Open Source
+			1. OSA Configuration
+			2. OSA Restart
+			3. OSA Start
+			4. OSA Stop
+		5. Mobile Application
+			1. Mobile App Configuration
+			2. Mobile App Restart
+			3. Mobile App Start
+			4. Mobile App Stop
+		6. BBS Applications
+			1. Mystic
+				1. Mystic Configuration
+			2. WWIV
+				1. WWIV Configuration
+
+	4. Email Server
+		1. Postfix
+			1. Postfix Configuration
+			2. Postfix Restart
+			3. Postfix Start
+			4. Postfix Stop
+		2. Citadel
+			1. Citadel Configuration
+			2. Citadel Restart
+			3. Citadel Start
+			4. Citadel Stop
+		3. Sendmail
+			1. Sendmail Configuration
+			2. Sendmail Restart
+			3. Sendmail Start
+			4. Sendmail Stop
+		4. Exim
+			1. Exim Configuration
+			2. Exim Restart
+			3. Exim Start
+			4. Exim Stop
+		5. Courier
+			1. Courier Configuration
+			2. Courier Restart
+			3. Courier Start
+			4. Courier Stop
+	5. File Server
+		1. FTP
+		2. NFS
+		3. Samba
+	6. Message Server
+
+	7. Proxy Server
+
+	8. System Configuration
+		1. File System
+			1. Drive Space
+			2. Mount Points
+			3. Raid Configuration
+			4. USB Drive Configuration
+		2. Memory
+			1. Memory Free
+			2. Swap Memory
+		3. File Editor
+			1. Hosts file
+			2. Hostname file
+		4. Network Configuration
+			1. Wireless Editor
+			2. Network Editor
+		5. Application Configuration
+			1. Git Configuration
+			2. Uninstall Applications
+
+	9. Logs
+		1. Apache Logs
+		2. PHP Logs
+		3. Access Logs
+		4. Error Logs
+		5. Installation Logs
 
 ## Current Tested Systems
 
@@ -64,29 +198,29 @@ GPL 3.0
 
 ## Other Information
 
-   Errors:
+	Errors:
 
-      100 - Package manager was not found
-      110 - Early exit status from script
-      111 - Log file failed to write
-      112 - Hangup signal received
-      113 - Script quit script was performed
-      114 - Illegal instruction signal received
-      115 - Trace trap not reset signal received
-      116 - Abort signal received
-      117 - Pollable event [XSR] generated, not supported signal received
-      118 - Floating point signal received
-      119 - Kill signal received
-      125 - Internet connection issue
-      150 - xterm or rxvt was not detected
-      151 - tputs column width is less than 150
-      180 - Configuration file error
-      190 - Script requires to be run as su
-      200 - Failed to write configuration file
-      201 - Failed to verify the write of config value
-      202 - Failed to remove parameter from configuration file
-      203 - Parameter may consist of A-Z, a-z, 0-9, underscores, and
-            dashes (no spaces or special characters)
+		100 - Package manager was not found
+		110 - Early exit status from script
+		111 - Log file failed to write
+		112 - Hangup signal received
+		113 - Script quit script was performed
+		114 - Illegal instruction signal received
+		115 - Trace trap not reset signal received
+		116 - Abort signal received
+		117 - Pollable event [XSR] generated, not supported signal received
+		118 - Floating point signal received
+		119 - Kill signal received
+		125 - Internet connection issue
+		150 - xterm or rxvt was not detected
+		151 - tputs column width is less than 150
+		180 - Configuration file error
+		190 - Script requires to be run as su
+		200 - Failed to write configuration file
+		201 - Failed to verify the write of config value
+		202 - Failed to remove parameter from configuration file
+		203 - Parameter may consist of A-Z, a-z, 0-9, underscores, and
+			dashes (no spaces or special characters)
 
 ## Change Log
 

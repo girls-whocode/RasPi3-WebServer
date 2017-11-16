@@ -1,27 +1,7 @@
 #!/bin/bash
-########################################################################
-#                    Raspberry Pi 3 Web Server                         #
-#                 Script created by Jessica Brown                      #
-#                       jessica@jbrowns.com                            #
-#                                                                      #
-# DESCRIPTION: https://github.com/jessicakennedy1028/RasPi3-WebServer  #
-#                                                                      #
-# I used Geany IDE to create this script with tab stops at 4           #
-# characters.                                                          #
-#                                                                      #
-# Feel free to modify, but please give credit where it's due. Thanks!  #
-#                                                                      #
-########################################################################
 # Set mode for script [development, production]
 environment="production"
 
-# variables- Defines default variables                                 #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   "set" "unset"                                                      #
-# Returns:                                                             #
-#   None                                                               #
 variables() {
 	if [[ "$1" == "set" ]]; then
 		# define and set the ANSI colors
@@ -56,8 +36,8 @@ variables() {
 
 		# Define paths and files
 		hosts="/etc/hosts"
-		logfolder="/var/log/"
-		logfile="${logfolder}"raspy3-install.log
+		logfolder="/var/log"
+		logfile="${logfolder}/raspy3-install.log"
 		
 		# [[ $environment = 'development' ]] && logfile="${logfolder}"raspy3-install.log || logfile="${logfolder}"raspy3-install_`date +'%m-%d-%Y_%H%M%S'`.log
 		
@@ -94,74 +74,32 @@ variables() {
 	elif [[ "$1" == "unset" ]]; then
 		# Free up used memory for all of the variables created by this script
 		for i in $(env | awk -F"=" '{print $1}'); do
-			log "Unsetting : "$i
+			# log "Unsetting : "$i
 			unset $i
 		done
 	fi
 }
-
-# trap_with_arg- Capture exit signal and send value                    #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   None                                                               #
-# Returns:                                                             #
-#   Signal code of exit status                                         #
 trap_with_arg() {
     func="$1" ; shift
     for sig ; do
         trap "$func $sig" "$sig"
     done
 }
-
-# evallog- Execute and send argument to the log file                   #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   Value to execute and record to log file                            #
-# Returns:                                                             #
-#   If verbose is true, return the argument to the screen              #
 evallog() {
-    if [ "$verbose" = true ]; then
-        eval "$@"
-    else
-        eval "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
-    fi
+	eval "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
 }
-
-# log- Send argument to the log file                                   #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   Value to record to log file                                        #
-# Returns:                                                             #
-#   None                                                               #
 log() {
-	if [ "$verbose" = true ]; then
-		echo "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
-	else
-		echo "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
-	fi
+	echo "`date '+%m-%d-%Y [%I:%M:%S]'` | $@" |& tee -a $logfile >/dev/null 2>&1
 }
-
-# haveprog- Function to test if program is already installed on system #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   program name                                                       #
-# Returns:                                                             #
-#   true or false                                                      #
+systeminfodialog() {
+	result=$(df -h)
+	dialog --title "Disk Information" \
+	--no-collapse \
+	--msgbox "$result" 0 0
+}
 haveprog() {
     [ -x "$(which $1)" ]
 }
-
-# isalpha- Tests whether *entire string* is alphabetic.                #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   string to process                                                  #
-# Returns:                                                             #
-#   true or false                                                      #
 isalpha () {
 	[ $# -eq 1 ] || return $FAILURE
 
@@ -174,14 +112,6 @@ isalpha () {
 			;;
 		esac
 }
-
-# tolower- Converts string(s) passed as argument(s) to lowercase       #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   string to process                                                  #
-# Returns:                                                             #
-#   string in all lowercase                                            #
 tolower () {
 	if [ -z "$1" ]; then
 		echo "(null)"
@@ -192,14 +122,6 @@ tolower () {
 	echo "$@" | tr A-Z a-z
 	return
 }
-
-# checkinet- Checks for internet connection                            #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   None                                                               #
-# Returns:                                                             #
-#   true or false                                                      #
 checkinet() {
     case "$(curl -s --max-time 2 -I http://google.com | sed 's/^[^ ]*  *\([0-9]\).*/\1/; 1q')" in
 	[23]) 
@@ -216,14 +138,6 @@ checkinet() {
 		;;
     esac
 }
-
-# checkversion- Checks for the latest version of this script           #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   None                                                               #
-# Returns:                                                             #
-#   If new version is found, download and re-run                       #
 checkversion() {
 	# Check for Internet Connection
 	if checkinet; then
@@ -238,14 +152,6 @@ checkversion() {
 	# Check to see if this is the latest version of the script, notice the $version variable in the URL
 	# Download location: https://github.com/jessicakennedy1028/RasPi3-WebServer/releases/download/$version/deploy.sh
 }
-
-# progress- Creates a spinner effeect for processing the script        #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   None                                                               #
-# Returns:                                                             #
-#   None                                                               #
 progress() {
     echo -n " "
     tput civis
@@ -259,14 +165,6 @@ progress() {
     echo ""
     tput cnorm
 }
-
-# quitscript- Finalize script on all types of exit                     #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   "abort" "complete"                                                 #
-# Returns:                                                             #
-#   None                                                               #
 quitscript() {
 	tput cnorm
 	log "quit signal: $1"
@@ -351,14 +249,6 @@ quitscript() {
 			;;
 	esac
 }
-
-# managehost- Modify the /etc/hosts file automagically                 #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   "remove" "add" "find"                                              #
-# Returns:                                                             #
-#   None                                                               #
 managehost() {
 	OPTION=$1
 	HOSTNAME=$2
@@ -398,15 +288,6 @@ managehost() {
 		fi
 	fi
 }
-
-# managehost- Modify the /etc/hosts file automagically                 #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   "change_value" "get_line" "read_value" "remove_config" 	           #
-#   "remove_value" "sanitize_value" "verify_write" "write_value"       #
-# Returns:                                                             #
-#   None                                                               #
 config() {
 	option=$1
 	option_mode=ini
@@ -548,15 +429,6 @@ config() {
 			;;
 	esac
 }
-
-# loadcfg - Load the $configfile and read default values, if any       #
-# configuration items are missing try to correct them                  #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   None                                                               #
-# Returns:                                                             #
-#   variables from the config                                          #
 loadcfg() {
 	if [[ -f $configfile ]]; then
 		# The configuration file exists, now let test to make sure the parameter exists
@@ -807,15 +679,6 @@ loadcfg() {
 		fi
 	fi
 }
-
-# checkcfg - Check the $configfile and set the values for the * in the #
-# menus to determine if the value was set or needs configured.         #
-# Globals:                                                             #
-#                                                                      #
-# Arguments:                                                           #
-#   None                                                               #
-# Returns:                                                             #
-#   variables from the config                                          #
 checkcfg() {
 	# Option number 1
 	# Default the fail test to false
@@ -1045,7 +908,6 @@ checkcfg() {
 	fi
 }
 
-
 chkserverconfig() {
 	# We need to check for other server types, then set the servetype to true or false accordingly
 	webservertype=$(config "read_value" "webserver")
@@ -1064,10 +926,50 @@ chkserverconfig() {
 	fi
 }
 
-
-webserverform() {
+############## MENU SYSTEM
+mainmenusystem() {
+	mainmenu=(1 "Web Server" 2 "Database Server" 3 "Application Server" 4 "Email Server" 5 "File Server" 6 "Message Server" 7 "Proxy Server" 8 "System Configuration" 9 "Logs")
+	webservermenu=(1 "Apache" 2 "nGinX" 3 "Lightspeed" 4 "SSL" 5 "Disable Web Server")
+	apachemenu=(1 "Apache Configuration" 2 "Apache Restart" 3 "Apache Start" 4 "Apache Stop")
+	nginxmenu=(1 "nGinX Configuration" 2 "nGinX Restart" 3 "nGinX Start" 4 "nGinX Stop")
+	lightspeed=(1 "Lightspeed Configuration" 2 "Lightspeed Restart" 3 "Lightspeed Start" 4 "Lightspeed Stop")
+	letsencryptmenu=(1 "Let's Encrypt Settings" 2 "Renew Certification" 3 "Revoke Certification")
+	databaseservermenu=(1 "mySQL" 2 "MariaDB" 3 "PostgreSQL" 4 "Disable Database Server")
+	mysqlmenu=(1 "mySQL Configuration" 2 "mySQL Restart" 3 "mySQL Start" 4 "mySQL Stop")
+	mariadbsqlmenu=(1 "MariaDB Configuration" 2 "MariaDB Restart" 3 "MariaDB Start" 4 "MariaDB Stop")
+	postgresqlmenu=(1 "PostgreSQL Configuration" 2 "PostgreSQL Restart" 3 "PostgreSQL Start" 4 "PostgreSQL Stop")
+	applicationservermenu=(1 "PHP" 2 "Java" 3 "Tomcat" 4 "Open Source" 5 "Mobile Application" 6 "BBS Applications")
+	phpmenu=(1 "PHP Configuration" 2 "PHP Restart" 3 "PHP Start" 4 "PHP Stop")
+	javamenu=(1 "Java Configuration" 2 "Java Restart" 3 "Java Start" 4 "Java Stop")
+	tomcatmenu=(1 "Tomcat Configuration" 2 "Tomcat Restart" 3 "Tomcat Start" 4 "Tomcat Stop")
+	opensourcemenu=(1 "Open Source Configuration" 2 "Open Source Restart" 3 "Open Source Start" 4 "Open Source Stop")
+	bbsappsmenu=(1 "Mystic" 2 "WWIV")
+	mysticmenu=(1 "Mystic Configuration" 2 "Mystic Local Mode")
+	wwivmenu=(1 "WWIV Configuration" 2 "WWIV Local Mode")
+	emailservermenu=(1 "Postfix" 2 "Citadel" 3 "Sendmail" 4 "Exim" 5 "Courier" 6 "Disable Email Server")
+	postfixmenu=(1 "Postfix Configuration" 2 "Postfix Restart" 3 "Postfix Start" 4 "Postfix Stop")
+	citadelmenu=(1 "Citadel Configuration" 2 "Citadel Restart" 3 "Citadel Start" 4 "Citadel Stop")
+	sendmailmenu=(1 "Sendmail Configuration" 2 "Sendmail Restart" 3 "Sendmail Start" 4 "Sendmail Stop")
+	eximmenu=(1 "Exim Configuration" 2 "Exim Restart" 3 "Exim Start" 4 "Exim Stop")
+	couriermenu=(1 "Courier Configuration" 2 "Courier Restart" 3 "Courier Start" 4 "Courier Stop")
+	fileservermenu=(1 "FTP" 2 "NFS" 3 "Samba" 4 "Disable File Server")
+	ftpmenu=(1 "FTP Configuration" 2 "FTP Restart" 3 "FTP Start" 4 "FTP Stop")
+	nfsmenu=(1 "NFS Configuration" 2 "NFS Restart" 3 "NFS Start" 4 "NFS Stop")
+	sambamenu=(1 "Samba Configuration" 2 "Samba Restart" 3 "Samba Start" 4 "Samba Stop")
+	messageservermenu=(1 "Not set up" 2 "Not set up" 3 "Not set up")
+	proxyservermenu=(1 "Not set up" 2 "Not set up" 3 "Not set up")
+	systemconfigmenu=(1 "File System" 2 "Memory" 3 "File Editor" 4 "Network Configuration" 5 "Application Configuration")
+	filesystemmenu=(1 "Drive Space" 2 "Mount Points" 3 "Raid Configuration" 4 "USB Drive Configuration")
+	memorymenu=(1 "Memory Free" 2 "Swap Memory")
+	fileeditormenu=(1 "Hosts file" 2 "Hostname file")
+	networkconfigmenu=(1 "Wireless Configuration" 2 "Network Configuration")
+	applicationmenu=(1 "Git Configuration" 2 "Uninstall Applications")
+	logsmenu=(1 "Apache Logs" 2 "PHP Logs" 3 "Access Logs" 4 "Error Logs" 5 "Installation Logs" 6 "System Logs" 7 "This Application Logs")
+}
+############## WEBSERVER CONFIG FORMS
+apacheconfigform() {
 	dialogtitle="Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from the system configuration."
+	dialoginstructions="Please answer the questions below to configure your Apache server to your specific needs. Some defaults are assumed from the system configuration."
 	if [ $opt1menufailtest == "true" ]; then
 		dialoginstructions="$dialoginstructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
 	fi
@@ -1157,16 +1059,273 @@ webserverform() {
 		esac
 	done
 }
+nginxconfigform() {
+	dialogtitle="Server Settings"
+	dialoginstructions="Please answer the questions below to configure your nGinX server to your specific needs. Some defaults are assumed from the system configuration."
+	if [ $opt1menufailtest == "true" ]; then
+		dialoginstructions="$dialoginstructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
+	fi
+	log "${dialogtitle} Dialog Form called"
+	returncode=0
 
+	while test $returncode != 1 && test $returncode != 250; do
+		# Place the loadcfg and checkcfg here so it is rechecked on each menu load
+		loadcfg
+		checkcfg
+	
+		# Redirect stream 3 to the stream 1 (STDOUT)
+		exec 3>&1
+	
+		# Store data to $VALUES variable
+		VALUES=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --form "$dialoginstructions" 20 55 0 \
+			"       Domain Name :"	1 1	"$fqdn"			1 22 27 0 \
+			"         User Name :"	2 1	"$user"			2 22 27 0 \
+			"Public HTML folder :"	3 1	"$webserverdir"	3 22 27 0 \
+			"             Email :"	4 1	"$email"		4 22 27 0 \
+			"    File ownership :"  5 1 "$ownergroup"	5 22 27 0 \
+			"                IP :"	6 1	"$IP"			6 22 27 0 \
+		2>&1 1>&3)
+		
+		returncode=$?
+		
+		# Close the stream
+		exec 3>&-
 
-installedappsform() {
-	dialogtitle="Installed Applications"
+		# Assign the variables to an array
+		webservervars=($VALUES)
+		show=`echo "$VALUES" |sed -e 's/^/ /'`
+
+		case $returncode in
+			1|255) # If back or ESC was pressed
+				dialog --clear --backtitle "$SCREENTITLE" --yesno "Return to Main Menu?" 10 30
+				case $? in
+					0)
+						# If Yes was pressed
+						break
+						;;
+					1)
+						# No was pressed, so return back to the form
+						returncode=99
+						;;
+				esac
+				;;
+			0) # If submit or <ENTER> was pressed
+				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
+				case $? in
+					0)
+						# Check that all fields are filled before writing record, or give an error message
+						# Create the record string from $value, deleting the last #
+						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
+
+						# Count the number of fields
+						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
+
+						if [ $NUMFLDS -lt 6 ]; then
+							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
+							case $? in
+								0)
+									return
+									;;
+								255)
+									return
+									;;
+							esac
+						else
+							config "write_value" "fqdn" "${webservervars[0]}"
+							config "write_value" "user" "${webservervars[1]}"
+							config "write_value" "webserverdir" "${webservervars[2]}"
+							config "write_value" "email" "${webservervars[3]}"
+							config "write_value" "ownergroup" "${webservervars[4]}"
+							config "write_value" "ip" "${webservervars[5]}"
+						fi
+						return
+						;;
+					1)
+						return
+						;;
+					255)
+						return
+						;;
+				esac
+				;;
+		esac
+	done
+}
+lightspeedconfigform() {
+	dialogtitle="Server Settings"
+	dialoginstructions="Please answer the questions below to configure your Lightspeed server to your specific needs. Some defaults are assumed from the system configuration."
+	if [ $opt1menufailtest == "true" ]; then
+		dialoginstructions="$dialoginstructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
+	fi
+	log "${dialogtitle} Dialog Form called"
+	returncode=0
+
+	while test $returncode != 1 && test $returncode != 250; do
+		# Place the loadcfg and checkcfg here so it is rechecked on each menu load
+		loadcfg
+		checkcfg
+	
+		# Redirect stream 3 to the stream 1 (STDOUT)
+		exec 3>&1
+	
+		# Store data to $VALUES variable
+		VALUES=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --form "$dialoginstructions" 20 55 0 \
+			"       Domain Name :"	1 1	"$fqdn"			1 22 27 0 \
+			"         User Name :"	2 1	"$user"			2 22 27 0 \
+			"Public HTML folder :"	3 1	"$webserverdir"	3 22 27 0 \
+			"             Email :"	4 1	"$email"		4 22 27 0 \
+			"    File ownership :"  5 1 "$ownergroup"	5 22 27 0 \
+			"                IP :"	6 1	"$IP"			6 22 27 0 \
+		2>&1 1>&3)
+		
+		returncode=$?
+		
+		# Close the stream
+		exec 3>&-
+
+		# Assign the variables to an array
+		webservervars=($VALUES)
+		show=`echo "$VALUES" |sed -e 's/^/ /'`
+
+		case $returncode in
+			1|255) # If back or ESC was pressed
+				dialog --clear --backtitle "$SCREENTITLE" --yesno "Return to Main Menu?" 10 30
+				case $? in
+					0)
+						# If Yes was pressed
+						break
+						;;
+					1)
+						# No was pressed, so return back to the form
+						returncode=99
+						;;
+				esac
+				;;
+			0) # If submit or <ENTER> was pressed
+				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
+				case $? in
+					0)
+						# Check that all fields are filled before writing record, or give an error message
+						# Create the record string from $value, deleting the last #
+						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
+
+						# Count the number of fields
+						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
+
+						if [ $NUMFLDS -lt 6 ]; then
+							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
+							case $? in
+								0)
+									return
+									;;
+								255)
+									return
+									;;
+							esac
+						else
+							config "write_value" "fqdn" "${webservervars[0]}"
+							config "write_value" "user" "${webservervars[1]}"
+							config "write_value" "webserverdir" "${webservervars[2]}"
+							config "write_value" "email" "${webservervars[3]}"
+							config "write_value" "ownergroup" "${webservervars[4]}"
+							config "write_value" "ip" "${webservervars[5]}"
+						fi
+						return
+						;;
+					1)
+						return
+						;;
+					255)
+						return
+						;;
+				esac
+				;;
+		esac
+	done
+}
+############## WEBSERVER CONTROL DIALOGS
+apachectrlform() {
+	action=$1
+	# Don't forget to check to see if Apache is even installedappsform
+	
+	case $action in
+		"restart")
+			# Check to see if Apache is running, then restart
+			echo "restart"
+			;;
+		"start")
+			# Check to see if Apache is not running
+			echo "start"
+			;;
+		"stop")
+			# Check to see if Apache is running
+			echo "stop"
+			;;
+	esac
+}
+nginxctrlform() {
+	action=$1
+	# Don't forget to check to see if nGinX is even installedappsform
+	
+	case $action in
+		"restart")
+			# Check to see if nGinX is running, then restart
+			echo "restart"
+			;;
+		"start")
+			# Check to see if nGinX is not running
+			echo "start"
+			;;
+		"stop")
+			# Check to see if nGinX is running
+			echo "stop"
+			;;
+	esac
+}
+lightspeedctrlform() {
+	action=$1
+	# Don't forget to check to see if Lightspeed is even installedappsform
+	
+	case $action in
+		"restart")
+			# Check to see if Lightspeed is running, then restart
+			echo "restart"
+			;;
+		"start")
+			# Check to see if Lightspeed is not running
+			echo "start"
+			;;
+		"stop")
+			# Check to see if Lightspeed is running
+			echo "stop"
+			;;
+	esac
+}
+
+emailserverform() {
+	dialogtitle="Email Server Settings"
 	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
 	log "${dialogtitle} Dialog Form called"
 	returncode=0
 }
-
-
+databaseserverform(){
+	dialogtitle="Database Server Settings"
+	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	log "${dialogtitle} Dialog Form called"
+	returncode=0
+}
+driveserverform(){
+	dialogtitle="File Server Settings"
+	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	log "${dialogtitle} Dialog Form called"
+	returncode=0
+}
+installedappsform() {
+	dialogtitle="Application Server Settings"
+	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	log "${dialogtitle} Dialog Form called"
+	returncode=0
+}
 servertypemenu() {
 	# Place the loadcfg and checkcfg here so it is rechecked on each menu load
 	loadcfg
@@ -1466,14 +1625,15 @@ servertypemenu() {
 			;;
 	esac
 }
-
-
-systeminfodialog() {
-	result=$(df -h)
-	dialog --title "Disk Information" \
-	--no-collapse \
-	--msgbox "$result" 0 0
+systeminfomenu() {
+	dialogtitle="System Information Menu"
+	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	log "${dialogtitle} Dialog Form called"
+	returncode=0
 }
-
-# RasPi-3 Server Auto Configuration
-# [![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/RasPi3-WebServer-Logo.png)](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer)<br />
+installationlogsdialog() {
+	dialogtitle="Installation Logs"
+	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
+	log "${dialogtitle} Dialog Form called"
+	returncode=0
+}
