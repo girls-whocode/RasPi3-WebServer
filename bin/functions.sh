@@ -1,9 +1,21 @@
 #!/bin/bash
+if [ "$SYSTEMKEY" != "3d430f9af713781b92af4a97fc2e6664be7ce8e0" ]; then
+	echo "Do not run this file. To run this program use sudo ./install.sh"
+	exit 105
+fi
 # Set mode for script [development, production]
 environment="production"
 
 variables() {
 	if [[ "$1" == "set" ]]; then
+		# Set program specific values
+		majversion="2.0.0a"
+		minversion="0"
+		subversion="0"
+		codestatus="a"
+		version="${majversion}.${minversion}.${subversion}${codestatus}"
+		APPNAME="Server Auto Config ${majversion}"
+
 		# define and set the ANSI colors
 		NOCOLOR="\033[0m"
 		BLACK="\033[0;30m"
@@ -34,6 +46,10 @@ variables() {
 			user=$USER
 		fi
 
+		OKSYMB="\Z2✔\Zn"
+		BADSYMB="\Zb\Z1x\Zn"
+		DISABLEDSYMB="\Z3o\Zn"
+		
 		# Define paths and files
 		hosts="/etc/hosts"
 		logfolder="/var/log"
@@ -46,9 +62,6 @@ variables() {
 		fi
 		configfile="raspconfig.ini"
 
-		# Set program specific values
-		version="2.0.0a"
-		
 		[[ $environment = 'development' ]] && verbose=true || verbose=false
 
 		# Input error in dialog box.
@@ -430,246 +443,196 @@ config() {
 	esac
 }
 loadcfg() {
-	if [[ -f $configfile ]]; then
-		# The configuration file exists, now let test to make sure the parameter exists
-		# Had to make a decision here, if the config file exists and there are missing
-		# items, do I decide to fix it or just delete it and force it to recreate?
-		
-		# For now, let's try to fix it, if this turns to be a problem, we'll delete it
-		# and then rebuild it.
-		inifileexists=true
-		log "$configfile exist"
+	# The configuration file exists, now let test to make sure the parameter exists
+	# Had to make a decision here, if the config file exists and there are missing
+	# items, do I decide to fix it or just delete it and force it to recreate the
+	# parameter and value?
+	
+	# Currently this is reading the ini file twice for each item being read, we
+	# should probably move all of the variables here and read it once then check
+	# against its return
+	
+	# loadcfg function will also assign what the menu active or inactive status
+	# indicator will show
+	
+	# For now, let's try to fix it, if this turns to be a problem, we'll delete it
+	# and then rebuild it.
+	
+	# Set the defaults for menu status disabled, false or true
+	# Web Server Menu
+	webservermenustatus="disabled"
+	apachemenustatus="disabled"
+	nginxmenustatus="disabled"
+	lightspeedmenustatus="disabled"
+	sslmenustatus="disabled"
+	
+	# Database Server Menu
+	databasemenustatus="disabled"
+	mysqlmenustatus="disabled"
+	mariadbmenustatus="disabled"
+	postgresqlmenustatus="disabled"
+	
+	# Application Server Menu
+	applicationmenustatus="disabled"
+	phpmenustatus="disabled"
+	javamenustatus="disabled"
+	tomcatmenustatus="disabled"
+	osamenustatus="disabled"
+	mobilemenustatus="disabled"
+	phpappmenustatus="disabled"
+	javaappmenustatus="disabled"
+	tomcatappmenustatus="disabled"
+	osaappmenustatus="disabled"
+	mobileappmenustatus="disabled"
+	bbsappmenustatus="disabled"
 
-		if [ $(config "read_value" "servetype") == 'false' ]; then
-			SERVETYPE=$(config "read_value" "servetype")
-			log "servetype parameter does not exist - set to default value"
-			config "write_value" "servetype" "disabled"
-		else
-			SERVETYPE=$(config "read_value" "servetype")
-		fi
-		if [ $(config "read_value" "webserver") == 'false' ]; then
-			SERVETYPE=$(config "read_value" "webserver")
-			log "webserver parameter does not exist - set to default value"
-			config "write_value" "webserver" "disabled"
-		else
-			SERVETYPE=$(config "read_value" "webserver")
-		fi
-		if [ $(config "read_value" "databaseserver") == 'false' ]; then
-			SERVETYPE=$(config "read_value" "databaseserver")
-			log "databaseserver parameter does not exist - set to default value"
-			config "write_value" "databaseserver" "disabled"
-		else
-			SERVETYPE=$(config "read_value" "databaseserver")
-		fi
-		if [ $(config "read_value" "appserver") == 'false' ]; then
-			SERVETYPE=$(config "read_value" "appserver")
-			log "appserver parameter does not exist - set to default value"
-			config "write_value" "appserver" "disabled"
-		else
-			SERVETYPE=$(config "read_value" "appserver")
-		fi
-		if [ $(config "read_value" "fileserver") == 'false' ]; then
-			SERVETYPE=$(config "read_value" "fileserver")
-			log "fileserver parameter does not exist - set to default value"
-			config "write_value" "fileserver" "disabled"
-		else
-			SERVETYPE=$(config "read_value" "fileserver")
-		fi
-		if [ $(config "read_value" "msgserver") == 'false' ]; then
-			SERVETYPE=$(config "read_value" "msgserver")
-			log "msgserver parameter does not exist - set to default value"
-			config "write_value" "msgserver" "disabled"
-		else
-			SERVETYPE=$(config "read_value" "msgserver")
-		fi
-		if [ $(config "read_value" "proxyserver") == 'false' ]; then
-			SERVETYPE=$(config "read_value" "proxyserver")
-			log "proxyserver parameter does not exist - set to default value"
-			config "write_value" "proxyserver" "disabled"
-		else
-			SERVETYPE=$(config "read_value" "proxyserver")
-		fi
-		if [ $(config "read_value" "emailserver") == 'false' ]; then
-			SERVETYPE=$(config "read_value" "emailserver")
-			log "emailserver parameter does not exist - set to default value"
-			config "write_value" "emailserver" "disabled"
-		else
-			SERVETYPE=$(config "read_value" "emailserver")
-		fi
-		if [ $(config "read_value" "distro") == 'false' ]; then
-			DISTRO=$( lsb_release -is )
-			log "DISTRO parameter does not exist - set to default value"
-			config "write_value" "distro" $DISTRO
-		else
-			DISTRO=$(config "read_value" "distro")
-		fi
-		if [ $(config "read_value" "codename") == 'false' ]; then
-			CODENAME=$( lsb_release -cs )
-			log "CODENAME parameter does not exist - set to default value"
-			config "write_value" "codename" $CODENAME
-		else
-			CODENAME=$(config "read_value" "codename")
-		fi
-		if [ $(config "read_value" "distro_version") == 'false' ]; then
-			DISTVERSION=$( lsb_release -rs )
-			log "DISTVERSION parameter does not exist - set to default value"
-			config "write_value" "distro_version" $DISTVERSION
-		else
-			DISTVERSION=$(config "read_value" "distro_version")
-		fi
-		if [ $(config "read_value" "ip") == 'false' ]; then
-			IP="127.0.0.1"
-			log "CODENAME parameter does not exist - set to default value"
-			config "write_value" "ip" $IP
-		else
-			IP=$(config "read_value" "ip")
-		fi
-		if [ $(config "read_value" "ownergroup") == 'false' ]; then
-			ownergroup="www-data:www-data"
-			log "CODENAME parameter does not exist - set to default value"
-			config "write_value" "ownergroup" $ownergroup
-		else
-			ownergroup=$(config "read_value" "ownergroup")
-		fi
-		if [ $(config "read_value" "tzone") == 'false' ]; then
-			tzone="$(cat /etc/timezone)"
-			log "CODENAME parameter does not exist - set to default value"
-			config "write_value" "tzone" $tzone
-		else
-			tzone=$(config "read_value" "tzone")
-		fi
-		if [ $(config "read_value" "webserverdir") == 'false' ]; then
-			webserverdir="/var/www/"
-			log "CODENAME parameter does not exist - set to default value"
-			config "write_value" "webserverdir" $webserverdir
-		else
-			webserverdir=$(config "read_value" "webserverdir")
-		fi
-		if [ $(config "read_value" "pkgmgr") == 'false' ]; then
-			log "CODENAME parameter does not exist - set to default value"
-			if haveProg apt-get; then
-				log "Package manager set to APT"
-				pkginstall='DEBIAN_FRONTEND=noninteractive sudo apt -y'
-				config "write_value" "pkgmgr" "apt"
-			elif haveProg dnf; then
-				log "Package manager set to DNF"
-				pkginstall='sudo dnf -y'
-				config "write_value" "pkgmgr" "dnf"
-			elif haveProg yum; then
-				log "Package manager set to YUM"
-				pkginstall='sudo yum -y'
-				config "write_value" "pkgmgr" "yum"
-			elif haveProg up2date; then
-				log "Package manager set to UP2DATE"
-				pkginstall='sudo up2date -y'
-				config "write_value" "pkgmgr" "up2date"
-			else
-				log "Package manager set to NONE"
-				config "write_value" "pkgmgr" "none"
-				# Consider installing and configuring everything without a package manager
-				exit 100
-			fi
-		else
-			pkgmgr=$(config "read_value" "pkgmgr")
-			if [ $pkgmgr == "apt" ]; then
-				pkginstall='DEBIAN_FRONTEND=noninteractive sudo apt -y'
-			elif [ $pkgmgr == "dnf" ]; then
-				pkginstall='sudo dnf -y'
-			elif [ $pkgmgr == "yum" ]; then
-				pkginstall='sudo yum -y'
-			elif [ $pkgmgr == "up2date" ]; then
-				pkginstall='sudo up2date -y'
-			fi
-		fi
+	# Email Server Menu
+	emailmenustatus="disabled"
+	postfixmenustatus="disabled"
+	citadelmenustatus="disabled"
+	sendmailmenustatus="disabled"
+	eximmenustatus="disabled"
+	couriermenustatus="disabled"
 
-		# If false then the questions were never answered, so now what to do?
-		if [ $(config "read_value" "fqdn") == "false" ]; then
-			fqdn="$(hostname --fqdn)"
-		else
-			fqdn=$(config "read_value" "fqdn")
-		fi
-		if [ $(config "read_value" "user") == 'false' ]; then
-			user=$USER
-		else
-			user=$(config "read_value" "user")
-		fi
-		if [ $(config "read_value" "webserverdir") == 'false' ]; then
-			webserverdir="/var/www/"
-		else
-			webserverdir=$(config "read_value" "webserverdir")
-		fi
-		if [ $(config "read_value" "email") == 'false' ]; then
-			email="noone@nowhere.com"
-		else
-			email=$(config "read_value" "email")
-		fi
-		if [ $(config "read_value" "usbdrv") == 'false' ]; then
-			usbdrv="false"
-		else
-			usbdrv=$(config "read_value" "usbdrv")
-		fi
-		if [ $(config "read_value" "mountpoint") == 'false' ]; then
-			mountpoint="false"
-		else
-			mountpoint=$(config "read_value" "mountpoint")
-		fi
-	else
-		# Config does not exist, let's create it here with default values.
-		log "$configfile does not exist - creating default values"
-		inifileexists=false
+	# File Server Menu
+	filemenustatus="disabled"
+	ftpmenustatus="disabled"
+	nfsmenustatus="disabled"
+	sambamenustatus="disabled"
+	
+	# Message Server Menu
+	messagemenustatus="disabled"
+	
+	# Proxy Server Menu
+	proxymenustatus="disabled"
+	
+	# System Config Menu
+	systemconfigmenustatus="false"
+	systeminfomenustatus="false"
+	filesystemmenustatus="false"
+	drivespacemenustatus="false"
+	mountpointmenustatus="disabled"
+	raidconfigmenustatus="disabled"
+	usbdrivemenustatus="disabled"
+	memoryconfigmenustatus="false"
+	memoryfreemenustataus="false"
+	swapmemorymenustatus="disabled"
+	fileeditormenustatus="false"
+	hostsfilemenustatus="false"
+	hostnamefilemenustatus="false"
+	networkconfigmenustatus="false"
+	wirelessconfigmenustatus="disabled"
+	networkitemconfigmenustatus="disabled"
+	applicationconfigmenustatus="false"
+	gitconfigmenustatus="disabled"
+	uninstallappmenustatus="false"
+	
+	# Logs Menu
+	logsmenustatus="false"
+	apachelogsmenustatus="disabled"
+	phplogsmenustatus="disabled"
+	accesslogsmenustatus="disabled"
+	errorlogsmenustatus="disabled"
+	installationlogmenustatus="disabled"
+	systemlogsmenustatus="disabled"
+	autoconfigmenustatus="true"
 
-		# Need to have Distro testing here.
-		DISTRO=$( lsb_release -is ) # Reports Raspbian
-		CODENAME=$( lsb_release -cs ) # Reports stretch
-		DISTVERSION=$( lsb_release -rs ) # Reports 9.1
+	faileditem=""
 
-		# Set custom default variables
-		IP="127.0.0.1"
-		fqdn="$(hostname --fqdn)"
-		
-		# Since this script was ran with sudo, it will always return root,
-		# this method will look for the normal privileged user first, if it
-		# does exists or is blank, then default to the current user which is
-		# probably root. We'll ask later anyways.
-		user="$(awk -F'[/:]' '{if ($3 >= 1000 && $3 != 65534) print $1}' /etc/passwd)"
-		if [ -z $user ]; then
-			user=$USER
-		fi
-
-		ownergroup="www-data:www-data"
-		tzone="$(cat /etc/timezone)"
-		webserverdir="/var/www/"
-		email=""
-		usbdrv="false"
-		mountpoint="false"
-
+	# DISTRO sets the distribution information
+	if [ $(config "read_value" "distro") == 'false' ] || [ $(config "read_value" "distro") == 'null' ]; then
+		DISTRO=$( lsb_release -is )
+		log "DISTRO parameter or value does not exist - set to default value"
 		config "write_value" "distro" $DISTRO
+	else
+		DISTRO=$(config "read_value" "distro")
+	fi
+	# CODENAME sets the distribution codename
+	if [ $(config "read_value" "codename") == 'false' ] || [ $(config "read_value" "codename") == 'null' ]; then
+		CODENAME=$( lsb_release -cs )
+		log "CODENAME parameter or value does not exist - set to default value"
 		config "write_value" "codename" $CODENAME
+	else
+		CODENAME=$(config "read_value" "codename")
+	fi
+	# DISTVERSION sets the distribution codename
+	if [ $(config "read_value" "distro_version") == 'false' ] || [ $(config "read_value" "distro_version") == 'null' ]; then
+		DISTVERSION=$( lsb_release -rs )
+		log "DISTVERSION parameter or value does not exist - set to default value"
 		config "write_value" "distro_version" $DISTVERSION
+	else
+		DISTVERSION=$(config "read_value" "distro_version")
+	fi
+	# EMAIL set a default email value
+	if [ $(config "read_value" "email") == 'false' ] || [ $(config "read_value" "email") == 'null' ]; then
+		EMAIL="disabled"
+		log "EMAIL parameter or value does not exist - set to default value"
+		config "write_value" "EMAIL" $EMAIL
+	else
+		EMAIL=$(config "read_value" "email")
+	fi
+	# IP sets the IP address
+	if [ $(config "read_value" "ip") == 'false' ] || [ $(config "read_value" "ip") == 'null' ]; then
+		IP="127.0.0.1"
+		log "IP parameter or value does not exist - set to default value"
 		config "write_value" "ip" $IP
-		config "write_value" "fqdn" $fqdn
-		config "write_value" "user" $user
-		config "write_value" "ownergroup" $ownergroup
-		config "write_value" "tzone" $tzone
-		config "write_value" "webserverdir" $webserverdir
-		config "write_value" "usbdrv" $usbdrv
-
-		# Check for Package Manager installation
+	else
+		IP=$(config "read_value" "ip")
+	fi
+	# OWNERGROUP sets the default ower:group for webserver files and folders
+	if [ $(config "read_value" "ownergroup") == 'false' ] || [ $(config "read_value" "ownergroup") == 'null' ]; then
+		OWNERGROUP="www-data:www-data"
+		log "OWNERGROUP parameter or value does not exist - set to default value"
+		config "write_value" "ownergroup" $OWNERGROUP
+	else
+		OWNERGROUP=$(config "read_value" "ownergroup")
+	fi
+	# TZONE gets the default value for the current system timezone
+	if [ $(config "read_value" "tzone") == 'false' ] || [ $(config "read_value" "tzone") == 'null' ]; then
+		TZONE="$(cat /etc/timezone)"
+		log "TZONE parameter or value does not exist - set to default value"
+		config "write_value" "tzone" $TZONE
+	else
+		TZONE=$(config "read_value" "tzone")
+	fi
+	# WEBSERVERDIR sets the default web server directory
+	if [ $(config "read_value" "webserverdir") == 'false' ] || [ $(config "read_value" "webserverdir") == 'null' ]; then
+		WEBSERVERDIR="/var/www/"
+		log "WEBSERVERDIR parameter or value does not exist - set to default value"
+		config "write_value" "webserverdir" $WEBSERVERDIR
+	else
+		WEBSERVERDIR=$(config "read_value" "webserverdir")
+		if [ -d $WEBSERVERDIR ]; then
+			webservermenustatus="true"
+			apachemenustatus="true"
+			nginxmenustatus="true"
+			lightspeedmenustatus="true"
+		else
+			webservermenustatus="false"
+			apachemenustatus="false"
+			nginxmenustatus="false"
+			lightspeedmenustatus="false"
+			faileditem="$faileditem \Zb\Z1Web Server Directory\Zn - does not exist\n"
+		fi
+	fi
+	# PKGINSTALL finds what package manager is installed and allows the user to choose which one to use
+	if [ $(config "read_value" "pkgmgr") == 'false' ] || [ $(config "read_value" "pkgmgr") == 'null' ]; then
+		log "PKGINSTALL parameter or value does not exist - set to default value"
 		if haveprog apt-get; then
 			log "Package manager set to APT"
-			pkginstall='DEBIAN_FRONTEND=noninteractive sudo apt -y'
+			PKGINSTALL='DEBIAN_FRONTEND=noninteractive sudo apt -y'
 			config "write_value" "pkgmgr" "apt"
 		elif haveprog dnf; then
 			log "Package manager set to DNF"
-			pkginstall='sudo dnf -y'
+			PKGINSTALL='sudo dnf -y'
 			config "write_value" "pkgmgr" "dnf"
 		elif haveprog yum; then
 			log "Package manager set to YUM"
-			pkginstall='sudo yum -y'
+			PKGINSTALL='sudo yum -y'
 			config "write_value" "pkgmgr" "yum"
 		elif haveprog up2date; then
 			log "Package manager set to UP2DATE"
-			pkginstall='sudo up2date -y'
+			PKGINSTALL='sudo up2date -y'
 			config "write_value" "pkgmgr" "up2date"
 		else
 			log "Package manager set to NONE"
@@ -677,963 +640,178 @@ loadcfg() {
 			# Consider installing and configuring everything without a package manager
 			exit 100
 		fi
-	fi
-}
-checkcfg() {
-	# Option number 1
-	# Default the fail test to false
-	opt1menufailtest="false"
-	faileditems1=""
-	
-	if [ $(config "read_value" "fqdn") == "false" ] || [ $(config "read_value" "fqdn") == "null" ]; then
-		log "tested fqdn returned $(config "read_value" "fqdn")"
-		# Activate the fail test since fqdn was false or null
-		opt1menufailtest="true"
-		faileditems1="$faileditems1 \Zb\Z1Domain Name\Zn - Is not read from the configuration file\n"
-		opt1menuitem="\Zb\Z1*\Zn"
-		domainchk="\Zb\Z1*\Zn"
 	else
-		# Test if FQDN really works
+		PKGMGR=$(config "read_value" "pkgmgr")
+		if [ $PKGMGR == "apt" ]; then
+			PKGINSTALL='DEBIAN_FRONTEND=noninteractive sudo apt -y'
+		elif [ $PKGMGR == "dnf" ]; then
+			PKGINSTALL='sudo dnf -y'
+		elif [ $PKGMGR == "yum" ]; then
+			PKGINSTALL='sudo yum -y'
+		elif [ $PKGMGR == "up2date" ]; then
+			PKGINSTALL='sudo up2date -y'
+		fi
+	fi
+	# FQDN sets the default domain of the server
+	if [ $(config "read_value" "fqdn") == "false" ] || [ $(config "read_value" "fqdn") == "null" ]; then
+		FQDN="$(hostname --fqdn)"
+		log "FQDN parameter or value does not exist - set to default value"
+		config "write_value" "fqdn" $FQDN
+	else
+		FQDN=$(config "read_value" "fqdn")
+		# FQDN will make menu items Web Server, Apache, nGinX, Lightspeed, SSL all fail
 		whois "$fqdn" | egrep -q '^No match|^NOT FOUND|^Not fo|AVAILABLE|^No Data Fou|has not been regi|No entri'
 		if [ $? -eq 0 ]; then
-			# The whois test came back with NOT FOUND
-			opt1menufailtest="true"
-			faileditems1="$faileditems1 \Zb\Z1Domain Name\Zn - Can not be resolved\n"
-			opt1menuitem="\Zb\Z1*\Zn"
-			domainchk="\Zb\Z1*\Zn"
+			fqdnstatus="false"
+			webservermenustatus="false"
+			apachemenustatus="false"
+			nginxmenustatus="false"
+			lightspeedmenustatus="false"
+			faileditem="$faileditem \Zb\Z1Domain Name\Zn - cannot be resolved\n"
 		else
-			if [ $opt1menufailtest != "true" ]; then
-				opt1menuitem="\Zb\Z1*\Zn"
-				domainchk="\Zb\Z1*\Zn"
-			else
-				opt1menufailtest="false"
-				opt1menuitem="\Zb\Z2*\Zn"
-				domainchk="\Zb\Z2*\Zn"
-			fi
+			fqdnstatus="true"
+			webservermenustatus="true"
+			apachemenustatus="true"
+			nginxmenustatus="true"
+			lightspeedmenustatus="true"
 		fi
 	fi
-	if [ $(config "read_value" "user") == "false" ] || [ $(config "read_value" "user") == "null" ] || [ $(config "read_value" "user") == "disabled" ]; then
-		log "tested user returned $(config "read_value" "user")"
-		# Activate the fail test since user was false or null
-		# Next we need to create the user and set a password
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
-	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menuitem="\Zb\Z2*\Zn"
+	# SERVERUSER tries to resolve the non-root user if available, if not, then set from $USER
+	if [ $(config "read_value" "user") == 'false' ]; then
+		# Since this script was ran with sudo, it will always return root,
+		# this method will look for the normal privileged user first, if it
+		# does exists or is blank, then default to the current user which is
+		# probably root. We'll ask later anyways.
+		SERVERUSER="$(awk -F'[/:]' '{if ($3 >= 1000 && $3 != 65534) print $1}' /etc/passwd)"
+		if [ -z $user ]; then
+			SERVERUSER=$USER
 		fi
-	fi
-	if [ $(config "read_value" "webserverdir") == "false" ] || [ $(config "read_value" "webserverdir") == "null" ] || [ $(config "read_value" "webserverdir") == "disabled" ]; then
-		log "tested webserverdir returned "config "read_value" "webserverdir"
-		# Activate the fail test since webserverdir was false or null
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
+		log "FQDN parameter or value does not exist - set to default value"
+		config "write_value" "user" $SERVERUSER
 	else
-		# Detecting the Apache web root folder may deem more difficult then anticipated, we also have to consider nGinX
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menufailtest="false"
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
-	fi
-	if [ $(config "read_value" "email") == "false" ] || [ $(config "read_value" "email") == "null" ] || [ $(config "read_value" "email") == "noone@nowhere.com" ]; then
-		log "tested email returned $(config "read_value" "email")"
-		faileditems1="$faileditems1 \Zb\Z1Email\Zn - Is not read from the configuration file\n"
-		# Activate the fail test since email was false or null or invalid
-		# Next we will actually do a test on the email to make sure the email is valid
-		
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
-	else
-		echo "$email" | egrep -q "^([A-Za-z]+[A-Za-z0-9]*((\.|\-|\_)?[A-Za-z]+[A-Za-z0-9]*){1,})@(([A-Za-z]+[A-Za-z0-9]*)+((\.|\-|\_)?([A-Za-z]+[A-Za-z0-9]*)+){1,})+\.([A-Za-z]{2,})+"
+		SERVERUSER=$(config "read_value" "user")
+		# SERVERUSER if does not exists will make menu items Web Server, Apache, nGinX, Lightspeed, 
+		# Database Server, mySQL, MariaDB, PostgreSQL, Application, PHP, Java, Tomcat, Open Source, 
+		# Mobile App, Email, Postfix, Citadel, Sendmail, Exim, Courier, File, FTP, NFS, Samba, 
+		# Message all fail
+		getent passwd $SERVERUSER > /dev/null
 		if [ $? -eq 0 ]; then
-			# Email regex check passed
-			if [ $opt1menufailtest != "true" ]; then
-				opt1menufailtest="false"
-				opt1menuitem="\Zb\Z2*\Zn"
-			fi
+			webservermenustatus="true"
+			apachemenustatus="true"
+			nginxmenustatus="true"
+			lightspeedmenustatus="true"
+			databasemenustatus="true"
+			mysqlmenustatus="true"
+			mariadbmenustatus="true"
+			postgresqlmenustatus="true"
+			applicationmenustatus="true"
+			phpmenustatus="true"
+			javamenustatus="true"
+			tomcatmenustatus="true"
+			osamenustatus="true"
+			mobilemenustatus="true"
+			emailmenustatus="true"
+			postfixmenustatus="true"
+			citadelmenustatus="true"
+			sendmailmenustatus="true"
+			eximmenustatus="true"
+			couriermenustatus="true"
+			filemenustatus="true"
+			ftpmenustatus="true"
+			nfsmenustatus="true"
+			sambamenustatus="true"
+			messagemenustatus="true"
 		else
-			# Email regex check failed
-			faileditems1="$faileditems1 \Zb\Z1Email\Zn - Is not valid\n"
-			opt1menufailtest="true"
-			opt1menuitem="\Zb\Z1*\Zn"
-		fi
+			webservermenustatus="false"
+			apachemenustatus="false"
+			nginxmenustatus="false"
+			lightspeedmenustatus="false"
+			databasemenustatus="false"
+			mysqlmenustatus="false"
+			mariadbmenustatus="false"
+			postgresqlmenustatus="false"
+			applicationmenustatus="false"
+			phpmenustatus="false"
+			javamenustatus="false"
+			tomcatmenustatus="false"
+			osamenustatus="false"
+			mobilemenustatus="false"
+			emailmenustatus="false"
+			postfixmenustatus="false"
+			citadelmenustatus="false"
+			sendmailmenustatus="false"
+			eximmenustatus="false"
+			couriermenustatus="false"
+			filemenustatus="false"
+			ftpmenustatus="false"
+			nfsmenustatus="false"
+			sambamenustatus="false"
+			messagemenustatus="false"
+			faileditem="$faileditem \Zb\Z1User\Zn - does not exist\n"
+		fi	
 	fi
-	if [ $(config "read_value" "ownergroup") == "false" ] || [ $(config "read_value" "ownergroup") == "null" ]; then
-		log "tested ownergroup returned "config "read_value" "ownergroup"
-		# Activate the fail test since ownergroup was false or null
-		# Add the user to the ownergroup
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
+	# WEBSERVERTYPE apache, nginx, lightspeed, false, disabled, null
+	if [ $(config "read_value" "webserver") == 'false' ] || [ $(config "read_value" "webserver") == 'null' ]; then
+		log "webserver parameter or value does not exist - set to default value"
+		config "write_value" "webserver" "disabled"
 	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menufailtest="false"
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
+		WEBSERVERTYPE=$(config "read_value" "webserver")
+		webservermenustatus=$([ "$WEBSERVERTYPE" == "disabled" ] && echo "disabled" || ([ "$WEBSERVERTYPE" == "false" ] && echo "false" || echo "true" ))
 	fi
-	if [ $(config "read_value" "ip") == "false" ] && [ $(config "read_value" "ip") == "null" ]; then
-		log "tested ip returned $(config "read_value" "ip")"
-		# Activate the fail test since ip was false or null
-		opt1menufailtest="true"
-		opt1menuitem="\Zb\Z1*\Zn"
+	# DATABASESERVERTYPE mysql, mariadb, postgresql, false, disabled, null
+	if [ $(config "read_value" "databaseserver") == 'false' ] || [ $(config "read_value" "databaseserver") == 'null' ]; then
+		log "databaseserver parameter or value does not exist - set to default value"
+		config "write_value" "databaseserver" "disabled"
 	else
-		if [ $opt1menufailtest != "true" ]; then
-			opt1menufailtest="false"
-			opt1menuitem="\Zb\Z2*\Zn"
-		fi
+		DATABASESERVERTYPE=$(config "read_value" "databaseserver")
+		databasemenustatus=$([ "$DATABASESERVERTYPE" == "disabled" ] && echo "disabled" || ([ "$DATABASESERVERTYPE" == "false" ] && echo "false" || echo "true" ))
 	fi
-
-	# Option number 2
-	opt2menuitem="\Zb\Z1*\Zn"
-	
-	# Option number 3
-	opt3menuitem="\Zb\Z1*\Zn"
-
-	# Option number 4
-	opt4menuitem="\Zb\Z1*\Zn"
-
-	# Option number 5
-	opt5menuitem="\Zb\Z1*\Zn"
-	programs="apache2 php certbot postfix dovecot telnet"
-	for i in $programs; do
-		if haveprog $i; then
-			log "tested $i exist"
-			opt5menufailtest="false"
-			opt5menuitem="\Zb\Z2*\Zn"
-		else
-			log "tested $i doesn't exist"
-			opt5menuitem="\Zb\Z1*\Zn"
-		fi
-	done
-	
-	# Option number 6
-	opt6menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "servetype") == "false" ] || [ $(config "read_value" "servetype") == "null" ] || [ $(config "read_value" "servetype") == "disabled" ]; then
-		log "tested servetype returned $(config "read_value" "servetype")"
-		# Activate the fail test since servetype was false, null or none
-		opt6menufailtest="true"
-		opt6menuitem="\Zb\Z1*\Zn"
+	# APPSERVERTYPE php, java, tomcat, osa, mobile, bbs, false, disabled, null
+	if [ $(config "read_value" "appserver") == 'false' ] || [ $(config "read_value" "appserver") == 'null' ]; then
+		log "appserver parameter or value does not exist - set to default value"
+		config "write_value" "appserver" "disabled"
 	else
-		opt6menufailtest="false"
-		opt6menuitem="\Zb\Z2*\Zn"
+		APPSERVERTYPE=$(config "read_value" "appserver")
+		applicationmenustatus=$([ "$APPSERVERTYPE" == "disabled" ] && echo "disabled" || ([ "$APPSERVERTYPE" == "false" ] && echo "false" || echo "true" ))
 	fi
-
-	# Option number 7 - No configuration is really needed since this is just a dialog
-	opt7menuitem="\Zb\Z2*\Zn"
-
-	# Option number 8 - No configuration is really needed since this is just a report
-	opt8menuitem="\Zb\Z2*\Zn"
-	
-	# Option number 11 - Server Type/Web Server
-	opt11menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "webserver") == "false" ] || [ $(config "read_value" "webserver") == "null" ] || [ $(config "read_value" "webserver") == "disabled" ]; then
-		log "tested webserver returned $(config "read_value" "webserver")"
-		# Activate the fail test since webserver was false or null
-		opt11menufailtest="true"
-		opt11menuitem="\Zb\Z1*\Zn"
+	# EMAILSERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+	if [ $(config "read_value" "emailserver") == 'false' ] || [ $(config "read_value" "emailserver") == 'null' ]; then
+		log "emailserver parameter or value does not exist - set to default value"
+		config "write_value" "emailserver" "disabled"
 	else
-		opt11menufailtest="false"
-		opt11menuitem="\Zb\Z2*\Zn"
+		EMAILSERVERTYPE=$(config "read_value" "emailserver")
+		emailmenustatus=$([ "$EMAILSERVERTYPE" == "disabled" ] && echo "disabled" || ([ "$EMAILSERVERTYPE" == "false" ] && echo "false" || echo "true" ))
 	fi
-
-	# Option number 12 - Server Type/Database Server
-	opt12menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "databaseserver") == "false" ] || [ $(config "read_value" "databaseserver") == "null" ] || [ $(config "read_value" "databaseserver") == "disabled" ]; then
-		log "tested databaseserver returned $(config "read_value" "databaseserver")"
-		# Activate the fail test since databaseserver was false or null
-		opt12menufailtest="true"
-		opt12menuitem="\Zb\Z1*\Zn"
+	# FILEERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+	if [ $(config "read_value" "fileserver") == 'false' ] || [ $(config "read_value" "fileserver") == 'null' ]; then
+		log "fileserver parameter or value does not exist - set to default value"
+		config "write_value" "fileserver" "disabled"
 	else
-		opt12menufailtest="false"
-		opt12menuitem="\Zb\Z2*\Zn"
+		FILEERVERTYPE=$(config "read_value" "fileserver")
+		filemenustatus=$([ "$FILEERVERTYPE" == "disabled" ] && echo "disabled" || ([ "$FILEERVERTYPE" == "false" ] && echo "false" || echo "true" ))
 	fi
-
-	# Option number 13 - Server Type/Application Server
-	opt13menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "appserver") == "false" ] || [ $(config "read_value" "appserver") == "null" ] || [ $(config "read_value" "appserver") == "disabled" ]; then
-		log "tested appserver returned $(config "read_value" "appserver")"
-		# Activate the fail test since appserver was false or null
-		opt13menufailtest="true"
-		opt13menuitem="\Zb\Z1*\Zn"
+	# MSGSERVERTYPE (right now not sure what to put here)
+	if [ $(config "read_value" "msgserver") == 'false' ] || [ $(config "read_value" "msgserver") == 'null' ]; then
+		log "msgserver parameter or value does not exist - set to default value"
+		config "write_value" "msgserver" "disabled"
 	else
-		opt13menufailtest="false"
-		opt13menuitem="\Zb\Z2*\Zn"
+		MSGSERVERTYPE=$(config "read_value" "msgserver")
+		messagemenustatus=$([ "$MSGSERVERTYPE" == "disabled" ] && echo "disabled" || ([ "$MSGSERVERTYPE" == "false" ] && echo "false" || echo "true" ))
 	fi
-
-	# Option number 14 - Server Type/File Server
-	opt14menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "fileserver") == "false" ] || [ $(config "read_value" "fileserver") == "null" ] || [ $(config "read_value" "fileserver") == "disabled" ]; then
-		log "tested fileserver returned $(config "read_value" "fileserver")"
-		# Activate the fail test since fileserver was false or null
-		opt14menufailtest="true"
-		opt14menuitem="\Zb\Z1*\Zn"
+	# PROXYSERVERTYPE (right now not sure what to put here)
+	if [ $(config "read_value" "proxyserver") == 'false' ] || [ $(config "read_value" "proxyserver") == 'null' ]; then
+		log "proxyserver parameter does not exist - set to default value"
+		config "write_value" "proxyserver" "disabled"
 	else
-		opt14menufailtest="false"
-		opt14menuitem="\Zb\Z2*\Zn"
+		PROXYSERVERTYPE=$(config "read_value" "proxyserver")
+		proxymenustatus=$([ "$PROXYSERVERTYPE" == "disabled" ] && echo "disabled" || ([ "$PROXYSERVERTYPE" == "false" ] && echo "false" || echo "true" ))
 	fi
-
-	# Option number 15 - Server Type/Message Server
-	opt15menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "msgserver") == "false" ] || [ $(config "read_value" "msgserver") == "null" ] || [ $(config "read_value" "msgserver") == "disabled" ]; then
-		log "tested msgserver returned $(config "read_value" "msgserver")"
-		# Activate the fail test since msgserver was false or null
-		opt15menufailtest="true"
-		opt15menuitem="\Zb\Z1*\Zn"
-	else
-		opt15menufailtest="false"
-		opt15menuitem="\Zb\Z2*\Zn"
-	fi
-
-	# Option number 16 - Server Type/Proxy Server
-	opt16menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "proxyserver") == "false" ] || [ $(config "read_value" "proxyserver") == "null" ] || [ $(config "read_value" "proxyserver") == "disabled" ]; then
-		log "tested proxyserver returned $(config "read_value" "proxyserver")"
-		# Activate the fail test since proxyserver was false or null
-		opt16menufailtest="true"
-		opt16menuitem="\Zb\Z1*\Zn"
-	else
-		opt16menufailtest="false"
-		opt16menuitem="\Zb\Z2*\Zn"
-	fi
-	
-	# Option number 17 - Server Type/Email Server
-	opt17menuitem="\Zb\Z1*\Zn"
-	if [ $(config "read_value" "emailserver") == "false" ] || [ $(config "read_value" "emailserver") == "null" ] || [ $(config "read_value" "emailserver") == "disabled" ]; then
-		log "tested emailserver returned $(config "read_value" "emailserver")"
-		# Activate the fail test since emailserver was false or null
-		opt17menufailtest="true"
-		opt17menuitem="\Zb\Z1*\Zn"
-	else
-		opt17menufailtest="false"
-		opt17menuitem="\Zb\Z2*\Zn"
-	fi
-}
-
-chkserverconfig() {
-	# We need to check for other server types, then set the servetype to true or false accordingly
-	webservertype=$(config "read_value" "webserver")
-	databaseservertype=$(config "read_value" "databaseserver")
-	appservertype=$(config "read_value" "appserver")
-	fileservertype=$(config "read_value" "fileserver")
-	msgservertype=$(config "read_value" "msgserver")
-	proxyservertype=$(config "read_value" "proxyserver")
-	emailservertype=$(config "read_value" "emailserver")
-
-	if [ $webservertype == "disabled" ] && [ $databaseservertype == "disabled" ] && [ $appservertype == "disabled" ] && [ $fileservertype == "disabled" ] && [ $msgservertype == "disabled" ] && [ $proxyservertype == "disabled" ] && [ $emailservertype == "disabled" ]; then
+	# SERVETYPE true, false, disabled, null
+	if [ $(config "read_value" "servetype") == 'false' ] || [ $(config "read_value" "servetype") == 'null' ]; then
+		log "servetype parameter or value does not exist - set to default value"
 		config "write_value" "servetype" "disabled"
 	else
-		config "write_value" "servetype" "true"
-
+		SERVETYPE=$(config "read_value" "servetype")
+		servertype=$([ "$SERVETYPE" == "disabled" ] && echo "disabled" || ([ "$SERVETYPE" == "false" ] && echo "false" || echo "true" ))
 	fi
-}
-
-############## MENU SYSTEM
-mainmenusystem() {
-	mainmenu=(1 "Web Server" 2 "Database Server" 3 "Application Server" 4 "Email Server" 5 "File Server" 6 "Message Server" 7 "Proxy Server" 8 "System Configuration" 9 "Logs")
-	webservermenu=(1 "Apache" 2 "nGinX" 3 "Lightspeed" 4 "SSL" 5 "Disable Web Server")
-	apachemenu=(1 "Apache Configuration" 2 "Apache Restart" 3 "Apache Start" 4 "Apache Stop")
-	nginxmenu=(1 "nGinX Configuration" 2 "nGinX Restart" 3 "nGinX Start" 4 "nGinX Stop")
-	lightspeed=(1 "Lightspeed Configuration" 2 "Lightspeed Restart" 3 "Lightspeed Start" 4 "Lightspeed Stop")
-	letsencryptmenu=(1 "Let's Encrypt Settings" 2 "Renew Certification" 3 "Revoke Certification")
-	databaseservermenu=(1 "mySQL" 2 "MariaDB" 3 "PostgreSQL" 4 "Disable Database Server")
-	mysqlmenu=(1 "mySQL Configuration" 2 "mySQL Restart" 3 "mySQL Start" 4 "mySQL Stop")
-	mariadbsqlmenu=(1 "MariaDB Configuration" 2 "MariaDB Restart" 3 "MariaDB Start" 4 "MariaDB Stop")
-	postgresqlmenu=(1 "PostgreSQL Configuration" 2 "PostgreSQL Restart" 3 "PostgreSQL Start" 4 "PostgreSQL Stop")
-	applicationservermenu=(1 "PHP" 2 "Java" 3 "Tomcat" 4 "Open Source" 5 "Mobile Application" 6 "BBS Applications")
-	phpmenu=(1 "PHP Configuration" 2 "PHP Restart" 3 "PHP Start" 4 "PHP Stop")
-	javamenu=(1 "Java Configuration" 2 "Java Restart" 3 "Java Start" 4 "Java Stop")
-	tomcatmenu=(1 "Tomcat Configuration" 2 "Tomcat Restart" 3 "Tomcat Start" 4 "Tomcat Stop")
-	opensourcemenu=(1 "Open Source Configuration" 2 "Open Source Restart" 3 "Open Source Start" 4 "Open Source Stop")
-	bbsappsmenu=(1 "Mystic" 2 "WWIV")
-	mysticmenu=(1 "Mystic Configuration" 2 "Mystic Local Mode")
-	wwivmenu=(1 "WWIV Configuration" 2 "WWIV Local Mode")
-	emailservermenu=(1 "Postfix" 2 "Citadel" 3 "Sendmail" 4 "Exim" 5 "Courier" 6 "Disable Email Server")
-	postfixmenu=(1 "Postfix Configuration" 2 "Postfix Restart" 3 "Postfix Start" 4 "Postfix Stop")
-	citadelmenu=(1 "Citadel Configuration" 2 "Citadel Restart" 3 "Citadel Start" 4 "Citadel Stop")
-	sendmailmenu=(1 "Sendmail Configuration" 2 "Sendmail Restart" 3 "Sendmail Start" 4 "Sendmail Stop")
-	eximmenu=(1 "Exim Configuration" 2 "Exim Restart" 3 "Exim Start" 4 "Exim Stop")
-	couriermenu=(1 "Courier Configuration" 2 "Courier Restart" 3 "Courier Start" 4 "Courier Stop")
-	fileservermenu=(1 "FTP" 2 "NFS" 3 "Samba" 4 "Disable File Server")
-	ftpmenu=(1 "FTP Configuration" 2 "FTP Restart" 3 "FTP Start" 4 "FTP Stop")
-	nfsmenu=(1 "NFS Configuration" 2 "NFS Restart" 3 "NFS Start" 4 "NFS Stop")
-	sambamenu=(1 "Samba Configuration" 2 "Samba Restart" 3 "Samba Start" 4 "Samba Stop")
-	messageservermenu=(1 "Not set up" 2 "Not set up" 3 "Not set up")
-	proxyservermenu=(1 "Not set up" 2 "Not set up" 3 "Not set up")
-	systemconfigmenu=(1 "File System" 2 "Memory" 3 "File Editor" 4 "Network Configuration" 5 "Application Configuration")
-	filesystemmenu=(1 "Drive Space" 2 "Mount Points" 3 "Raid Configuration" 4 "USB Drive Configuration")
-	memorymenu=(1 "Memory Free" 2 "Swap Memory")
-	fileeditormenu=(1 "Hosts file" 2 "Hostname file")
-	networkconfigmenu=(1 "Wireless Configuration" 2 "Network Configuration")
-	applicationmenu=(1 "Git Configuration" 2 "Uninstall Applications")
-	logsmenu=(1 "Apache Logs" 2 "PHP Logs" 3 "Access Logs" 4 "Error Logs" 5 "Installation Logs" 6 "System Logs" 7 "This Application Logs")
-}
-############## WEBSERVER CONFIG FORMS
-apacheconfigform() {
-	dialogtitle="Server Settings"
-	dialoginstructions="Please answer the questions below to configure your Apache server to your specific needs. Some defaults are assumed from the system configuration."
-	if [ $opt1menufailtest == "true" ]; then
-		dialoginstructions="$dialoginstructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
-	fi
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-
-	while test $returncode != 1 && test $returncode != 250; do
-		# Place the loadcfg and checkcfg here so it is rechecked on each menu load
-		loadcfg
-		checkcfg
-	
-		# Redirect stream 3 to the stream 1 (STDOUT)
-		exec 3>&1
-	
-		# Store data to $VALUES variable
-		VALUES=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --form "$dialoginstructions" 20 55 0 \
-			"       Domain Name :"	1 1	"$fqdn"			1 22 27 0 \
-			"         User Name :"	2 1	"$user"			2 22 27 0 \
-			"Public HTML folder :"	3 1	"$webserverdir"	3 22 27 0 \
-			"             Email :"	4 1	"$email"		4 22 27 0 \
-			"    File ownership :"  5 1 "$ownergroup"	5 22 27 0 \
-			"                IP :"	6 1	"$IP"			6 22 27 0 \
-		2>&1 1>&3)
-		
-		returncode=$?
-		
-		# Close the stream
-		exec 3>&-
-
-		# Assign the variables to an array
-		webservervars=($VALUES)
-		show=`echo "$VALUES" |sed -e 's/^/ /'`
-
-		case $returncode in
-			1|255) # If back or ESC was pressed
-				dialog --clear --backtitle "$SCREENTITLE" --yesno "Return to Main Menu?" 10 30
-				case $? in
-					0)
-						# If Yes was pressed
-						break
-						;;
-					1)
-						# No was pressed, so return back to the form
-						returncode=99
-						;;
-				esac
-				;;
-			0) # If submit or <ENTER> was pressed
-				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
-				case $? in
-					0)
-						# Check that all fields are filled before writing record, or give an error message
-						# Create the record string from $value, deleting the last #
-						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
-
-						# Count the number of fields
-						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
-
-						if [ $NUMFLDS -lt 6 ]; then
-							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
-							case $? in
-								0)
-									return
-									;;
-								255)
-									return
-									;;
-							esac
-						else
-							config "write_value" "fqdn" "${webservervars[0]}"
-							config "write_value" "user" "${webservervars[1]}"
-							config "write_value" "webserverdir" "${webservervars[2]}"
-							config "write_value" "email" "${webservervars[3]}"
-							config "write_value" "ownergroup" "${webservervars[4]}"
-							config "write_value" "ip" "${webservervars[5]}"
-						fi
-						return
-						;;
-					1)
-						return
-						;;
-					255)
-						return
-						;;
-				esac
-				;;
-		esac
-	done
-}
-nginxconfigform() {
-	dialogtitle="Server Settings"
-	dialoginstructions="Please answer the questions below to configure your nGinX server to your specific needs. Some defaults are assumed from the system configuration."
-	if [ $opt1menufailtest == "true" ]; then
-		dialoginstructions="$dialoginstructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
-	fi
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-
-	while test $returncode != 1 && test $returncode != 250; do
-		# Place the loadcfg and checkcfg here so it is rechecked on each menu load
-		loadcfg
-		checkcfg
-	
-		# Redirect stream 3 to the stream 1 (STDOUT)
-		exec 3>&1
-	
-		# Store data to $VALUES variable
-		VALUES=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --form "$dialoginstructions" 20 55 0 \
-			"       Domain Name :"	1 1	"$fqdn"			1 22 27 0 \
-			"         User Name :"	2 1	"$user"			2 22 27 0 \
-			"Public HTML folder :"	3 1	"$webserverdir"	3 22 27 0 \
-			"             Email :"	4 1	"$email"		4 22 27 0 \
-			"    File ownership :"  5 1 "$ownergroup"	5 22 27 0 \
-			"                IP :"	6 1	"$IP"			6 22 27 0 \
-		2>&1 1>&3)
-		
-		returncode=$?
-		
-		# Close the stream
-		exec 3>&-
-
-		# Assign the variables to an array
-		webservervars=($VALUES)
-		show=`echo "$VALUES" |sed -e 's/^/ /'`
-
-		case $returncode in
-			1|255) # If back or ESC was pressed
-				dialog --clear --backtitle "$SCREENTITLE" --yesno "Return to Main Menu?" 10 30
-				case $? in
-					0)
-						# If Yes was pressed
-						break
-						;;
-					1)
-						# No was pressed, so return back to the form
-						returncode=99
-						;;
-				esac
-				;;
-			0) # If submit or <ENTER> was pressed
-				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
-				case $? in
-					0)
-						# Check that all fields are filled before writing record, or give an error message
-						# Create the record string from $value, deleting the last #
-						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
-
-						# Count the number of fields
-						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
-
-						if [ $NUMFLDS -lt 6 ]; then
-							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
-							case $? in
-								0)
-									return
-									;;
-								255)
-									return
-									;;
-							esac
-						else
-							config "write_value" "fqdn" "${webservervars[0]}"
-							config "write_value" "user" "${webservervars[1]}"
-							config "write_value" "webserverdir" "${webservervars[2]}"
-							config "write_value" "email" "${webservervars[3]}"
-							config "write_value" "ownergroup" "${webservervars[4]}"
-							config "write_value" "ip" "${webservervars[5]}"
-						fi
-						return
-						;;
-					1)
-						return
-						;;
-					255)
-						return
-						;;
-				esac
-				;;
-		esac
-	done
-}
-lightspeedconfigform() {
-	dialogtitle="Server Settings"
-	dialoginstructions="Please answer the questions below to configure your Lightspeed server to your specific needs. Some defaults are assumed from the system configuration."
-	if [ $opt1menufailtest == "true" ]; then
-		dialoginstructions="$dialoginstructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
-	fi
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-
-	while test $returncode != 1 && test $returncode != 250; do
-		# Place the loadcfg and checkcfg here so it is rechecked on each menu load
-		loadcfg
-		checkcfg
-	
-		# Redirect stream 3 to the stream 1 (STDOUT)
-		exec 3>&1
-	
-		# Store data to $VALUES variable
-		VALUES=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --form "$dialoginstructions" 20 55 0 \
-			"       Domain Name :"	1 1	"$fqdn"			1 22 27 0 \
-			"         User Name :"	2 1	"$user"			2 22 27 0 \
-			"Public HTML folder :"	3 1	"$webserverdir"	3 22 27 0 \
-			"             Email :"	4 1	"$email"		4 22 27 0 \
-			"    File ownership :"  5 1 "$ownergroup"	5 22 27 0 \
-			"                IP :"	6 1	"$IP"			6 22 27 0 \
-		2>&1 1>&3)
-		
-		returncode=$?
-		
-		# Close the stream
-		exec 3>&-
-
-		# Assign the variables to an array
-		webservervars=($VALUES)
-		show=`echo "$VALUES" |sed -e 's/^/ /'`
-
-		case $returncode in
-			1|255) # If back or ESC was pressed
-				dialog --clear --backtitle "$SCREENTITLE" --yesno "Return to Main Menu?" 10 30
-				case $? in
-					0)
-						# If Yes was pressed
-						break
-						;;
-					1)
-						# No was pressed, so return back to the form
-						returncode=99
-						;;
-				esac
-				;;
-			0) # If submit or <ENTER> was pressed
-				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
-				case $? in
-					0)
-						# Check that all fields are filled before writing record, or give an error message
-						# Create the record string from $value, deleting the last #
-						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
-
-						# Count the number of fields
-						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
-
-						if [ $NUMFLDS -lt 6 ]; then
-							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
-							case $? in
-								0)
-									return
-									;;
-								255)
-									return
-									;;
-							esac
-						else
-							config "write_value" "fqdn" "${webservervars[0]}"
-							config "write_value" "user" "${webservervars[1]}"
-							config "write_value" "webserverdir" "${webservervars[2]}"
-							config "write_value" "email" "${webservervars[3]}"
-							config "write_value" "ownergroup" "${webservervars[4]}"
-							config "write_value" "ip" "${webservervars[5]}"
-						fi
-						return
-						;;
-					1)
-						return
-						;;
-					255)
-						return
-						;;
-				esac
-				;;
-		esac
-	done
-}
-############## WEBSERVER CONTROL DIALOGS
-apachectrlform() {
-	action=$1
-	# Don't forget to check to see if Apache is even installedappsform
-	
-	case $action in
-		"restart")
-			# Check to see if Apache is running, then restart
-			echo "restart"
-			;;
-		"start")
-			# Check to see if Apache is not running
-			echo "start"
-			;;
-		"stop")
-			# Check to see if Apache is running
-			echo "stop"
-			;;
-	esac
-}
-nginxctrlform() {
-	action=$1
-	# Don't forget to check to see if nGinX is even installedappsform
-	
-	case $action in
-		"restart")
-			# Check to see if nGinX is running, then restart
-			echo "restart"
-			;;
-		"start")
-			# Check to see if nGinX is not running
-			echo "start"
-			;;
-		"stop")
-			# Check to see if nGinX is running
-			echo "stop"
-			;;
-	esac
-}
-lightspeedctrlform() {
-	action=$1
-	# Don't forget to check to see if Lightspeed is even installedappsform
-	
-	case $action in
-		"restart")
-			# Check to see if Lightspeed is running, then restart
-			echo "restart"
-			;;
-		"start")
-			# Check to see if Lightspeed is not running
-			echo "start"
-			;;
-		"stop")
-			# Check to see if Lightspeed is running
-			echo "stop"
-			;;
-	esac
-}
-
-emailserverform() {
-	dialogtitle="Email Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-}
-databaseserverform(){
-	dialogtitle="Database Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-}
-driveserverform(){
-	dialogtitle="File Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-}
-installedappsform() {
-	dialogtitle="Application Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-}
-servertypemenu() {
-	# Place the loadcfg and checkcfg here so it is rechecked on each menu load
-	loadcfg
-	checkcfg
-
-	$title="Server Type Configuration"
-	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n\Zn[\Zb\Z1*\Zn/\Z2*\Zn] - Invalid/Valid Settings Detected\n\n"
-
-	ServerTypeMenuOptions=(1 "\Zn[${opt11menuitem}] Web Server" 2 "\Zn[${opt12menuitem}] Database Server" 3 "\Zn[${opt13menuitem}] Application Server" 4 "\Zn[${opt14menuitem}] File Server" 5 "\Zn[${opt15menuitem}] Message Server" 6 "\Zn[${opt16menuitem}] Proxy Server" 7 "\Zn[${opt17menuitem}] Email Server")
-	exec 3>&1
-	CHOICE=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${ServerTypeMenuOptions[@]}" 2>&1 1>&3)
-	exit_status=$?
-
-	case $exit_status in
-		255) return;;
-	esac
-
-	case $CHOICE in
-		1) # Web Server
-			servertype=$(config "read_value" "webserver")
-			case $servertype in
-				"apache")
-					WebChoices=(1 "Apache" on 2 "nGinX" off 3 "LightSpeed" off 4 "Disable Server" off)
-					;;
-				"nginx")
-					WebChoices=(1 "Apache" off 2 "nGinX" on 3 "LightSpeed" off 4 "Disable Server" off)
-					;;
-				"lightspeed")
-					WebChoices=(1 "Apache" off 2 "nGinX" off 3 "LightSpeed" on 4 "Disable Server" off)
-					;;
-				"disabled")
-					WebChoices=(1 "Apache" off 2 "nGinX" off 3 "LightSpeed" off 4 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a web server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "webserver" "apache"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "webserver" "nginx"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "webserver" "lightspeed"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "webserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-		2) # Database Server
-			servertype=$(config "read_value" "databaseserver")
-			case $servertype in
-				"mysql")
-					WebChoices=(1 "mySQL" on 2 "MariaDB" off 3 "PostgreSQL" off 4 "Disable Server" off)
-					;;
-				"mariadb")
-					WebChoices=(1 "mySQL" off 2 "MariaDB" on 3 "PostgreSQL" off 4 "Disable Server" off)
-					;;
-				"postgresql")
-					WebChoices=(1 "mySQL" off 2 "MariaDB" off 3 "PostgreSQL" on 4 "Disable Server" off)
-					;;
-				"disabled")
-					WebChoices=(1 "mySQL" off 2 "MariaDB" off 3 "PostgreSQL" off 4 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a database server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "databaseserver" "mysql"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "databaseserver" "mariadb"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "databaseserver" "postgresql"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "databaseserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-		3) # Application Server
-			servertype=$(config "read_value" "appserver")
-			echo $servertype
-			case $servertype in
-				"php")
-					WebChoices=(1 "PHP" on 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
-					;;
-				"java")
-					WebChoices=(1 "PHP" off 2 "Java" on 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
-					;;
-				"tomcat")
-					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" on 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
-					;;
-				"osa")
-					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" on 5 "Mobile Application" off 6 "Disable Server" off)
-					;;
-				"mobile")
-					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" on 6 "Disable Server" off)
-					;;
-				"disabled")
-					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a application server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "appserver" "php"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "appserver" "java"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "appserver" "tomcat"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "appserver" "osa"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					5)
-						config "write_value" "appserver" "mobile"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					6)
-						config "write_value" "appserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-		4) # FileServer
-			servertype=$(config "read_value" "fileserver")
-			echo $servertype
-			case $servertype in
-				"ftp")
-					WebChoices=(1 "FTP" on 2 "NFS" off 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
-					;;
-				"nfs")
-					WebChoices=(1 "FTP" off 2 "NFS" on 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
-					;;
-				"smb")
-					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" on 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
-					;;
-				"nas")
-					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" on 5 "Boot Image" off 6 "Disable Server" off)
-					;;
-				"bootimg")
-					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" on 5 "Boot Image" on 6 "Disable Server" off)
-					;;
-				"disabled")
-					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a file server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "fileserver" "ftp"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "fileserver" "nfs"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "fileserver" "smb"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "fileserver" "nas"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					5)
-						config "write_value" "fileserver" "bootimg"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					6)
-						config "write_value" "fileserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-		5) # Message Server
-			servertype=$(config "read_value" "fileserver")
-			echo "Option 5"
-			;;
-		6) # Proxy Server
-			echo "Option 6"
-			;;
-		7) # Email server
-			EmailChoices=(1 "Postfix" "on" 2 "Citadel" "off" 3 "Sendmail" "off" 4 "Exim" "off" 5 "Courier" "off")
-			servertype=$(config "read_value" "emailserver")
-			echo $servertype
-			case $servertype in
-				"postfix")
-					WebChoices=(1 "Postfix" on 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
-					;;
-				"citadel")
-					WebChoices=(1 "Postfix" off 2 "Citadel" on 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
-					;;
-				"sendmail")
-					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" on 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
-					;;
-				"exim")
-					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" on 5 "Courier" off 6 "Disable Server" off)
-					;;
-				"courier")
-					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" on)
-					;;
-				"disabled")
-					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a email server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "emailserver" "postfix"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "emailserver" "citadel"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "emailserver" "sendmail"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "emailserver" "exim"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					5)
-						config "write_value" "emailserver" "courier"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					6)
-						config "write_value" "fileserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-	esac
-}
-systeminfomenu() {
-	dialogtitle="System Information Menu"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-}
-installationlogsdialog() {
-	dialogtitle="Installation Logs"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
 }

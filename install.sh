@@ -15,6 +15,7 @@
 # Errors:                                                              #
 #                                                                      #
 #   100 - Package manager was not found                                #
+#	105 - Program called from another file                             #
 #   110 - Early exit status from script                                #
 #   111 - Log file failed to write                                     #
 #   112 - Hangup signal received                                       #
@@ -38,7 +39,10 @@
 #                                                                      #
 ########################################################################
 
+SYSTEMKEY="3d430f9af713781b92af4a97fc2e6664be7ce8e0"
 source ./bin/functions.sh # Call the functions file
+source ./bin/menu.sh # Call the menu file
+
 variables "set" # Set the variables
 mainmenusystem
 
@@ -62,7 +66,6 @@ log "Script started ############################################################
 log "Start installation script"
 
 loadcfg # Load the configuration file
-checkcfg # Process the configuration file and set variables
 
 # Test for ncurses dialog application
 if haveprog dialog; then
@@ -86,26 +89,24 @@ fi
 
 # Set the defaults for the dialog environment
 SCREENTITLE="System Server Auto Configuration"
-HEIGHT=20
-WIDTH=45
-CHOICE_HEIGHT=20
+HEIGHT=23
+WIDTH=40
+CHOICE_HEIGHT=21
 OKLABEL="Submit"
 CANCELLABEL="Back"
 CREDITS="Jessica Brown"
 
 # Main Menu Options List
 title="Main Menu"
-instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n\Zn[\Zb\Z1*\Zn/\Z2*\Zn] - Invalid/Valid Settings Detected\n\n"
+instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
 
 while true; do
 	# Place the loadcfg and checkcfg here so it is rechecked on each menu load
 	loadcfg
-	checkcfg
 
 	# So many things that could be done, but let's start with the basics
 		# Additional items to add someday:
 		# Move the Drive information inside the Drive Configuration
-	# MainMenuOptions=(1 "\Zn[${opt1menuitem}] Web Server Configuration" 2 "\Zn[${opt2menuitem}] Email Server Configuration" 3 "\Zn[${opt3menuitem}] Database Server Configuration" 4 "\Zn[${opt4menuitem}] Drive Configuration" 5 "\Zn[${opt5menuitem}] Installed Programs" 6 "\Zn[${opt6menuitem}] Change Server Type" 7 "\Zn[${opt7menuitem}] System Information" 8 "\Zn[${opt1menuitem}] Installation Logs")
 
 	exec 3>&1
 	CHOICE=$(dialog --clear --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${mainmenu[@]}" 2>&1 1>&3)
@@ -331,7 +332,24 @@ while true; do
 							;;
 					esac
 					;;
-				5) # BBS Applications
+				5) # Open Source
+					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${mobilemenu[@]}" 2>&1 1>&3)
+					case $CHOICE in
+						1) # Open Source Configuration
+							echo "Mobile App Configuration"
+							;;
+						2) # Open Source Restart
+							echo "Mobile App Restart"
+							;;
+						3) # Open Source Start
+							echo "Mobile App Start"
+							;;
+						4) # Open Source Stop
+							echo "Mobile App Stop"
+							;;
+					esac
+					;;
+				6) # BBS Applications
 					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${bbsappsmenu[@]}" 2>&1 1>&3)
 					case $CHOICE in
 						1) # Mystic 
@@ -358,7 +376,7 @@ while true; do
 							;;
 					esac
 					;;
-				6) # Disable Application Server
+				7) # Disable Application Server
 					echo "Disable Application Server"
 					;;
 			esac
@@ -524,7 +542,10 @@ while true; do
 		8) # System Configuration
 			CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${systemconfigmenu[@]}" 2>&1 1>&3)
 			case $CHOICE in
-				1) # File System
+				1) # System Information
+					echo "System Information"
+					;;
+				2) # File System
 					CHOICE=$(dialog --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${filesystemmenu[@]}" 2>&1 1>&3)
 					case $CHOICE in
 						1) # Drive Information
@@ -541,7 +562,7 @@ while true; do
 							;;
 					esac
 					;;
-				2) # Memory
+				3) # Memory
 					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${memorymenu[@]}" 2>&1 1>&3)
 					case $CHOICE in
 						1) # Free Memory
@@ -552,7 +573,7 @@ while true; do
 							;;
 					esac
 					;;
-				3) # File Editor
+				4) # File Editor
 					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${fileeditormenu[@]}" 2>&1 1>&3)
 					case $CHOICE in
 						1) # Host file
@@ -563,7 +584,7 @@ while true; do
 							;;
 					esac
 					;;
-				4) # Network Configuration
+				5) # Network Configuration
 					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${networkconfigmenu[@]}" 2>&1 1>&3)
 					case $CHOICE in
 						1) # Exim Configuration
@@ -574,8 +595,8 @@ while true; do
 							;;
 					esac
 					;;
-				5) # Application Configuration
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${couriermenu[@]}" 2>&1 1>&3)
+				6) # Application Configuration
+					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${applicationmenu[@]}" 2>&1 1>&3)
 					case $CHOICE in
 						1) # Git Configuration
 							echo "Git Configuration"

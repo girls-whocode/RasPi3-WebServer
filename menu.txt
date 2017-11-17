@@ -1,0 +1,149 @@
+Server Type
+  1. Web Server                        # SERVETYPE true, false, disabled, null
+    1. Apache                          # WEBSERVERTYPE apache, nginx, lightspeed, false, disabled, null
+      1. Apache Configuration
+      2. Apache Restart
+      3. Apache Start
+      4. Apache Stop
+    2. nGinX                           # WEBSERVERTYPE apache, nginx, lightspeed, false, disabled, null
+      1. nGinx Configuration
+      2. nGinX Restart
+      3. nGinX Start
+      4. nGinX Stop
+    3. Lightspeed                      # WEBSERVERTYPE apache, nginx, lightspeed, false, disabled, null
+      1. Lightspeed Configuration
+      2. Lightspeed Restart
+      3. Lightspeed Start
+      4. Lightspeed Stop
+    4. SSL Setup
+      1. Let's Encrypt Settings
+      2. Renew Certification
+      3. Revoke Certification
+    5. Disabled
+
+  2. Database Server                  # SERVETYPE true, false, disabled, null
+    1. mySQL                          # DATABASESERVERTYPE mysql, mariadb, postgresql, false, disabled, null
+      1. mySQL Configuration
+      2. mySQL Restart
+      3. mySQL Start
+      4. mySQL Stop
+    2. MariaDB                        # DATABASESERVERTYPE mysql, mariadb, postgresql, false, disabled, null
+      1. MariaDB Configuration
+      2. MariaDB Restart
+      3. MariaDB Start
+      4. MariaDB Stop
+    3. PostgreSQL                     # DATABASESERVERTYPE mysql, mariadb, postgresql, false, disabled, null
+      1. PostgreSQL Configuration
+      2. PostgreSQL Restart
+      3. PostgreSQL Start
+      4. PostgreSQL Stop
+
+  3. Application Server               # SERVETYPE true, false, disabled, null
+    1. PHP                            # APPSERVERTYPE php, java, tomcat, osa, mobile, bbs, false, disabled, null
+      1. PHP Configuration
+      2. PHP Restart
+      3. PHP Start
+      4. PHP Stop
+    2. Java                           # APPSERVERTYPE php, java, tomcat, osa, mobile, bbs, false, disabled, null
+      1. Java Configuration
+      2. Java Restart
+      3. Java Start
+      4. Java Stop
+    3. Tomcat                         # APPSERVERTYPE php, java, tomcat, osa, mobile, bbs, false, disabled, null
+      1. Tomcat Configuration
+      2. Tomcat Restart
+      3. Tomcat Start
+      4. Tomcat Stop
+    4. Open Source                    # APPSERVERTYPE php, java, tomcat, osa, mobile, bbs, false, disabled, null
+      1. OSA Configuration
+      2. OSA Restart
+      3. OSA Start
+      4. OSA Stop
+    5. Mobile Application             # APPSERVERTYPE php, java, tomcat, osa, mobile, bbs, false, disabled, null
+      1. Mobile App Configuration
+      2. Mobile App Restart
+      3. Mobile App Start
+      4. Mobile App Stop
+    6. BBS Applications               # APPSERVERTYPE php, java, tomcat, osa, mobile, bbs, false, disabled, null
+      1. Mystic
+        1. Mystic Configuration
+      2. WWIV
+        1. WWIV Configuration
+
+  4. Email Server                     # SERVETYPE true, false, disabled, null
+    1. Postfix                        # EMAILSERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+      1. Postfix Configuration
+      2. Postfix Restart
+      3. Postfix Start
+      4. Postfix Stop
+    2. Citadel                        # EMAILSERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+      1. Citadel Configuration
+      2. Citadel Restart
+      3. Citadel Start
+      4. Citadel Stop
+    3. Sendmail                       # EMAILSERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+      1. Sendmail Configuration
+      2. Sendmail Restart
+      3. Sendmail Start
+      4. Sendmail Stop
+    4. Exim                           # EMAILSERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+      1. Exim Configuration
+      2. Exim Restart
+      3. Exim Start
+      4. Exim Stop
+    5. Courier                        # EMAILSERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+      1. Courier Configuration
+      2. Courier Restart
+      3. Courier Start
+      4. Courier Stop
+
+  5. File Server                      # SERVETYPE true, false, disabled, null
+    1. FTP                            # FILEERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+      1. FTP Configuration
+      2. FTP Restart
+      3. FTP Start
+      4. FTP Stop
+    2. NFS                            # FILEERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+      1. NFS Configuration
+      2. NFS Restart
+      3. NFS Start
+      4. NFS Stop
+    3. Samba                          # FILEERVERTYPE postfix, citadel, sendmail, exim, courier, false, disabled, null
+      1. Samba Configuration
+      2. Samba Restart
+      3. Samba Start
+      4. Samba Stop
+
+  6. Message Server                   # SERVETYPE true, false, disabled, null
+
+  7. Proxy Server                     # SERVETYPE true, false, disabled, null
+
+  8. System Configuration
+    1. System Information
+      1. View System Information
+      2. Host settings
+      3. Clock settings
+    2. File System
+      1. Drive Space
+      2. Mount Points
+      3. Raid Configuration
+      4. USB Drive Configuration
+    3. Memory
+      1. Memory Free
+      2. Swap Memory
+    4. File Editor
+      1. Hosts file
+      2. Hostname file
+    5. Network Configuration
+      1. Wireless Editor
+      2. Network Editor
+    6. Application Configuration
+      1. Git Configuration
+      2. Uninstall Applications
+
+  9. Logs
+    1. Apache Logs
+    2. PHP Logs
+    3. Access Logs
+    4. Error Logs
+    5. Installation Logs
