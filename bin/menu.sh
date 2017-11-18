@@ -20,26 +20,109 @@ mainmenusystem() {
 	proxymenuicon=$([ "$proxymenustatus" == "true" ] && echo "$OKSYMB" || ([ "$proxymenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
 	systemconfigmenuicon=$([ "$systemconfigmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$systemconfigmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
 	logsmenuicon=$([ "$logsmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$logsmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
+
+	# Main Menu Items
+	mainmenu=(1 "$webservermenuicon Web Server" 2 "$databasemenuicon Database Server" 3 "$applicationmenuicon Application Server" 4 "$emailmenuicon Email Server" 5 "$filemenuicon File Server" 6 "$messagemenuicon Message Server" 7 "$proxymenuicon Proxy Server" 8 "$systemconfigmenuicon System Configuration" 9 "$logsmenuicon Logs")
 	###################################################################
-	# Web Server Menu Items
+	# Web Server Menu Switches
 	apachemenuicon=$([ "$apachemenustatus" == "true" ] && echo "$OKSYMB" || ([ "$apachemenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
 	nginxmenuicon=$([ "$nginxmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$nginxmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
 	lightspeedmenuicon=$([ "$lightspeedmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$lightspeedmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
 	sslmenuicon=$([ "$sslmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$sslmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
-
-	# Apache Server Menu Items
-
-	# nGinX Server Menu Items
-	
-	# Lightspeed Server Menu Items
-	
-	# SSL Menu Items
 	###################################################################
-	# Database Server Menu Items
+	# Web Server Menu Items
+	webservermenu=(1 "$apachemenuicon Apache" 2 "$nginxmenuicon nGinX" 3 "$lightspeedmenuicon Lightspeed" 4 "$sslmenuicon SSL")
+	###################################################################
+	# Apache Server Menu Switches
+	# Settings that need to be valid:
+	status="false" # set the status to default as fail
+
+	# Domain name must be valid
+	whois "$FQDN" | egrep -q '^No match|^NOT FOUND|^Not fo|AVAILABLE|^No Data Fou|has not been regi|No entri'
+	if [ $? -eq 0 ]; then
+		# Domain name is not valid
+		status="false"
+		webservererror="$webservererror \Zb\Z1Domain Name\Zn - cannot be resolved\n"
+	else
+		status="true"
+	fi
+	
+	# Web folder must be valid
+	if [ -d $WEBSERVERDIR ]; then
+		# Directory exist
+		if [ $status != "false" ]; then
+			status="true"
+		fi
+	else
+		# Directory does not exist
+		status="false"
+		webservererror="$webservererror \Zb\Z1Public HTML folder\Zn - Does not exist\n"
+	fi
+
+	# Web user must exist
+	getent passwd $SERVERUSER > /dev/null 2&>1
+	if [ $? -eq 0 ]; then
+		# The user exist
+		if [ $status != "false" ]; then
+			status="true"
+		fi
+	else
+		# User does not exist
+		status="false"
+		webservererror="$webservererror \Zb\Z1User $SERVERUSER\Zn - Does not exist\n"
+	fi
+
+	# Web folder must have correct permissions
+	#ls -ld $WEBSERVERDIR | awk 'NR==1 {print $3}'
+	if [ -n "$(find . -maxdepth 0 -user "$SERVERUSER")" ]; then
+		# Ownership is correct
+		if [ $status != "false" ]; then
+			status="true"
+		fi
+	else
+		# User does not exist
+		status="false"
+		webservererror="$webservererror \Zb\Z1Public HTML folder\Zn - Has invalid ownership\n"
+	fi
+
+	# Apache must be installed
+	if haveprog apache2; then
+		if [ $status != "false" ]; then
+			status="true"
+		fi
+	else
+		status="false"
+		webservererror="$webservererror \Zb\Z1Apache Server\Zn - Has not been installed\n"
+	fi
+
+	# Apache log folder must exist
+
+	# Apache sites-enabled must exist
+	apacheconfigmenuicon=$([ "$status" == "true" ] && echo "$OKSYMB" || ([ "$status" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
+	###################################################################
+	# Apache Server Menu Items
+	apachemenu=(1 "$apacheconfigmenuicon Apache Configuration" 2 "Apache Restart" 3 "Apache Start" 4 "Apache Stop" 5 "$apachestatus")
+	###################################################################
+	# nGinX Server Menu Switches
+	###################################################################
+	# nGinX Server Menu Items
+	nginxmenu=(1 "nGinX Configuration" 2 "nGinX Restart" 3 "nGinX Start" 4 "nGinX Stop" 5 "$nginxstatus")
+	###################################################################
+	# Lightspeed Server Menu Switches
+	
+	###################################################################
+	# Lightspeed Server Menu Items
+	lightspeed=(1 "Lightspeed Configuration" 2 "Lightspeed Restart" 3 "Lightspeed Start" 4 "Lightspeed Stop" 5 "$lightspeedstatus")	
+	# SSL Menu Items
+	letsencryptmenu=(1 "Let's Encrypt Settings" 2 "Renew Certification" 3 "Revoke Certification")
+	###################################################################
+	# Database Server Menu Switches
 	mysqlmenuicon=$([ "$mysqlmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$mysqlmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
 	mariadbmenuicon=$([ "$mariadbmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$mariadbmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
 	postgresqlmenuicon=$([ "$postgresqlmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$postgresqlmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
-	
+	###################################################################
+	# Database Server Menu Items
+	###################################################################
 	# MySQL Database Menu Items
 	
 	# MariaDB Database Menu Items
@@ -145,18 +228,11 @@ mainmenusystem() {
 	autoconfigmenuicon=$([ "$autoconfigmenustatus" == "true" ] && echo "$OKSYMB" || ([ "$autoconfigmenustatus" == "false" ] && echo "$BADSYMB" || echo "$DISABLEDSYMB"))
 	###################################################################
 
-
 	# Server enable/disable status items
 	apachestatus=$([ "$WEBSERVERTYPE" == "apache" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")
 	nginxstatus=$([ "$WEBSERVERTYPE" == "nginx" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")
 	lightspeedstatus=$([ "$WEBSERVERTYPE" == "lightspeed" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")
 
-	mainmenu=(1 "$webservermenuicon Web Server" 2 "$databasemenuicon Database Server" 3 "$applicationmenuicon Application Server" 4 "$emailmenuicon Email Server" 5 "$filemenuicon File Server" 6 "$messagemenuicon Message Server" 7 "$proxymenuicon Proxy Server" 8 "$systemconfigmenuicon System Configuration" 9 "$logsmenuicon Logs")
-	webservermenu=(1 "$apachemenuicon Apache" 2 "$nginxmenuicon nGinX" 3 "$lightspeedmenuicon Lightspeed" 4 "$sslmenuicon SSL")
-	apachemenu=(1 "Apache Configuration" 2 "Apache Restart" 3 "Apache Start" 4 "Apache Stop" 5 "$apachestatus")
-	nginxmenu=(1 "nGinX Configuration" 2 "nGinX Restart" 3 "nGinX Start" 4 "nGinX Stop" 5 "$nginxstatus")
-	lightspeed=(1 "Lightspeed Configuration" 2 "Lightspeed Restart" 3 "Lightspeed Start" 4 "Lightspeed Stop" 5 "$lightspeedstatus")
-	letsencryptmenu=(1 "Let's Encrypt Settings" 2 "Renew Certification" 3 "Revoke Certification")
 	databaseservermenu=(1 "mySQL" 2 "MariaDB" 3 "PostgreSQL")
 	mysqlmenu=(1 "$mysqlmenuicon mySQL Configuration" 2 "mySQL Restart" 3 "mySQL Start" 4 "mySQL Stop")
 	mariadbsqlmenu=(1 "$mariadbmenuicon MariaDB Configuration" 2 "MariaDB Restart" 3 "MariaDB Start" 4 "MariaDB Stop")

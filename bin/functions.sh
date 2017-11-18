@@ -609,18 +609,6 @@ loadcfg() {
 		config "write_value" "webserverdir" $WEBSERVERDIR
 	else
 		WEBSERVERDIR=$(config "read_value" "webserverdir")
-		if [ -d $WEBSERVERDIR ]; then
-			webservermenustatus="true"
-			apachemenustatus="true"
-			nginxmenustatus="true"
-			lightspeedmenustatus="true"
-		else
-			webservermenustatus="false"
-			apachemenustatus="false"
-			nginxmenustatus="false"
-			lightspeedmenustatus="false"
-			faileditem="$faileditem \Zb\Z1Web Server Directory\Zn - does not exist\n"
-		fi
 	fi
 	# PKGINSTALL finds what package manager is installed and allows the user to choose which one to use
 	if [ $(config "read_value" "pkgmgr") == 'false' ] || [ $(config "read_value" "pkgmgr") == 'null' ]; then
@@ -666,22 +654,6 @@ loadcfg() {
 		config "write_value" "fqdn" $FQDN
 	else
 		FQDN=$(config "read_value" "fqdn")
-		# FQDN will make menu items Web Server, Apache, nGinX, Lightspeed, SSL all fail
-		whois "$fqdn" | egrep -q '^No match|^NOT FOUND|^Not fo|AVAILABLE|^No Data Fou|has not been regi|No entri'
-		if [ $? -eq 0 ]; then
-			fqdnstatus="false"
-			webservermenustatus="false"
-			apachemenustatus="false"
-			nginxmenustatus="false"
-			lightspeedmenustatus="false"
-			faileditem="$faileditem \Zb\Z1Domain Name\Zn - cannot be resolved\n"
-		else
-			fqdnstatus="true"
-			webservermenustatus="true"
-			apachemenustatus="true"
-			nginxmenustatus="true"
-			lightspeedmenustatus="true"
-		fi
 	fi
 	# SERVERUSER tries to resolve the non-root user if available, if not, then set from $USER
 	if [ $(config "read_value" "user") == 'false' ]; then
