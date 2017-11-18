@@ -6,8 +6,7 @@
 #                                                                      #
 # DESCRIPTION: https://github.com/jessicakennedy1028/RasPi3-WebServer  #
 #                                                                      #
-# I used Geany IDE to create this script with tab stops at 4           #
-# characters.                                                          #
+# I used Kate to create this script with tab stops at 4 characters     #
 #                                                                      #
 # Feel free to modify, but please give credit where it's due. Thanks!  #
 #                                                                      #
@@ -44,7 +43,7 @@ source ./bin/functions.sh # Call the functions file
 source ./bin/menu.sh # Call the menu file
 
 variables "set" # Set the variables
-mainmenusystem
+mainmenusystem # Load all of the menu items
 
 # install.sh must be run from terminal
 tty -s
@@ -96,4 +95,5 @@ OKLABEL="Submit"
 CANCELLABEL="Back"
 CREDITS="Jessica Brown"
 
+# Display the main dialog menu system
 main

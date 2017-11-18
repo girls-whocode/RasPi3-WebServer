@@ -1,5 +1,5 @@
-Server Type
-  1. Web Server                        # SERVETYPE true, false, disabled, null
+Main (main)
+  1. Web Server (webservermenu)                       # SERVETYPE true, false, disabled, null
     1. Apache                          # WEBSERVERTYPE apache, nginx, lightspeed, false, disabled, null
       1. Apache Configuration
       2. Apache Restart
