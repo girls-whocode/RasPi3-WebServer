@@ -37,14 +37,14 @@ function main() {
 	chkinet
 	chkversion
 	loadcfg
-	if [ $PKGMGR == "apt" ]; then
+	if [ "${PKGMGR}" == "apt" ]; then
 		evallog "DEBIAN_FRONTEND=noninteractive"
 	fi
 	chkmemory
 
 	# Test for ncurses dialog application
 	echo -e $LIGHTRED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Starting Application and checking dependancies "$LIGHTRED"==="$COLOR_NONE
-	if haveprog 'dialog'; then
+	if haveprog "dialog"; then
 		log "Dialog is already installed"
 		if [ ! -f "./.dialogrc" ]; then
 			evallog "dialog --create-rc ./.dialogrc"
@@ -53,7 +53,7 @@ function main() {
 		evallog "${PKGINSTALL} dialog" & pid=$!
 		progress
 
-		if haveprog 'dialog'; then
+		if haveprog "dialog"; then
 			log "Dialog installed successfully"
 		else
 			log "${error["185"]}"
@@ -62,7 +62,7 @@ function main() {
 	fi
 
 	# Test for net-tools whois application
-	if haveprog 'whois'; then
+	if haveprog "whois"; then
 		log "Whois is already installed"
 	else
 		evallog "${PKGINSTALL} whois" & pid=$!
