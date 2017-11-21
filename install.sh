@@ -60,7 +60,7 @@ function main() {
 		evallog "${PKGINSTALL} whois" & pid=$!
 		progress
 	fi
-	
+
 	if haveprog "lsb_release"; then
 		log "lsb_release is already installed"
 	else

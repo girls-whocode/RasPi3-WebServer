@@ -325,22 +325,22 @@ function loadcfg() {
 		if haveprog "apt-get"; then
 			log "Package manager set to APT"
 			PKGMGR="apt"
-			PKGINSTALL="sudo apt -y install"
+			PKGINSTALL="sudo apt install -y"
 			config "write_value" "pkgmgr" "apt"
 		elif haveprog "dnf"; then
 			log "Package manager set to DNF"
 			PKGMGR="dnf"
-			PKGINSTALL="sudo dnf -y install"
+			PKGINSTALL="sudo dnf install -y"
 			config "write_value" "pkgmgr" "dnf"
 		elif haveprog "yum"; then
 			log "Package manager set to YUM"
 			PKGMGR="yum"
-			PKGINSTALL="sudo yum -y install"
+			PKGINSTALL="sudo yum install -y"
 			config "write_value" "pkgmgr" "yum"
 		elif haveprog "up2date"; then
 			log "Package manager set to UP2DATE"
 			PKGMGR="up2date"
-			PKGINSTALL="sudo up2date -y install"
+			PKGINSTALL="sudo up2date install -y"
 			config "write_value" "pkgmgr" "up2date"
 		else
 			log "Package manager set to NONE"

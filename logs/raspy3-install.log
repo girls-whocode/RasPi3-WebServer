@@ -1,0 +1,162 @@
+11-21-2017 [03:24:14] | Script started #############################################################
+11-21-2017 [03:24:14] | Start installation script
+cdialog (ComeOn Dialog!) version 1.3-20160828
+Copyright 2000-2015,2016 Thomas E. Dickey
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+* Display dialog boxes from shell scripts *
+
+Usage: dialog <options> { --and-widget <options> }
+where options are "common" options, followed by "box" options
+
+Special options:
+  [--create-rc "file"]
+Common options:
+  [--ascii-lines] [--aspect <ratio>] [--backtitle <backtitle>] [--beep]
+  [--beep-after] [--begin <y> <x>] [--cancel-label <str>] [--clear]
+  [--colors] [--column-separator <str>] [--cr-wrap] [--date-format <str>]
+  [--default-button <str>] [--default-item <str>] [--defaultno]
+  [--exit-label <str>] [--extra-button] [--extra-label <str>]
+  [--help-button] [--help-label <str>] [--help-status] [--help-tags]
+  [--hfile <str>] [--hline <str>] [--ignore] [--input-fd <fd>]
+  [--insecure] [--item-help] [--keep-tite] [--keep-window] [--last-key]
+  [--max-input <n>] [--no-cancel] [--no-collapse] [--no-cr-wrap]
+  [--no-items] [--no-kill] [--no-label <str>] [--no-lines] [--no-mouse]
+  [--no-nl-expand] [--no-ok] [--no-shadow] [--no-tags] [--nook]
+  [--ok-label <str>] [--output-fd <fd>] [--output-separator <str>]
+  [--print-maxsize] [--print-size] [--print-version] [--quoted]
+  [--scrollbar] [--separate-output] [--separate-widget <str>] [--shadow]
+  [--single-quoted] [--size-err] [--sleep <secs>] [--stderr] [--stdout]
+  [--tab-correct] [--tab-len <n>] [--time-format <str>] [--timeout <secs>]
+  [--title <title>] [--trace <file>] [--trim] [--version] [--visit-items]
+  [--week-start <str>] [--yes-label <str>]
+Box options:
+  --buildlist    <text> <height> <width> <list-height> <tag1> <item1> <status1>...
+  --calendar     <text> <height> <width> <day> <month> <year>
+  --checklist    <text> <height> <width> <list height> <tag1> <item1> <status1>...
+  --dselect      <directory> <height> <width>
+  --editbox      <file> <height> <width>
+  --form         <text> <height> <width> <form height> <label1> <l_y1> <l_x1> <item1> <i_y1> <i_x1> <flen1> <ilen1>...
+  --fselect      <filepath> <height> <width>
+  --gauge        <text> <height> <width> [<percent>]
+  --infobox      <text> <height> <width>
+  --inputbox     <text> <height> <width> [<init>]
+  --inputmenu    <text> <height> <width> <menu height> <tag1> <item1>...
+  --menu         <text> <height> <width> <menu height> <tag1> <item1>...
+  --mixedform    <text> <height> <width> <form height> <label1> <l_y1> <l_x1> <item1> <i_y1> <i_x1> <flen1> <ilen1> <itype>...
+  --mixedgauge   <text> <height> <width> <percent> <tag1> <item1>...
+  --msgbox       <text> <height> <width>
+  --passwordbox  <text> <height> <width> [<init>]
+  --passwordform <text> <height> <width> <form height> <label1> <l_y1> <l_x1> <item1> <i_y1> <i_x1> <flen1> <ilen1>...
+  --pause        <text> <height> <width> <seconds>
+  --prgbox       <text> <command> <height> <width>
+  --programbox   <text> <height> <width>
+  --progressbox  <text> <height> <width>
+  --radiolist    <text> <height> <width> <list height> <tag1> <item1> <status1>...
+  --rangebox     <text> <height> <width> <min-value> <max-value> <default-value>
+  --tailbox      <file> <height> <width>
+  --tailboxbg    <file> <height> <width>
+  --textbox      <file> <height> <width>
+  --timebox      <text> <height> <width> <hour> <minute> <second>
+  --treeview     <text> <height> <width> <list-height> <tag1> <item1> <status1> <depth1>...
+  --yesno        <text> <height> <width>
+
+Auto-size with height and width = 0. Maximize with height and width = -1.
+Global-auto-size if also menu_height/list_height = 0.
+11-21-2017 [03:24:15] | Dependency program installation failed
+11-21-2017 [03:24:15] | Script ended ###############################################################
+Usage: whois [OPTION]... OBJECT...
+
+-h HOST, --host HOST   connect to server HOST
+-p PORT, --port PORT   connect to PORT
+-H                     hide legal disclaimers
+      --verbose        explain what is being done
+      --help           display this help and exit
+      --version        output version information and exit
+
+These flags are supported by whois.ripe.net and some RIPE-like servers:
+-l                     find the one level less specific match
+-L                     find all levels less specific matches
+-m                     find all one level more specific matches
+-M                     find all levels of more specific matches
+-c                     find the smallest match containing a mnt-irt attribute
+-x                     exact match
+-b                     return brief IP address ranges with abuse contact
+-B                     turn off object filtering (show email addresses)
+-G                     turn off grouping of associated objects
+-d                     return DNS reverse delegation objects too
+-i ATTR[,ATTR]...      do an inverse look-up for specified ATTRibutes
+-T TYPE[,TYPE]...      only look for objects of TYPE
+-K                     only primary keys are returned
+-r                     turn off recursive look-ups for contact information
+-R                     force to show local copy of the domain object even
+                       if it contains referral
+-a                     also search all the mirrored databases
+-s SOURCE[,SOURCE]...  search the database mirrored from SOURCE
+-g SOURCE:FIRST-LAST   find updates from SOURCE from serial FIRST to LAST
+-t TYPE                request template for object of TYPE
+-v TYPE                request verbose template for object of TYPE
+-q [version|sources|types]  query specified server info
+./bin/functions.sh: line 56: redhat-lsb-core: command not found
+11-21-2017 [03:24:15] | Memory at 466292
+11-21-2017 [03:24:16] | CHECKING FOR INTERNET - The network connection passed
+11-21-2017 [03:24:16] | CHECKING FOR THE LATEST VERSION
+11-21-2017 [03:24:16] | distro false
+11-21-2017 [03:24:16] | codename false
+11-21-2017 [03:24:16] | distro_version false
+11-21-2017 [03:24:16] | email false
+11-21-2017 [03:24:16] | ip false
+11-21-2017 [03:24:16] | ownergroup false
+11-21-2017 [03:24:16] | tzone false
+11-21-2017 [03:24:16] | webserverdir false
+11-21-2017 [03:24:16] | pkgmgr false
+11-21-2017 [03:24:16] | fqdn false
+11-21-2017 [03:24:16] | user false
+11-21-2017 [03:24:16] | webserver false
+11-21-2017 [03:24:16] | databaseserver false
+11-21-2017 [03:24:16] | appserver false
+11-21-2017 [03:24:16] | emailserver false
+11-21-2017 [03:24:16] | fileserver false
+11-21-2017 [03:24:16] | msgserver false
+11-21-2017 [03:24:16] | proxyserver false
+11-21-2017 [03:24:16] | servetype false
+11-21-2017 [03:24:16] | DISTRO parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Creating configuration file for first use
+11-21-2017 [03:24:16] | Add distro to raspconfig.ini with Ubuntu
+11-21-2017 [03:24:16] | CODENAME parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Opening configuration file for modification
+11-21-2017 [03:24:16] | Retrieving line number for codename
+11-21-2017 [03:24:16] | codename was not found - Adding to configuration file with value of artful
+11-21-2017 [03:24:16] | DISTVERSION parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Opening configuration file for modification
+11-21-2017 [03:24:16] | Retrieving line number for distro_version
+11-21-2017 [03:24:16] | distro_version was not found - Adding to configuration file with value of 17.10
+11-21-2017 [03:24:16] | Email parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Opening configuration file for modification
+11-21-2017 [03:24:16] | Retrieving line number for email
+11-21-2017 [03:24:16] | email was not found - Adding to configuration file with value of disabled
+11-21-2017 [03:24:16] | IP parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Opening configuration file for modification
+11-21-2017 [03:24:16] | Retrieving line number for ip
+11-21-2017 [03:24:16] | ip was not found - Adding to configuration file with value of 127.0.0.1
+11-21-2017 [03:24:16] | OWNERGROUP parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Opening configuration file for modification
+11-21-2017 [03:24:16] | Retrieving line number for ownergroup
+11-21-2017 [03:24:16] | ownergroup was not found - Adding to configuration file with value of www-data:www-data
+11-21-2017 [03:24:16] | TZONE parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Opening configuration file for modification
+11-21-2017 [03:24:16] | Retrieving line number for tzone
+11-21-2017 [03:24:16] | tzone was not found - Adding to configuration file with value of America/New_York
+11-21-2017 [03:24:16] | WEBSERVERDIR parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Opening configuration file for modification
+11-21-2017 [03:24:16] | Retrieving line number for webserverdir
+11-21-2017 [03:24:16] | webserverdir was not found - Adding to configuration file with value of /var/www/
+11-21-2017 [03:24:16] | PKGINSTALL parameter or value does not exist - set to default value
+11-21-2017 [03:24:16] | Package manager set to NONE
+11-21-2017 [03:24:16] | Opening configuration file for modification
+11-21-2017 [03:24:16] | Retrieving line number for pkgmgr
+11-21-2017 [03:24:16] | pkgmgr was not found - Adding to configuration file with value of none
+11-21-2017 [03:24:16] | quit signal: EXIT
+11-21-2017 [03:24:16] | Script quit script was performed
+11-21-2017 [03:24:16] | Script ended ###############################################################
