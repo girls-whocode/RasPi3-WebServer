@@ -1,0 +1,1 @@
+# This folder is for the log files for Server Auto Config
