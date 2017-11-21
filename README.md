@@ -1,17 +1,15 @@
-# RasPi-3 Server Auto Configuration
+# Server Auto Configuration
 [![Gitter](https://badges.gitter.im/RasPi3-WebServer/Lobby.svg)](https://gitter.im/RasPi3-WebServer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)  [![HitCount](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer.svg)](http://hits.dwyl.io/jessicakennedy1028/RasPi3-WebServer)  [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 ## Description
 
 NOTICE! THIS SCRIPT IS INCOMPLETE AS I STARTED A NEW BUILD, I DO NOT HAVE A PRIVATE GITHUB ACCOUNT SO IT IS OUT HERE! YOU MAY DOWNLOAD AND PLAY WITH THE CODE. PLEASE LET ME KNOW IF THERE IS ANY CHANGES THAT NEEDS TO BE MADE. THIS NOTICE WILL DISAPPEAR IN THE BETA VERSION
 
-This script is just to help streamline the install process for Raspberry Pi 3 web, database, file, application, messaging, proxy and email servers. With a advanced installation system it will determine what is already installed and configured and allow you to make changes, or install or remove any application built into this system. You assume all responsibility of this script and understand there is no warranties, liabilities, or guarentees on this script. This script assumes a fresh OS install.
+This script is just to help streamline the install process for many Linux distributions on a PC or Raspberry Pi 3 for web, database, file, application, messaging, proxy and email servers.
 
-I used Geany IDE to create this script with tab stops at 4 characters.
+With an advanced installation system it will determine what is already installed and configured and allow you to make changes, install or remove any application built into this system.
 
-Feel free to modify, but please give credit where it's due. Thanks!
-
-If you wish to see the progress and TODO's please click here: https://github.com/jessicakennedy1028/RasPi3-WebServer/projects/1
+You assume all responsibility of this script and understand there is no warranties, liabilities, or guarentees on this script. This script assumes a fresh OS install.
 
 ## Screenshots
 
@@ -30,7 +28,11 @@ If you wish to see the progress and TODO's please click here: https://github.com
 
 ## Usage
 
-RasPi-3 Server Configuration manages many mundane file changes automatically for you from questions that is given. Although this has been built on Ubuntu 17.10, I have tested on Raspberry 3 with Rasberian Stretch.
+Server Auto Configuration manages many mundane file changes automatically for you from questions that is given. Although this has been built on Ubuntu 17.10, I have tested on:
+
+1. Ubuntu 17.10
+2. Raspberry 3 with Rasberian Stretch
+3. CentOS 7
 
 ### Menu System
 
@@ -181,13 +183,17 @@ Raspberian Stretch
 
 ## History
 
-This started as a simple command line interface for installing Apache, PHP, MariaDB, Webmin, myPHPadmin, Roundcube, Postfix and Dovecot since then I continued to build more functionality and it is now a complete system written in BASH script. Although in the near future Python will be introduced to some of the application's core functions, it will maintain a simple programming structure.
+This script started out as a "DARE" that BASH scripts were for idiots who can't program. Well, I thought I would take this challenge on, although I am not a major BASH script writter, I thought I would try to explain to people that if there is enough drive to do something, then it can be done.
 
-Currently it will automatically install 2 additional programs at startup: whosis and dialog.
+When I started this script, it was a simple command line interface for installing Apache, PHP, MariaDB, Webmin, myPHPadmin, Roundcube, Postfix and Dovecot since then I continued to build more functionality and it is now a complete system written in BASH script. Although in the near future Python will be introduced to some of the application's core functions, it will maintain a simple programming structure.
+
+Currently it will automatically install 2 additional programs at startup:
+1. whosis
+2. dialog
 
 ## Credits
 
-So far: Jessica Brown
+So far: Jessica Brown (just me)
 
 ## License
 
@@ -196,7 +202,6 @@ GPL 3.0
 ## Other Information
 
 	Errors:
-
 		100 - Package manager was not found
 		110 - Early exit status from script
 		111 - Log file failed to write
@@ -221,6 +226,10 @@ GPL 3.0
 
 ## Change Log
 
+	3.0
+	   Current version
+	2.1
+	   Scrapped to build a more modular style
     2.0
        Total redesign, currently not functional
 

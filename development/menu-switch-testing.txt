@@ -1,0 +1,58 @@
+Apache				DISABLED
+-- FQDN
+	-- Yes			TRUE
+	-- No			FALSE
+-- DIRECTORY
+	-- Yes
+		-- Not False
+		-- Not Disabled	TRUE
+	-- No			FALSE
+-- USER
+	-- Yes
+		-- Not False
+		-- Not Disabled	TRUE
+	-- No			FALSE
+-- PERMISSIONS
+	-- Yes
+		-- Not False
+		-- Not Disabled	TRUE
+	-- No			FALSE
+-- INSTALLED
+	-- Yes
+		-- Not False
+		-- Not Disabled	TRUE
+	-- No			FALSE
+
+
+nGinX				DISABLED
+-- FQDN
+	-- Yes			TRUE
+	-- No			FALSE
+-- DIRECTORY
+	-- Yes	
+		-- Not False
+		-- Not Disabled	TRUE
+	-- No			FALSE
+-- USER
+	-- Yes
+		-- Not False
+		-- Not Disabled	TRUE
+	-- No			FALSE
+-- PERMISSIONS
+	-- Yes
+		-- Not False
+		-- Not Disabled	TRUE
+	-- No			FALSE
+-- INSTALLED
+	-- Yes
+		-- Not False
+		-- Not Disabled	TRUE
+	-- No			FALSE
+-- SERVERTYPE
+	-- apache		-SKIP
+	-- nginx
+		-- Not False
+		-- Not Disabled	TRUE
+	-- lighttpd		-SKIP
+
+
