@@ -299,7 +299,11 @@ function loadcfg() {
 
 	# TZONE gets the default value for the current system timezone
 	if [ "${TZONECFG}" == "false" ] || [ "${TZONECFG}" == "null" ]; then
-		TZONE="$(cat /etc/timezone)"
+		if [ -f /etc/timezone ]; then
+			TZONE="$(cat /etc/timezone)"
+		else
+			TZONE="America/New_York"
+		fi
 		log "TZONE parameter or value does not exist - set to default value"
 		config "write_value" "tzone" $TZONE
 	else
