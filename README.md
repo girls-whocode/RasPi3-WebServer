@@ -15,15 +15,12 @@ If you wish to see the progress and TODO's please click here: https://github.com
 
 ## Screenshots
 
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-mainmenu.png)
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver.png)
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-servertype.png)
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-fileserver.png)
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-appserver.png)
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-databaseserver.png)
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-emailserver.png)
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver-settings.png)
-[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/ss-webserver-settings-errors.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/Terminal_078.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/Terminal_080.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/Terminal_081.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/Terminal_082.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/Terminal_083.png)
+[![RasPi3 Logo](https://github.com/jessicakennedy1028/RasPi3-WebServer/blob/master/screenshots/Terminal_084.png)
 
 ## Installation
 

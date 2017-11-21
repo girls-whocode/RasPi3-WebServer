@@ -5,15 +5,15 @@ if [ "$SYSTEMKEY" != "3d430f9af713781b92af4a97fc2e6664be7ce8e0" ]; then
 fi
 
 function config() {
-	option="$1"
+	option="${1}"
 	option_mode="ini"
 	SEPARATOR_INI="="
 
 	case $option in
 		"change_value")
-			parameter="$2"
-			separator="$SEPARATOR_INI"
-			value="$3"
+			parameter="${2}"
+			separator="${SEPARATOR_INI}"
+			value="${3}"
 			
 			if [[ -f $configfile ]]; then
 				line_number=$(config "get_line" $parameter $separator)
@@ -29,14 +29,14 @@ function config() {
 				else
 					# In case the parameter is not there, just write it to the config file
 					echo "${parameter}${separator}${value}" >> "${configfile}"
-					sort -o "$configfile" "$configfile"
+					sort -o "${configfile}" "${configfile}"
 				fi
 			fi
 			config "verify_write" $parameter $value
 			;;
 		"get_line")
-			parameter=$2
-			separator=$SEPARATOR_INI
+			parameter="${2}"
+			separator="${SEPARATOR_INI}"
 			log "Retrieving line number for ${parameter}"
 			output=$(sed -n "/^${parameter}${separator}/=" "${configfile}" 2>/dev/null)
 			if [[ ! -z ${output##*[!0-9]*} ]]; then
@@ -45,8 +45,8 @@ function config() {
 			fi
 			;;
 		"read_value")
-			parameter=$2
-			separator=$SEPARATOR_INI
+			parameter="${2}"
+			separator="${SEPARATOR_INI}"
 			output=$(sed -n "s/^${parameter}${separator}//p" "${configfile}" 2>/dev/null)
 			
 			if [[ -n $output ]]; then
@@ -63,7 +63,7 @@ function config() {
 			fi
 			;;
 		"remove_config")
-			rm -f "$2" &>/dev/null
+			rm -f "${2}" &>/dev/null
 			config_return=true
 			
 			if [[ -f $configfile ]]; then
@@ -71,8 +71,8 @@ function config() {
 			fi
 			;;
 		"remove_value")
-			parameter=$2
-			separator=$SEPARATOR_INI
+			parameter="${2}"
+			separator="${SEPARATOR_INI}"
 
 			line_number=$(config "get_line" $parameter $separator)
 
@@ -84,9 +84,9 @@ function config() {
 			fi
 			;;
 		"sanitize_value")
-			parameter=$2
+			parameter="${2}"
  
-			if ! echo "$parameter" | grep -q '^[A-Za-z0-9_-]\+$'; then
+			if ! echo "${parameter}" | grep -q '^[A-Za-z0-9_-]\+$'; then
 				exit 203
 			fi
 			;;
@@ -98,9 +98,9 @@ function config() {
 			fi
 			;;
 		"write_value")
-			parameter=$2
-			separator=$SEPARATOR_INI
-			value=$3
+			parameter="${2}"
+			separator="${SEPARATOR_INI}"
+			value="${3}"
 
 			if [[ -f $configfile ]]; then
 				log "Opening configuration file for modification"
@@ -111,7 +111,7 @@ function config() {
 				else
 					log "${parameter} was not found - Adding to configuration file with value of ${value}"
 					echo "${parameter}${separator}${value}" >> "${configfile}"
-					sort -o "$configfile" "$configfile"
+					sort -o "${configfile}" "${configfile}"
 				fi
 			else
 				log "Creating configuration file for first use"

@@ -10,24 +10,71 @@ function menusystem() {
 	loadcfg
 	webservererror=""
 
-	# Apache Server Menu Switches Settings that need to be valid:
-	apachestatus="false" # set the status to default as fail
-	apachemenustatus="false"
-	nginxstatus="false"
-	lightspeedstatus="false"
+	# Apache Server Menu Switches Settings that need to be validated:
+	apachestatus="disabled"
+	apachemenustatus="disabled"
+	nginxstatus="disabled"
+	nginxmenustatus="disabled"
+	lightspeedstatus="disabled"
+	lightspeedmenustatus="disabled"
+	cherokeestatus="disabled"
+	cherokeemenustatus="disabled"
+	caddystatus="disabled"
+	caddymenustatus="disabled"
+	monkeystatus="disabled"
+	monkeymenustatus="disabled"
+	hiawathastatus="disabled"
+	hiawathamenustatus="disabled"
 
-	# Domain name must be valid
+	# Database Configuration Menu Switches that need to be validated:
+	mysqlstatus="false"
+	mariadbstatus="false"
+	postgresqlstatus="false"
+	sqlitestatus="false"
+	pervasivestatus="false"
+	voltdbstatus="false"
+	gigabase="false"
+	
+	# System Configuration Menu Switches that need to be validated:
+	systeminfostatus="false"
+	filesystemstatus="false"
+	memorystatus="false"
+	fileeditorstatus="false"
+	networkconfigstatus="false"
+	applicationconfigstatus="false"
+
+	# Domain name must be valid for all web servers
 	host "${FQDN}" 2>&1 > /dev/null
 	if [ $? -eq 0 ]; then
         apachestatus="true"
         apachemenustatus="true"
         nginxstatus="true"
-        lightspeedstatus="true"
+		nginxmenustatus="true"
+		lightspeedstatus="true"
+		lightspeedmenustatus="true"
+		cherokeestatus="true"
+		cherokeemenustatus="true"
+		caddystatus="true"
+		caddymenustatus="true"
+		monkeystatus="true"
+		monkeymenustatus="true"
+		hiawathastatus="true"
+		hiawathamenustatus="true"
     else
 		apachestatus="false"
 		apachemenustatus="false"
 		nginxstatus="false"
+		nginxmenustatus="false"
 		lightspeedstatus="false"
+		lightspeedmenustatus="false"
+		cherokeestatus="false"
+		cherokeemenustatus="false"
+		caddystatus="false"
+		caddymenustatus="false"
+		monkeystatus="false"
+		monkeymenustatus="false"
+		hiawathastatus="false"
+		hiawathamenustatus="false"
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1Domain Name\Zn - cannot be resolved\n"
     fi
@@ -35,19 +82,30 @@ function menusystem() {
 	# Web folder must be valid
 	if [ -d $WEBSERVERDIR ]; then
 		# Directory exist
-		if [ "${apachestatus}" != "false" ]; then
+		if [ "${apachestatus}" != "false" ] || [ "${apachestatus}" != "disabled" ]; then
 			apachestatus="true"
 			apachemenustatus="true"
+		fi
+		if [ "${nginxstatus}" != "false" ] || [ "${nginxstatus}" != "disabled" ]; then
 			nginxstatus="true"
-			lightspeedstatus="true"
+			nginxmenustatus="true"
 		fi
 	else
 		# Directory does not exist
 		apachestatus="false"
 		apachemenustatus="false"
-		apachemenustatus="true"
 		nginxstatus="false"
+		nginxmenustatus="false"
 		lightspeedstatus="false"
+		lightspeedmenustatus="false"
+		cherokeestatus="false"
+		cherokeemenustatus="false"
+		caddystatus="false"
+		caddymenustatus="false"
+		monkeystatus="false"
+		monkeymenustatus="false"
+		hiawathastatus="false"
+		hiawathamenustatus="false"
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1Public HTML folder\Zn - Does not exist\n"
 	fi
@@ -56,18 +114,30 @@ function menusystem() {
 	getent passwd "${SERVERUSER}" > /dev/null 2&>1
 	if [ $? -eq 0 ]; then
 		# The user exist
-		if [ "${apachestatus}" != "false" ]; then
+		if [ "${apachestatus}" != "false" ] || [ "${apachestatus}" != "disabled" ]; then
 			apachestatus="true"
 			apachemenustatus="true"
+		fi
+		if [ "${nginxstatus}" != "false" ] || [ "${nginxstatus}" != "disabled" ]; then
 			nginxstatus="true"
-			lightspeedstatus="true"
+			nginxmenustatus="true"
 		fi
 	else
 		# User does not exist
 		apachestatus="false"
 		apachemenustatus="false"
 		nginxstatus="false"
+		nginxmenustatus="false"
 		lightspeedstatus="false"
+		lightspeedmenustatus="false"
+		cherokeestatus="false"
+		cherokeemenustatus="false"
+		caddystatus="false"
+		caddymenustatus="false"
+		monkeystatus="false"
+		monkeymenustatus="false"
+		hiawathastatus="false"
+		hiawathamenustatus="false"
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1User ${SERVERUSER}\Zn - Does not exist\n"
 	fi
@@ -75,123 +145,383 @@ function menusystem() {
 	# Web folder must have correct permissions
 	if [ -n "$(find "${WEBSERVERDIR}" -maxdepth 0 -user "${OWNERGROUP}")" ]; then
 		# Ownership is correct
-		if [ "${apachestatus}" != "false" ]; then
+		if [ "${apachestatus}" != "false" ] || [ "${apachestatus}" != "disabled" ]; then
 			apachestatus="true"
-			apachemenustatus="false"
 			apachemenustatus="true"
+		fi
+		if [ "${nginxstatus}" != "false" ] || [ "${nginxstatus}" != "disabled" ]; then
 			nginxstatus="true"
-			lightspeedstatus="true"
+			nginxmenustatus="true"
 		fi
 	else
 		# User does not exist
 		apachestatus="false"
 		apachemenustatus="false"
 		nginxstatus="false"
+		nginxmenustatus="false"
 		lightspeedstatus="false"
+		lightspeedmenustatus="false"
+		cherokeestatus="false"
+		cherokeemenustatus="false"
+		caddystatus="false"
+		caddymenustatus="false"
+		monkeystatus="false"
+		monkeymenustatus="false"
+		hiawathastatus="false"
+		hiawathamenustatus="false"
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1Public HTML folder\Zn - Has invalid ownership\n"
 	fi
 
 	# Apache must be installed
 	if haveprog "apache2"; then
-		if [ $apachestatus != "false" ]; then
+		if [ "${apachestatus}" != "false" ] || [ "${apachestatus}" != "disabled" ]; then
 			apachestatus="true"
 			apachemenustatus="true"
-			nginxstatus="true"
-			lightspeedstatus="true"
 		fi
 	else
 		apachestatus="false"
 		apachemenustatus="false"
-		nginxstatus="false"
-		lightspeedstatus="false"
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1Apache Server\Zn - Has not been installed\n"
 	fi
 
+	# nGinX must be installed
+	if haveprog "nginx"; then
+		if [ "${nginxstatus}" != "false" ] || [ "${nginxstatus}" != "disabled" ]; then
+			nginxstatus="true"
+			nginxmenustatus="true"
+		fi
+	else
+		nginxstatus="false"
+		nginxmenustatus="false"
+		webserverfailtest="true"
+		webservererror="${webservererror} \Zb\Z1nGinX Server\Zn - Has not been installed\n"
+	fi
+
 	# Apache log folder must exist
-
+		# TODO
 	# Apache sites-enabled must exist
+		# TODO
 
-	# Apache Status Icons
-	if [ "${apachestatus}" == "false" ]; then
-		apacheconfigmenuicon="$([ "${apachestatus}" == "true" ] && echo "${OKSYMB}" || ([ "${apachestatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-		apachemenuicon="${DISABLEDSYMB}"
-	else
-		apacheconfigmenuicon="$([ "${apachestatus}" == "true" ] && echo "${OKSYMB}" || ([ "${apachestatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-		apachemenuicon="$([ "${apachemenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${apachemenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+	###################################################################
+	# Menu icon status symbols
+	###################################################################
+	# Apache, nGinX, Lightspeed Server icon status symbols
+	###################################################################
+	if [ "${WEBSERVERTYPE}" == "apache" ]; then
+		if [ "${apachestatus}" != "false" ]; then
+			apachemenustatus="true"
+		fi
+		nginxstatus="disabled"
+		lightspeedstatus="disabled"
+		cherokeestatus="disabled"
+		caddystatus="disabled"
+		monkeystatus="disabled"
+		hiawathastatus="disabled"
+	fi
+	if [ "${WEBSERVERTYPE}" == "nginx" ]; then
+		if [ "${nginxstatus}" != "false" ]; then
+			nginxmenustatus="true"
+		fi
+		apachestatus="disabled"
+		lightspeedstatus="disabled"
+		cherokeestatus="disabled"
+		caddystatus="disabled"
+		monkeystatus="disabled"
+		hiawathastatus="disabled"
+	fi
+	if [ "${WEBSERVERTYPE}" == "lightspeed" ]; then
+		if [ "${lightspeedstatus}" != "false" ]; then
+			lightspeedmenustatus="true"
+		fi
+		apachestatus="disabled"
+		nginxstatus="disabled"
+		cherokeestatus="disabled"
+		caddystatus="disabled"
+		monkeystatus="disabled"
+		hiawathastatus="disabled"
+	fi
+	if [ "${WEBSERVERTYPE}" == "cherokee" ]; then
+		if [ "${cherokeestatus}" != "false" ]; then
+			cherokeemenustatus="true"
+		fi
+		apachestatus="disabled"
+		lightspeedstatus="disabled"
+		caddystatus="disabled"
+		monkeystatus="disabled"
+		hiawathastatus="disabled"
+	fi
+	if [ "${WEBSERVERTYPE}" == "caddy" ]; then
+		if [ "${caddystatus}" != "false" ]; then
+			caddymenustatus="true"
+		fi
+		apachestatus="disabled"
+		lightspeedstatus="disabled"
+		cherokeestatus="disabled"
+		monkeystatus="disabled"
+		hiawathastatus="disabled"
+	fi
+	if [ "${WEBSERVERTYPE}" == "monkey" ]; then
+		if [ "${monkeystatus}" != "false" ]; then
+			monkeymenustatus="true"
+		fi
+		apachestatus="disabled"
+		lightspeedstatus="disabled"
+		cherokeestatus="disabled"
+		caddystatus="disabled"
+		hiawathastatus="disabled"
+	fi
+	if [ "${WEBSERVERTYPE}" == "hiawatha" ]; then
+		if [ "${hiawathastatus}" != "false" ]; then
+			hiawathamenustatus="true"
+		fi
+		apachestatus="disabled"
+		lightspeedstatus="disabled"
+		cherokeestatus="disabled"
+		caddystatus="disabled"
+		monkeystatus="disabled"
 	fi
 
-	# nGinX Status Icons
-	if [ ${nginxstatus} == "false" ]; then
-		nginxconfigmenuicon="$([ "${nginxstatus}" == "true" ] && echo "${OKSYMB}" || ([ "${nginxstatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-		nginxmenuicon="${DISABLEDSYMB}"
-	else
-		nginxconfigmenuicon="$([ "${nginxstatus}" == "true" ] && echo "${OKSYMB}" || ([ "${nginxstatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-		nginxmenuicon="$([ "${nginxmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${nginxmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+	if [ "${WEBSERVERTYPE}" == "disabled" ]; then
+		apachestatus="disabled"
+		apachemenustatus="disabled"
+		nginxstatus="disabled"
+		nginxmenustatus="disabled"
+		lightspeedstatus="disabled"
+		lightspeedmenustatus="disabled"
+		cherokeestatus="disabled"
+		cherokeemenustatus="disabled"
+		caddystatus="disabled"
+		caddymenustatus="disabled"
+		monkeystatus="disabled"
+		monkeymenustatus="disabled"
+		hiawathastatus="disabled"
+		hiawathamenustatus="disabled"
 	fi
 
-	# Lightspeed Status Icons
-	if [ ${lightspeedstatus} == "false" ]; then
-		lightspeedconfigmenuicon="$([ "${lightspeedstatus}" == "true" ] && echo "${OKSYMB}" || ([ "${lightspeedstatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-		lightspeedmenuicon="${DISABLEDSYMB}"
-	else
-		lightspeedconfigmenuicon="$([ "${lightspeedmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${lightspeedstatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-		lightspeedmenuicon="$([ "${lightspeedmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${lightspeedmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-	fi
-
-	# Webserver Status Icons
 	if [ "${apachestatus}" == "diasbled" ] && [ "${nginxstatus}" == "disabled" ] && [ "${lightspeedstatus}" == "disabled" ]; then
 		webservermenuicon="${DISABLEDSYMB}"
-	elif [ "${apachestatus}" == "false" ] || [ "${nginxstatus}" == "false" ] || [ "${lightspeedstatus}" == "false" ]; then
+	else
+		webservermenuicon="${OKSYMB}"
+	fi
+
+	if [ "${apachestatus}" == "false" ] && [ "${nginxstatus}" == "false" ] && [ "${lightspeedstatus}" == "false" ]; then
 		webservermenuicon="${BADSYMB}"
 	else
 		webservermenuicon="${OKSYMB}"
 	fi
 
-	###################################################################
-	# Menu icon status symbols
-	###################################################################
-	# APACHE
-	apachestatus="$([ "${WEBSERVERTYPE}" == "apache" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
-	if [ "${WEBSERVERTYPE}" == "disabled" ]; then
-		apachemenuicon="${DISABLEDSYMB}"
-		apacheconfigmenuicon="${DISABLEDSYMB}"
-		apachelogsmenuicon="${DISABLEDSYMB}"
-	else
-		apachemenuicon="$([ "${apachemenustatus}" == "true" ] && echo "${OKSYMB}" || echo "${BADSYMB}")"
-		apacheconfigmenuicon="$([ "${apachemenustatus}" == "true" ] && echo "${OKSYMB}" || echo "${BADSYMB}")"
-		apachelogsmenuicon="$([ "${apachelogsmenustatus}" == "true" ] && echo "${OKSYMB}" || echo "${BADSYMB}")"
+	if [ "${apachestatus}" == "true" ]; then
+		apacheconfigmenuicon="${OKSYMB}"
+		apachemenuicon="${OKSYMB}"
+		service="apache2"
+		if (( $(ps -ef | grep -v grep | grep $service | wc -l) > 0 )); then
+			apacherestartmenuicon="${OKSYMB}"
+			apachestartmenuicon="${BADSYMB}"
+			apachestopmenuicon="${OKSYMB}"
+		else
+			apacherestartmenuicon="${OKSYMB}"
+			apachestartmenuicon="${OKSYMB}"
+			apachestopmenuicon="${BADSYMB}"
+		fi
 	fi
 
-	###################################################################
-	# NGINX
+	if [ "${nginxstatus}" == "true" ]; then
+		nginxconfigmenuicon="${OKSYMB}"
+		nginxmenuicon="${OKSYMB}"
+		service="nginx"
+		if (( $(ps -ef | grep -v grep | grep $service | wc -l) > 0 )); then
+			nginxrestartmenuicon="${OKSYMB}"
+			nginxstartmenuicon="${BADSYMB}"
+			nginxstopmenuicon="${OKSYMB}"
+		else
+			nginxrestartmenuicon="${OKSYMB}"
+			nginxstartmenuicon="${OKSYMB}"
+			nginxstopmenuicon="${BADSYMB}"
+		fi
+	fi
+
+	if [ "${lightspeedstatus}" == "true" ]; then
+		lightspeedconfigmenuicon="${OKSYMB}"
+		lightspeedmenuicon="${OKSYMB}"
+		service="lightspeed"
+		if (( $(ps -ef | grep -v grep | grep $service | wc -l) > 0 )); then
+			lightspeedrestartmenuicon="${OKSYMB}"
+			lightspeedstartmenuicon="${BADSYMB}"
+			lightspeedstopmenuicon="${OKSYMB}"
+		else
+			lightspeedrestartmenuicon="${OKSYMB}"
+			lightspeedstartmenuicon="${OKSYMB}"
+			lightspeedstopmenuicon="${BADSYMB}"
+		fi
+	fi
+
+	if [ "${apachestatus}" == "false" ]; then
+		apacheconfigmenuicon="${BADSYMB}"
+		apachemenuicon="${BADSYMB}"
+		apacherestartmenuicon="${BADSYMB}"
+		apachestartmenuicon="${BADSYMB}"
+		apachestopmenuicon="${BADSYMB}"
+	fi
+	if [ "${nginxstatus}" == "false" ]; then
+		nginxconfigmenuicon="${BADSYMB}"
+		nginxmenuicon="${BADSYMB}"
+		nginxrestartmenuicon="${BADSYMB}"
+		nginxstartmenuicon="${BADSYMB}"
+		nginxstopmenuicon="${BADSYMB}"
+	fi
+	if [ "${lightspeedstatus}" == "false" ]; then
+		lightspeedconfigmenuicon="${BADSYMB}"
+		lightspeedmenuicon="${BADSYMB}"
+		lightspeedrestartmenuicon="${BADSYMB}"
+		lightspeedstartmenuicon="${BADSYMB}"
+		lightspeedstopmenuicon="${BADSYMB}"
+	fi
+	if [ "${cherokeestatus}" == "false" ]; then
+		cherokeeconfigmenuicon="${BADSYMB}"
+		cherokeemenuicon="${BADSYMB}"
+		cherokeerestartmenuicon="${BADSYMB}"
+		cherokeestartmenuicon="${BADSYMB}"
+		cherokeestopmenuicon="${BADSYMB}"
+	fi
+	if [ "${caddystatus}" == "false" ]; then
+		caddyconfigmenuicon="${BADSYMB}"
+		caddymenuicon="${BADSYMB}"
+		caddyrestartmenuicon="${BADSYMB}"
+		caddystartmenuicon="${BADSYMB}"
+		caddystopmenuicon="${BADSYMB}"
+	fi
+	if [ "${monkeystatus}" == "false" ]; then
+		monkeyconfigmenuicon="${BADSYMB}"
+		monkeymenuicon="${BADSYMB}"
+		monkeyrestartmenuicon="${BADSYMB}"
+		monkeystartmenuicon="${BADSYMB}"
+		monkeystopmenuicon="${BADSYMB}"
+	fi
+	if [ "${hiawathastatus}" == "false" ]; then
+		hiawathaconfigmenuicon="${BADSYMB}"
+		hiawathamenuicon="${BADSYMB}"
+		hiawatharestartmenuicon="${BADSYMB}"
+		hiawathastartmenuicon="${BADSYMB}"
+		hiawathastopmenuicon="${BADSYMB}"
+	fi
+
+	if [ "${apachestatus}" == "disabled" ]; then
+		apacheconfigmenuicon="${DISABLEDSYMB}"
+		apachemenuicon="${DISABLEDSYMB}"
+		apacherestartmenuicon="${DISABLEDSYMB}"
+		apachestartmenuicon="${DISABLEDSYMB}"
+		apachestopmenuicon="${DISABLEDSYMB}"
+	fi
+	if [ "${nginxstatus}" == "disabled" ]; then
+		nginxconfigmenuicon="${DISABLEDSYMB}"
+		nginxmenuicon="${DISABLEDSYMB}"
+		nginxrestartmenuicon="${DISABLEDSYMB}"
+		nginxstartmenuicon="${DISABLEDSYMB}"
+		nginxstopmenuicon="${DISABLEDSYMB}"
+	fi
+	if [ "${lightspeedstatus}" == "disabled" ]; then
+		lightspeedconfigmenuicon="${DISABLEDSYMB}"
+		lightspeedmenuicon="${DISABLEDSYMB}"
+		lightspeedrestartmenuicon="${DISABLEDSYMB}"
+		lightspeedstartmenuicon="${DISABLEDSYMB}"
+		lightspeedstopmenuicon="${DISABLEDSYMB}"
+	fi
+	if [ "${cherokeestatus}" == "disabled" ]; then
+		cherokeeconfigmenuicon="${DISABLEDSYMB}"
+		cherokeemenuicon="${DISABLEDSYMB}"
+		cherokeerestartmenuicon="${DISABLEDSYMB}"
+		cherokeestartmenuicon="${DISABLEDSYMB}"
+		cherokeestopmenuicon="${DISABLEDSYMB}"
+	fi
+	if [ "${caddystatus}" == "disabled" ]; then
+		caddyconfigmenuicon="${DISABLEDSYMB}"
+		caddymenuicon="${DISABLEDSYMB}"
+		caddyrestartmenuicon="${DISABLEDSYMB}"
+		caddystartmenuicon="${DISABLEDSYMB}"
+		caddystopmenuicon="${DISABLEDSYMB}"
+	fi
+	if [ "${monkeystatus}" == "disabled" ]; then
+		monkeyconfigmenuicon="${DISABLEDSYMB}"
+		monkeymenuicon="${DISABLEDSYMB}"
+		monkeyrestartmenuicon="${DISABLEDSYMB}"
+		monkeystartmenuicon="${DISABLEDSYMB}"
+		monkeystopmenuicon="${DISABLEDSYMB}"
+	fi
+	if [ "${hiawathastatus}" == "disabled" ]; then
+		hiawathaconfigmenuicon="${DISABLEDSYMB}"
+		hiawathamenuicon="${DISABLEDSYMB}"
+		hiawatharestartmenuicon="${DISABLEDSYMB}"
+		hiawathastartmenuicon="${DISABLEDSYMB}"
+		hiawathastopmenuicon="${DISABLEDSYMB}"
+	fi
+
+	if [ "${apachestatus}" == "true" ] || [ "${nginxstatus}" == "true" ] || [ "${lightspeedstatus}" == "true" ] || [ "${cherokeestatus}" == "true" ] || [ "${caddystatus}" == "true" ] || [ "${monkeystatus}" == "true" ] || [ "${hiawathastatus}" == "true" ]; then
+		webservermenuicon="${OKSYMB}"
+	fi
+
+	apachestatus="$([ "${WEBSERVERTYPE}" == "apache" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
 	nginxstatus="$([ "${WEBSERVERTYPE}" == "nginx" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
-	###################################################################
-	# LIGHTSPEED
 	lightspeedstatus="$([ "${WEBSERVERTYPE}" == "lightspeed" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
+	sslmenuicon="$([ "${sslmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${sslmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 
 	###################################################################
-	webservermenu=(1 "${apachemenuicon} Apache" 2 "${nginxmenuicon} nGinX" 3 "${lightspeedmenuicon} Lightspeed" 4 "${sslmenuicon} SSL")
-	###################################################################
-	apachemenu=(1 "${apacheconfigmenuicon} Apache Configuration" 2 "Apache Restart" 3 "Apache Start" 4 "Apache Stop" 5 "${apachestatus}")
-	nginxmenu=(1 "nGinX Configuration" 2 "nGinX Restart" 3 "nGinX Start" 4 "nGinX Stop" 5 "${nginxstatus}")
-	lightspeed=(1 "Lightspeed Configuration" 2 "Lightspeed Restart" 3 "Lightspeed Start" 4 "Lightspeed Stop" 5 "${lightspeedstatus}")
-
+	# Database Server icon status symbols
 	###################################################################
 	databasemenuicon="$([ "${databasemenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${databasemenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	mysqlmenuicon="$([ "${mysqlmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${mysqlmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	mariadbmenuicon="$([ "${mariadbmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${mariadbmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	postgresqlmenuicon="$([ "${postgresqlmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${postgresqlmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 
-	sslmenuicon="$([ "${sslmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${sslmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+	###################################################################
+	# System Configuration Server icon status symbols
+	###################################################################
+	minmemoryreq=262144 # 256 Megabytes
+	mindrivereq=665600 # 650 Megabytes
+
+	systeminfomenustatus="true"
+	filesystemmenustatus="true"
+	drivespacemenustatus="true"
+	mountpointmenustatus="disabled"
+	raidconfigmenustatus="disabled"
+	usbdrivemenustatus="disabled"
+
+	if [ $phymem -lt $minmemoryreq ]; then
+		systeminfostatus="false"
+		memoryconfigmenustatus="false"
+	else
+		systeminfostatus="true"
+		memoryconfigmenustatus="true"
+	fi
+	
+	if [ $systeminfostatus == "true" ]; then
+		systemconfigmenustatus="true"
+	else
+		systemconfigmenustatus="false"
+	fi
+
+	memoryfreemenustatus="true"
+	swapmemorymenustatus="true"
+	fileeditormenustatus="true"
+	hostsfilemenustatus="true"
+	hostnamefilemenustatus="true"
+	networkconfigmenustatus="true"
+	wirelessconfigmenustatus="true"
+	networkitemconfigmenustatus="true"
+	applicationconfigmenustatus="true"
+	gitconfigmenustatus="true"
+	uninstallappmenustatus="true"
+
+	###################################################################
+	# Logs icon status symbols
+	###################################################################
+	logsmenustatus="true"
+
+	###################################################################
+	# Application Server icon status symbols
+	###################################################################
 	applicationmenuicon="$([ "${applicationmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${applicationmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-	emailmenuicon="$([ "${emailmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${emailmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-	filemenuicon="$([ "${filemenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${filemenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-	messagemenuicon="$([ "${messagemenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${messagemenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-	proxymenuicon="$([ "${proxymenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${proxymenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-	systemconfigmenuicon="$([ "${systemconfigmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${systemconfigmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
-	logsmenuicon="$([ "${logsmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${logsmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	phpmenuicon="$([ "${phpmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${phpmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	javamenuicon="$([ "${javamenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${javamenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	tomcatmenuicon="$([ "${tomcatmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${tomcatmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
@@ -203,14 +533,39 @@ function menusystem() {
 	osaappmenuicon="$([ "${osaappmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${osaappmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	mobileappmenuicon="$([ "${mobileappmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${mobileappmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	bbsappmenuicon="$([ "${bbsappmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${bbsappmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+
+	###################################################################
+	# Email Server icon status symbols
+	###################################################################
+	emailmenuicon="$([ "${emailmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${emailmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	postfixmenuicon="$([ "${postfixmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${postfixmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	citadelmenuicon="$([ "${citadelmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${citadelmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	sendmailmenuicon="$([ "${sendmailmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${sendmailmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	eximmenuicon="$([ "${eximmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${eximmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	couriermenuicon="$([ "${couriermenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${couriermenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+
+	###################################################################
+	# File Server icon status symbols
+	###################################################################
+	filemenuicon="$([ "${filemenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${filemenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	ftpmenuicon="$([ "${ftpmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${ftpmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	nfsmenuicon="$([ "${nfsmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${nfsmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	sambamenuicon="$([ "${sambamenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${sambamenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+
+	###################################################################
+	# Message Server icon status symbols
+	###################################################################
+	messagemenuicon="$([ "${messagemenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${messagemenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+
+	###################################################################
+	# Proxy Server icon status symbols
+	###################################################################
+	proxymenuicon="$([ "${proxymenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${proxymenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+
+	###################################################################
+	# System Configuration icon status symbols
+	###################################################################
+	systemconfigmenuicon="$([ "${systemconfigmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${systemconfigmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	systeminfomenuicon="$([ "${systeminfomenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${systeminfomenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	filesystemmenuicon="$([ "${filesystemmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${filesystemmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	drivespacemenuicon="$([ "${drivespacemenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${drivespacemenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
@@ -229,6 +584,11 @@ function menusystem() {
 	applicationconfigmenuicon="$([ "${applicationconfigmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${applicationconfigmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	gitconfigmenuicon="$([ "${gitconfigmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${gitconfigmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	uninstallappmenuicon="$([ "${uninstallappmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${uninstallappmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+
+	###################################################################
+	# Logs icon status symbols
+	###################################################################
+	logsmenuicon="$([ "${logsmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${logsmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	phplogsmenuicon="$([ "${phplogsmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${phplogsmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	accesslogsmenuicon="$([ "${accesslogsmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${accesslogsmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	errorlogsmenuicon="$([ "${errorlogsmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${errorlogsmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
@@ -236,10 +596,19 @@ function menusystem() {
 	systemlogsmenuicon="$([ "${systemlogsmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${systemlogsmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 	autoconfigmenuicon="$([ "${autoconfigmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${autoconfigmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 
+	###################################################################
+	# Menu Lists
+	###################################################################
 	mainmenu=("1" "${webservermenuicon} Web Server" "2" "${databasemenuicon} Database Server" "3" "${applicationmenuicon} Application Server" "4" "${emailmenuicon} Email Server" "5" "${filemenuicon} File Server" "6" "${messagemenuicon} Message Server" "7" "${proxymenuicon} Proxy Server" "8" "${systemconfigmenuicon} System Configuration" "9" "${logsmenuicon} Logs")
-
+	###################################################################
+	webservermenu=(1 "${apachemenuicon} Apache" 2 "${nginxmenuicon} nGinX" 3 "${lightspeedmenuicon} LightTPD" 4 "${cherokeemenuicon} Cherokee" 5 "${caddymenuicon} Caddy" 6 "${monkeymenuicon} Monkey HTTP" 7 "${hiawathamenuicon} Hiawatha" 8 "${sslmenuicon} SSL")
+	###################################################################
+	apachemenu=(1 "${apacheconfigmenuicon} Apache Configuration" 2 "${apacherestartmenuicon} Apache Restart" 3 "${apachestartmenuicon} Apache Start" 4 "${apachestopmenuicon} Apache Stop" 5 "${apachestatus}")
+	nginxmenu=(1 "${nginxconfigmenuicon} nGinX Configuration" 2 "${nginxrestartmenuicon} nGinX Restart" 3 "${nginxstartmenuicon} nGinX Start" 4 "${nginxstopmenuicon} nGinX Stop" 5 "${nginxstatus}")
+	lightspeed=(1 "${lightspeedconfigmenuicon} Lightspeed Configuration" 2 "${lightspeedrestartmenuicon} Lightspeed Restart" 3 "${lightspeedstartmenuicon} Lightspeed Start" 4 "${lightspeedstopmenuicon} Lightspeed Stop" 5 "${lightspeedstatus}")
+	###################################################################
 	letsencryptmenu=(1 "Let's Encrypt Settings" 2 "Renew Certification" 3 "Revoke Certification")
-	databaseservermenu=(1 "mySQL" 2 "MariaDB" 3 "PostgreSQL")
+	databaseservermenu=(1 "mySQL" 2 "MariaDB" 3 "PostgreSQL" 4 "SQLite" 5 "Pervasive" 6 "VoltDB" 7 "GigaBASE")
 	mysqlmenu=(1 "${mysqlmenuicon} mySQL Configuration" 2 "mySQL Restart" 3 "mySQL Start" 4 "mySQL Stop")
 	mariadbsqlmenu=(1 "${mariadbmenuicon} MariaDB Configuration" 2 "MariaDB Restart" 3 "MariaDB Start" 4 "MariaDB Stop")
 	postgresqlmenu=(1 "${postgresqlmenuicon} PostgreSQL Configuration" 2 "PostgreSQL Restart" 3 "PostgreSQL Start" 4 "PostgreSQL Stop")
@@ -276,6 +645,7 @@ function menusystem() {
 function mainmenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="Main Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -340,6 +710,7 @@ function mainmenu() {
 function webservermenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="Web Server Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -378,6 +749,7 @@ function webservermenu() {
 function databasemenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="Database Server Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -459,6 +831,7 @@ function databasemenu() {
 function applicationmenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="Application Server Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -601,6 +974,7 @@ function applicationmenu() {
 function emailmenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="Email Server Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -716,6 +1090,7 @@ function emailmenu() {
 function filemenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="File Server Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -796,6 +1171,7 @@ function filemenu() {
 function messagemenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="Message Server Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -825,6 +1201,7 @@ function messagemenu() {
 function proxymenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="Proxy Server Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -854,6 +1231,7 @@ function proxymenu() {
 function systemconfigmenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="System Configuration Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -944,6 +1322,7 @@ function systemconfigmenu() {
 function systemlogsmenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="System Logs Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -986,6 +1365,7 @@ function systemlogsmenu() {
 function apacheselectmenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 
 	title="Apache Options Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
@@ -1178,6 +1558,7 @@ function apacheconfigform() {
 	log "${title} menu called"
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
+	menusystem
 	while test $returncode != 1 && test $returncode != 250; do
 		# Redirect stream 3 to the stream 1 (STDOUT)
 		exec 3>&1
@@ -1252,16 +1633,49 @@ function apachectrlform() {
 	
 	case $action in
 		"restart")
-			# Check to see if Apache is running, then restart
-			echo "restart"
+			if [ -f /usr/local/apache/bin/apachectl ]; then
+				log "Apache restart: /usr/local/apache/bin/apachectl"
+				/usr/local/apache/bin/apachectl restart > /dev/null
+				apacheselectmenu
+			elif [ -f /etc/init.d/apache2 ]; then
+				log "Apache restart: /etc/init.d/apache2"
+				/etc/init.d/apache2 restart > /dev/null
+				apacheselectmenu
+			else
+				log "Apache restart: service apache2 stop"
+				service apache2 restart > /dev/null
+				apacheselectmenu
+			fi
 			;;
 		"start")
-			# Check to see if Apache is not running
-			echo "start"
+			if [ -f /usr/local/apache/bin/apachectl ]; then
+				log "Apache start: /usr/local/apache/bin/apachectl"
+				/usr/local/apache/bin/apachectl start > /dev/null
+				apacheselectmenu
+			elif [ -f /etc/init.d/apache2 ]; then
+				log "Apache start: /etc/init.d/apache2"
+				/etc/init.d/apache2 start > /dev/null
+				apacheselectmenu
+			else
+				log "Apache start: service apache2 stop"
+				service apache2 start > /dev/null
+				apacheselectmenu
+			fi
 			;;
 		"stop")
-			# Check to see if Apache is running
-			echo "stop"
+			if [ -f /usr/local/apache/bin/apachectl ]; then
+				log "Apache stop: /usr/local/apache/bin/apachectl"
+				/usr/local/apache/bin/apachectl stop > /dev/null
+				apacheselectmenu
+			elif [ -f /etc/init.d/apache2 ]; then
+				log "Apache stop: /etc/init.d/apache2"
+				/etc/init.d/apache2 stop > /dev/null
+				apacheselectmenu
+			else
+				log "Apache stop: service apache2 stop"
+				service apache2 stop > /dev/null
+				apacheselectmenu
+			fi
 			;;
 	esac
 }
@@ -1479,8 +1893,6 @@ function lightspeedctrlform() {
 			;;
 	esac
 }
-
-
 function emailserverform() {
 	dialogtitle="Email Server Settings"
 	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
@@ -1508,7 +1920,7 @@ function installedappsform() {
 function servertypemenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
-	mainmenusystem
+	menusystem
 
 	$title="Server Type Configuration"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n\Zn[\Zb\Z1*\Zn/\Z2*\Zn] - Invalid/Valid Settings Detected\n\n"
