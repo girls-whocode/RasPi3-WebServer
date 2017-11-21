@@ -33,14 +33,6 @@ fi
 function main() {
 	log "Script started #############################################################"
 	log "Start installation script"
-	chkmemory
-	chkinet
-	chkversion
-	loadcfg
-	if [ "${PKGMGR}" == "apt" ]; then
-		evallog "DEBIAN_FRONTEND=noninteractive"
-	fi
-	chkmemory
 
 	# Test for ncurses dialog application
 	echo -e $LIGHTRED"=== "$LIGHT_GREEN `date +'%I:%M:%S'` $LIGHT_RED" === "$WHITE"Starting Application and checking dependancies "$LIGHTRED"==="$COLOR_NONE
@@ -68,6 +60,22 @@ function main() {
 		evallog "${PKGINSTALL} whois" & pid=$!
 		progress
 	fi
+	
+	if haveprog "lsb_release"; then
+		log "lsb_release is already installed"
+	else
+		evallog "${PKGINSTALL} redhat-lsb-core" & pid=$!
+		progress
+	fi
+
+	chkmemory
+	chkinet
+	chkversion
+	loadcfg
+	if [ "${PKGMGR}" == "apt" ]; then
+		evallog "DEBIAN_FRONTEND=noninteractive"
+	fi
+	chkmemory
 	
 	menusystem
 	mainmenu
