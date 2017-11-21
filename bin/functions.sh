@@ -11,7 +11,7 @@ function trap_with_arg() {
     done
 }
 function haveprog() {
-    [ -x "$(which $1)" ]
+    [ -x "$(which $1 > /dev/null)" ]
 }
 function managehost() {
 	OPTION=$1
