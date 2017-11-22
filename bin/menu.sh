@@ -8,73 +8,68 @@ fi
 function menusystem() {
 	# Get the updated config file so menu status icons will be displayed correctly
 	loadcfg
-	webservererror=""
-
-	# Apache Server Menu Switches Settings that need to be validated:
-	apachestatus="disabled"
-	apachemenustatus="disabled"
-	nginxstatus="disabled"
-	nginxmenustatus="disabled"
-	lightspeedstatus="disabled"
-	lightspeedmenustatus="disabled"
-	cherokeestatus="disabled"
-	cherokeemenustatus="disabled"
-	caddystatus="disabled"
-	caddymenustatus="disabled"
-	monkeystatus="disabled"
-	monkeymenustatus="disabled"
-	hiawathastatus="disabled"
-	hiawathamenustatus="disabled"
-
-	# Database Configuration Menu Switches that need to be validated:
-	mysqlstatus="false"
-	mariadbstatus="false"
-	postgresqlstatus="false"
-	sqlitestatus="false"
-	pervasivestatus="false"
-	voltdbstatus="false"
-	gigabase="false"
-	
-	# System Configuration Menu Switches that need to be validated:
-	systeminfostatus="false"
-	filesystemstatus="false"
-	memorystatus="false"
-	fileeditorstatus="false"
-	networkconfigstatus="false"
-	applicationconfigstatus="false"
+	varreset
 
 	# Domain name must be valid for all web servers
 	host "${FQDN}" 2>&1 > /dev/null
 	if [ $? -eq 0 ]; then
-        apachestatus="true"
-        apachemenustatus="true"
-        nginxstatus="true"
-		nginxmenustatus="true"
-		lightspeedstatus="true"
-		lightspeedmenustatus="true"
-		cherokeestatus="true"
-		cherokeemenustatus="true"
-		caddystatus="true"
-		caddymenustatus="true"
-		monkeystatus="true"
-		monkeymenustatus="true"
-		hiawathastatus="true"
-		hiawathamenustatus="true"
+		if [ "${apachestatus}" != "disabled" ]; then 
+			apachestatus="true"
+			apachemenustatus="true"
+		fi
+		if [ "${nginxstatus}" != "disabled" ]; then 
+			nginxstatus="true"
+			nginxmenustatus="true"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="true"
+			lightspeedmenustatus="true"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			cherokeestatus="true"
+			cherokeemenustatus="true"
+		fi
+		if [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="true"
+			caddymenustatus="true"
+		fi
+		if [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="true"
+			monkeymenustatus="true"
+		fi
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="true"
+			hiawathamenustatus="true"
+		fi
     else
-		apachestatus="false"
-		apachemenustatus="false"
-		nginxstatus="false"
-		nginxmenustatus="false"
-		lightspeedstatus="false"
-		lightspeedmenustatus="false"
-		cherokeestatus="false"
-		cherokeemenustatus="false"
-		caddystatus="false"
-		caddymenustatus="false"
-		monkeystatus="false"
-		monkeymenustatus="false"
-		hiawathastatus="false"
-		hiawathamenustatus="false"
+		if [ "${apachestatus}" != "disabled" ]; then 
+			apachestatus="false"
+			apachemenustatus="false"
+		fi
+		if [ "${nginxstatus}" != "disabled" ]; then 
+			nginxstatus="false"
+			nginxmenustatus="false"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="false"
+			lightspeedmenustatus="false"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			cherokeestatus="false"
+			cherokeemenustatus="false"
+		fi
+		if [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="false"
+			caddymenustatus="false"
+		fi
+		if [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="false"
+			monkeymenustatus="false"
+		fi
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="false"
+			hiawathamenustatus="false"
+		fi
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1Domain Name\Zn - cannot be resolved\n"
     fi
@@ -82,62 +77,130 @@ function menusystem() {
 	# Web folder must be valid
 	if [ -d $WEBSERVERDIR ]; then
 		# Directory exist
-		if [ "${apachestatus}" != "false" ] || [ "${apachestatus}" != "disabled" ]; then
+		if [ "${apachestatus}" != "disabled" ]; then 
 			apachestatus="true"
 			apachemenustatus="true"
 		fi
-		if [ "${nginxstatus}" != "false" ] || [ "${nginxstatus}" != "disabled" ]; then
+		if [ "${nginxstatus}" != "disabled" ]; then 
 			nginxstatus="true"
 			nginxmenustatus="true"
 		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="true"
+			lightspeedmenustatus="true"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			cherokeestatus="true"
+			cherokeemenustatus="true"
+		fi
+		if [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="true"
+			caddymenustatus="true"
+		fi
+		if [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="true"
+			monkeymenustatus="true"
+		fi
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="true"
+			hiawathamenustatus="true"
+		fi
 	else
 		# Directory does not exist
-		apachestatus="false"
-		apachemenustatus="false"
-		nginxstatus="false"
-		nginxmenustatus="false"
-		lightspeedstatus="false"
-		lightspeedmenustatus="false"
-		cherokeestatus="false"
-		cherokeemenustatus="false"
-		caddystatus="false"
-		caddymenustatus="false"
-		monkeystatus="false"
-		monkeymenustatus="false"
-		hiawathastatus="false"
-		hiawathamenustatus="false"
+		if [ "${apachestatus}" != "disabled" ]; then 
+			apachestatus="false"
+			apachemenustatus="false"
+		fi
+		if [ "${nginxstatus}" != "disabled" ]; then 
+			nginxstatus="false"
+			nginxmenustatus="false"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="false"
+			lightspeedmenustatus="false"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			cherokeestatus="false"
+			cherokeemenustatus="false"
+		fi
+		if [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="false"
+			caddymenustatus="false"
+		fi
+		if [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="false"
+			monkeymenustatus="false"
+		fi
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="false"
+			hiawathamenustatus="false"
+		fi
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1Public HTML folder\Zn - Does not exist\n"
 	fi
 
 	# Web user must exist
-	getent passwd "${SERVERUSER}" > /dev/null 2&>1
+	getent passwd "${SERVERUSER}" > /dev/null
 	if [ $? -eq 0 ]; then
 		# The user exist
-		if [ "${apachestatus}" != "false" ] || [ "${apachestatus}" != "disabled" ]; then
+		if [ "${apachestatus}" != "disabled" ]; then 
 			apachestatus="true"
 			apachemenustatus="true"
 		fi
-		if [ "${nginxstatus}" != "false" ] || [ "${nginxstatus}" != "disabled" ]; then
+		if [ "${nginxstatus}" != "disabled" ]; then 
 			nginxstatus="true"
 			nginxmenustatus="true"
 		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="true"
+			lightspeedmenustatus="true"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			cherokeestatus="true"
+			cherokeemenustatus="true"
+		fi
+		if [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="true"
+			caddymenustatus="true"
+		fi
+		if [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="true"
+			monkeymenustatus="true"
+		fi
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="true"
+			hiawathamenustatus="true"
+		fi
 	else
 		# User does not exist
-		apachestatus="false"
-		apachemenustatus="false"
-		nginxstatus="false"
-		nginxmenustatus="false"
-		lightspeedstatus="false"
-		lightspeedmenustatus="false"
-		cherokeestatus="false"
-		cherokeemenustatus="false"
-		caddystatus="false"
-		caddymenustatus="false"
-		monkeystatus="false"
-		monkeymenustatus="false"
-		hiawathastatus="false"
-		hiawathamenustatus="false"
+		if [ "${apachestatus}" != "disabled" ]; then 
+			apachestatus="false"
+			apachemenustatus="false"
+		fi
+		if [ "${nginxstatus}" != "disabled" ]; then 
+			nginxstatus="false"
+			nginxmenustatus="false"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="false"
+			lightspeedmenustatus="false"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			cherokeestatus="false"
+			cherokeemenustatus="false"
+		fi
+		if [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="false"
+			caddymenustatus="false"
+		fi
+		if [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="false"
+			monkeymenustatus="false"
+		fi
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="false"
+			hiawathamenustatus="false"
+		fi
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1User ${SERVERUSER}\Zn - Does not exist\n"
 	fi
@@ -145,30 +208,64 @@ function menusystem() {
 	# Web folder must have correct permissions
 	if [ -n "$(find "${WEBSERVERDIR}" -maxdepth 0 -user "${OWNERGROUP}")" ]; then
 		# Ownership is correct
-		if [ "${apachestatus}" != "false" ] || [ "${apachestatus}" != "disabled" ]; then
+		if [ "${apachestatus}" != "disabled" ]; then 
 			apachestatus="true"
 			apachemenustatus="true"
 		fi
-		if [ "${nginxstatus}" != "false" ] || [ "${nginxstatus}" != "disabled" ]; then
+		if [ "${nginxstatus}" != "disabled" ]; then 
 			nginxstatus="true"
 			nginxmenustatus="true"
 		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="true"
+			lightspeedmenustatus="true"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			cherokeestatus="true"
+			cherokeemenustatus="true"
+		fi
+		if [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="true"
+			caddymenustatus="true"
+		fi
+		if [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="true"
+			monkeymenustatus="true"
+		fi
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="true"
+			hiawathamenustatus="true"
+		fi
 	else
-		# User does not exist
-		apachestatus="false"
-		apachemenustatus="false"
-		nginxstatus="false"
-		nginxmenustatus="false"
-		lightspeedstatus="false"
-		lightspeedmenustatus="false"
-		cherokeestatus="false"
-		cherokeemenustatus="false"
-		caddystatus="false"
-		caddymenustatus="false"
-		monkeystatus="false"
-		monkeymenustatus="false"
-		hiawathastatus="false"
-		hiawathamenustatus="false"
+		# Ownership is incorrect
+		if [ "${apachestatus}" != "disabled" ]; then 
+			apachestatus="false"
+			apachemenustatus="false"
+		fi
+		if [ "${nginxstatus}" != "disabled" ]; then 
+			nginxstatus="false"
+			nginxmenustatus="false"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="false"
+			lightspeedmenustatus="false"
+		fi
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			cherokeestatus="false"
+			cherokeemenustatus="false"
+		fi
+		if [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="false"
+			caddymenustatus="false"
+		fi
+		if [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="false"
+			monkeymenustatus="false"
+		fi
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="false"
+			hiawathamenustatus="false"
+		fi
 		webserverfailtest="true"
 		webservererror="${webservererror} \Zb\Z1Public HTML folder\Zn - Has invalid ownership\n"
 	fi
@@ -180,10 +277,13 @@ function menusystem() {
 			apachemenustatus="true"
 		fi
 	else
-		apachestatus="false"
-		apachemenustatus="false"
 		webserverfailtest="true"
-		webservererror="${webservererror} \Zb\Z1Apache Server\Zn - Has not been installed\n"
+		# If Apache is disabled, we don't care if it is installed or not
+		if [ "${apachestatus}" != "disabled" ]; then
+			webservererror="${webservererror} \Zb\Z1Apache Server\Zn - Has not been installed\n"
+			apachestatus="false"
+			apachemenustatus="false"
+		fi
 	fi
 
 	# nGinX must be installed
@@ -193,10 +293,95 @@ function menusystem() {
 			nginxmenustatus="true"
 		fi
 	else
-		nginxstatus="false"
-		nginxmenustatus="false"
 		webserverfailtest="true"
-		webservererror="${webservererror} \Zb\Z1nGinX Server\Zn - Has not been installed\n"
+		# If nGinX is disabled, we don't care if it is installed or not
+		if [ "${nginxstatus}" != "disabled" ]; then
+			webservererror="${webservererror} \Zb\Z1nGinX Server\Zn - Has not been installed\n"
+			nginxstatus="false"
+			nginxmenustatus="false"
+		fi
+	fi
+
+	# LightTPD must be installed
+	if haveprog "lighttpd"; then
+		if [ "${lightspeedstatus}" != "false" ] || [ "${lightspeedstatus}" != "disabled" ]; then
+			lightspeedstatus="true"
+			lightspeedmenustatus="true"
+		fi
+	else
+		webserverfailtest="true"
+		# If LightTPD is disabled, we don't care if it is installed or not
+		if [ "${lightspeedstatus}" != "disabled" ]; then
+			webservererror="${webservererror} \Zb\Z1LightTPD Server\Zn - Has not been installed\n"
+			lightspeedstatus="false"
+			lightspeedmenustatus="false"
+		fi
+	fi
+
+	# Cherokee must be installed
+	if haveprog "cherokee"; then
+		if [ "${cherokeestatus}" != "false" ] || [ "${cherokeestatus}" != "disabled" ]; then
+			cherokeestatus="true"
+			cherokeemenustatus="true"
+		fi
+	else
+		webserverfailtest="true"
+		# If Cherokee is disabled, we don't care if it is installed or not
+		if [ "${cherokeestatus}" != "disabled" ]; then
+			webservererror="${webservererror} \Zb\Z1Cherokee Server\Zn - Has not been installed\n"
+			cherokeestatus="false"
+			cherokeemenustatus="false"
+		fi
+	fi
+
+	# Caddy must be installed
+	if haveprog "caddy"; then
+		if [ "${caddystatus}" != "false" ] || [ "${caddystatus}" != "disabled" ]; then
+			caddystatus="true"
+			caddymenustatus="true"
+		fi
+	else
+		webserverfailtest="true"
+		# If Caddy is disabled, we don't care if it is installed or not
+		if [ "${caddystatus}" != "disabled" ]; then
+			webservererror="${webservererror} \Zb\Z1Caddy Server\Zn - Has not been installed\n"
+			caddystatus="false"
+			caddymenustatus="false"
+		fi
+	fi
+
+	# Monkey must be installed
+	if haveprog "monkey"; then
+		if [ "${monkeystatus}" != "false" ] || [ "${monkeystatus}" != "disabled" ]; then
+			monkeystatus="true"
+			monkeymenustatus="true"
+		fi
+	else
+		webserverfailtest="true"
+		# If Monkey is disabled, we don't care if it is installed or not
+		if [ "${monkeystatus}" != "disabled" ]; then
+			webservererror="${webservererror} \Zb\Z1Monkey HTTP Server\Zn - Has not been installed\n"
+			monkeystatus="false"
+			monkeymenustatus="false"
+		fi
+	fi
+
+	# Hiawatha must be installed
+	if haveprog "hiawatha"; then
+		if [ "${hiawathastatus}" != "false" ] || [ "${hiawathastatus}" != "disabled" ]; then
+			hiawathastatus="true"
+			hiawathamenustatus="true"
+		fi
+	else
+		# If Hiawatha is disabled, we don't care if it is installed or not
+		webserverfailtest="true"
+		echo $hiawathastatus
+		if [ "${hiawathastatus}" != "disabled" ]; then
+			zzz="Shouldn't exist"
+			webservererror="${webservererror} \Zb\Z1Hiawatha Server\Zn - Has not been installed\n"
+			hiawathastatus="false"
+			hiawathamenustatus="false"
+		fi
 	fi
 
 	# Apache log folder must exist
@@ -299,15 +484,14 @@ function menusystem() {
 		hiawathastatus="disabled"
 		hiawathamenustatus="disabled"
 	fi
-	
 
-	if [ "${apachestatus}" == "diasbled" ] && [ "${nginxstatus}" == "disabled" ] && [ "${lightspeedstatus}" == "disabled" ]; then
+	if [ "${apachestatus}" == "diasbled" ] && [ "${nginxstatus}" == "disabled" ] && [ "${lightspeedstatus}" == "disabled" ] && [ "${cherokeestatus}" == "disabled" ] && [ "${caddystatus}" == "disabled" ] && [ "${monkeystatus}" == "disabled" ] && [ "${hiawathastatus}" == "disabled" ]; then
 		webservermenuicon="${DISABLEDSYMB}"
 	else
 		webservermenuicon="${OKSYMB}"
 	fi
 
-	if [ "${apachestatus}" == "false" ] || [ "${nginxstatus}" == "false" ] || [ "${lightspeedstatus}" == "false" ]; then
+	if [ "${apachestatus}" == "false" ] || [ "${nginxstatus}" == "false" ] || [ "${lightspeedstatus}" == "false" ] || [ "${cherokeestatus}" == "false" ] || [ "${caddystatus}" == "false" ] || [ "${monkeystatus}" == "false" ] || [ "${hiawathastatus}" == "false" ]; then
 		webservermenuicon="${BADSYMB}"
 	else
 		webservermenuicon="${OKSYMB}"
@@ -466,10 +650,14 @@ function menusystem() {
 		webservermenuicon="${DISABLEDSYMB}"
 	fi
 
-	apachestatus="$([ "${WEBSERVERTYPE}" == "apache" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
-	nginxstatus="$([ "${WEBSERVERTYPE}" == "nginx" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
-	lightspeedstatus="$([ "${WEBSERVERTYPE}" == "lightspeed" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
-	sslmenuicon="$([ "${sslmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${sslmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
+#	apachestatus="$([ "${WEBSERVERTYPE}" == "apache" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
+#	nginxstatus="$([ "${WEBSERVERTYPE}" == "nginx" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
+#	lightspeedstatus="$([ "${WEBSERVERTYPE}" == "lightspeed" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
+#	cherokeestatus="$([ "${WEBSERVERTYPE}" == "cherokee" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
+#	caddystatus="$([ "${WEBSERVERTYPE}" == "caddy" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
+#	monkeystatus="$([ "${WEBSERVERTYPE}" == "monkey" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
+#	hiawathastatus="$([ "${WEBSERVERTYPE}" == "hiawatha" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
+#	sslmenuicon="$([ "${sslmenustatus}" == "true" ] && echo "${OKSYMB}" || ([ "${sslmenustatus}" == "false" ] && echo "${BADSYMB}" || echo "${DISABLEDSYMB}"))"
 
 	###################################################################
 	# Database Server icon status symbols
@@ -482,9 +670,6 @@ function menusystem() {
 	###################################################################
 	# System Configuration Server icon status symbols
 	###################################################################
-	minmemoryreq=262144 # 256 Megabytes
-	mindrivereq=665600 # 650 Megabytes
-
 	systeminfomenustatus="true"
 	filesystemmenustatus="true"
 	drivespacemenustatus="true"
@@ -645,6 +830,8 @@ function menusystem() {
 	networkconfigmenu=(1 "${wirelessconfigmenuicon} Wireless Configuration" 2 "${networkitemconfigmenuicon} Network Configuration")
 	applicationmenu=(1 "${gitconfigmenuicon} Git Configuration" 2 "${uninstallappmenuicon} Uninstall Applications")
 	logsmenu=(1 "${apachelogsmenuicon} Apache Logs" 2 "${phplogsmenuicon} PHP Logs" 3 "${accesslogsmenuicon} Access Logs" 4 "${errorlogsmenuicon} Error Logs" 5 "${installationlogsmenuicon} Installation Logs" 6 "$systemlogsmenuicon System Logs" 7 "${autoconfigmenuicon} ${APPNAME} Logs")
+
+	( set -o posix ; set ) >logs/variables.log
 }
 ############## MAIN MENU LIST
 function mainmenu() {
@@ -1417,21 +1604,23 @@ function sslselectmenu() {
 }
 ############## WEB SERVER APACHE MENU ITEMS 1-5
 function apacheconfigform() {
-	unset title
-	unset instructions
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	menusystem
+
 	title="Apache Configuration Settings"
 	instructions="Please answer the questions below to configure your Apache server to your specific needs. Some defaults are assumed from the system configuration."
 	if [ "$webserverfailtest" == "true" ]; then
 		instructions="$instructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${webservererror}"
 	fi
-	returncode=0
+
 	log "${title} menu called"
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
-	loadcfg
-	menusystem
+
 	while test $returncode != 1 && test $returncode != 250; do
 		# Redirect stream 3 to the stream 1 (STDOUT)
 		exec 3>&1
+
 		# Store data to $VALUES variable
 		VALUES=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$title" --form "$instructions" 20 55 0 \
 			"       Domain Name :"	1 1	"$FQDN"			1 22 27 0 \
@@ -1447,9 +1636,10 @@ function apacheconfigform() {
 		# Assign the variables to an array
 		webservervars=($VALUES)
 		show=`echo "$VALUES" |sed -e 's/^/ /'`
+
 		case $returncode in
 			1|255) # If back or ESC was pressed
-				dialog --backtitle "$SCREENTITLE" --yesno "Return to Apache Options Menu?" 10 30
+				dialog --backtitle "$SCREENTITLE" --yesno "If you leave, your values will be lost, would you like to return to Apache Options Menu?" 10 30
 				case $? in
 					0)
 						# If Yes was pressed
@@ -1472,6 +1662,7 @@ function apacheconfigform() {
 						# Count the number of fields
 						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
 
+						# Test the number of fields to make sure there are no empty values
 						if [ $NUMFLDS -lt 6 ]; then
 							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
 							case $? in
@@ -1490,6 +1681,7 @@ function apacheconfigform() {
 							config "write_value" "ownergroup" "${webservervars[4]}"
 							config "write_value" "ip" "${webservervars[5]}"
 						fi
+						varreset
 						apacheselectmenu
 						;;
 				esac
@@ -2293,304 +2485,3 @@ function errorlogsdialog() {
 function installationlogsdialog() {
 	systemlogsmenu
 }
-
-function OLD-servertypemenu() {
-	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
-	loadcfg
-	menusystem
-
-	$title="Server Type Configuration"
-	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n\Zn[\Zb\Z1*\Zn/\Z2*\Zn] - Invalid/Valid Settings Detected\n\n"
-
-	ServerTypeMenuOptions=(1 "\Zn[${opt11menuitem}] Web Server" 2 "\Zn[${opt12menuitem}] Database Server" 3 "\Zn[${opt13menuitem}] Application Server" 4 "\Zn[${opt14menuitem}] File Server" 5 "\Zn[${opt15menuitem}] Message Server" 6 "\Zn[${opt16menuitem}] Proxy Server" 7 "\Zn[${opt17menuitem}] Email Server")
-	exec 3>&1
-	CHOICE=$(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${ServerTypeMenuOptions[@]}" 2>&1 1>&3)
-	exit_status=$?
-
-	case $exit_status in
-		255) return;;
-	esac
-
-	case $CHOICE in
-		1) # Web Server
-			servertype=$(config "read_value" "webserver")
-			case $servertype in
-				"apache")
-					WebChoices=(1 "Apache" on 2 "nGinX" off 3 "LightSpeed" off 4 "Disable Server" off)
-					;;
-				"nginx")
-					WebChoices=(1 "Apache" off 2 "nGinX" on 3 "LightSpeed" off 4 "Disable Server" off)
-					;;
-				"lightspeed")
-					WebChoices=(1 "Apache" off 2 "nGinX" off 3 "LightSpeed" on 4 "Disable Server" off)
-					;;
-				"disabled")
-					WebChoices=(1 "Apache" off 2 "nGinX" off 3 "LightSpeed" off 4 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a web server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "webserver" "apache"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "webserver" "nginx"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "webserver" "lightspeed"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "webserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-		2) # Database Server
-			servertype=$(config "read_value" "databaseserver")
-			case $servertype in
-				"mysql")
-					WebChoices=(1 "mySQL" on 2 "MariaDB" off 3 "PostgreSQL" off 4 "Disable Server" off)
-					;;
-				"mariadb")
-					WebChoices=(1 "mySQL" off 2 "MariaDB" on 3 "PostgreSQL" off 4 "Disable Server" off)
-					;;
-				"postgresql")
-					WebChoices=(1 "mySQL" off 2 "MariaDB" off 3 "PostgreSQL" on 4 "Disable Server" off)
-					;;
-				"disabled")
-					WebChoices=(1 "mySQL" off 2 "MariaDB" off 3 "PostgreSQL" off 4 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a database server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "databaseserver" "mysql"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "databaseserver" "mariadb"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "databaseserver" "postgresql"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "databaseserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-		3) # Application Server
-			servertype=$(config "read_value" "appserver")
-			echo $servertype
-			case $servertype in
-				"php")
-					WebChoices=(1 "PHP" on 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
-					;;
-				"java")
-					WebChoices=(1 "PHP" off 2 "Java" on 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
-					;;
-				"tomcat")
-					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" on 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" off)
-					;;
-				"osa")
-					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" on 5 "Mobile Application" off 6 "Disable Server" off)
-					;;
-				"mobile")
-					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" on 6 "Disable Server" off)
-					;;
-				"disabled")
-					WebChoices=(1 "PHP" off 2 "Java" off 3 "Tomcat" off 4 "Open Source Application" off 5 "Mobile Application" off 6 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a application server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "appserver" "php"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "appserver" "java"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "appserver" "tomcat"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "appserver" "osa"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					5)
-						config "write_value" "appserver" "mobile"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					6)
-						config "write_value" "appserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-		4) # FileServer
-			servertype=$(config "read_value" "fileserver")
-			echo $servertype
-			case $servertype in
-				"ftp")
-					WebChoices=(1 "FTP" on 2 "NFS" off 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
-					;;
-				"nfs")
-					WebChoices=(1 "FTP" off 2 "NFS" on 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
-					;;
-				"smb")
-					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" on 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" off)
-					;;
-				"nas")
-					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" on 5 "Boot Image" off 6 "Disable Server" off)
-					;;
-				"bootimg")
-					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" on 5 "Boot Image" on 6 "Disable Server" off)
-					;;
-				"disabled")
-					WebChoices=(1 "FTP" off 2 "NFS" off 3 "Samba" off 4 "NAS" off 5 "Boot Image" off 6 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a file server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "fileserver" "ftp"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "fileserver" "nfs"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "fileserver" "smb"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "fileserver" "nas"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					5)
-						config "write_value" "fileserver" "bootimg"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					6)
-						config "write_value" "fileserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-		5) # Message Server
-			servertype=$(config "read_value" "fileserver")
-			echo "Option 5"
-			;;
-		6) # Proxy Server
-			echo "Option 6"
-			;;
-		7) # Email server
-			EmailChoices=(1 "Postfix" "on" 2 "Citadel" "off" 3 "Sendmail" "off" 4 "Exim" "off" 5 "Courier" "off")
-			servertype=$(config "read_value" "emailserver")
-			echo $servertype
-			case $servertype in
-				"postfix")
-					WebChoices=(1 "Postfix" on 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
-					;;
-				"citadel")
-					WebChoices=(1 "Postfix" off 2 "Citadel" on 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
-					;;
-				"sendmail")
-					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" on 4 "Exim" off 5 "Courier" off 6 "Disable Server" off)
-					;;
-				"exim")
-					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" on 5 "Courier" off 6 "Disable Server" off)
-					;;
-				"courier")
-					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" on)
-					;;
-				"disabled")
-					WebChoices=(1 "Postfix" off 2 "Citadel" off 3 "Sendmail" off 4 "Exim" off 5 "Courier" off 6 "Disable Server" on)
-					;;
-			esac
-			cmd=(dialog --clear --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --title "$title" --backtitle "$SCREENTITLE" --radiolist "Select a email server" 0 0 0)
-			
-			choices=$("${cmd[@]}" "${WebChoices[@]}" 2>&1 >/dev/tty)
-			for choice in $choices; do
-				case $choice in
-					1)
-						config "write_value" "emailserver" "postfix"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					2)
-						config "write_value" "emailserver" "citadel"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					3)
-						config "write_value" "emailserver" "sendmail"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					4)
-						config "write_value" "emailserver" "exim"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					5)
-						config "write_value" "emailserver" "courier"
-						config "write_value" "servetype" "true"
-						servertypemenu
-						;;
-					6)
-						config "write_value" "fileserver" "disabled"
-						chkserverconfig
-						servertypemenu
-						;;
-				esac
-			done
-			;;
-	esac
-}
-

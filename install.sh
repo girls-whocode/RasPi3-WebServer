@@ -8,7 +8,7 @@ environment="production"
 if [ $environment == "development" ]; then
 	set -vxe
 fi
-( set -o posix ; set ) >logs/variables.before
+( set -o posix ; set ) >logs/variables.log
 
 # Load the files required for this script
 if [ -f ./bin/errors.sh ]; then source ./bin/errors.sh; else echo "./bin/errors.sh file is missing"; exit 141; fi
@@ -19,16 +19,20 @@ if [ -f ./bin/menu.sh ]; then source ./bin/menu.sh; else echo "./bin/menu.sh ${e
 if [ -f ./bin/dialog.sh ]; then source ./bin/dialog.sh; else echo "./bin/dialog.sh ${error["141"]}"; exit 141; fi
 
 variables
+varreset
 
 tty -s
 status=$?
 if [ $status -ne 0 ]; then
-	log "$0 must run from terminal"
-fi
-
-if [ "${BASH_VERSINFO}" -lt 4 ]; then
-	log "${error["140"]}"
-	exit 140
+	log "${0} must run from terminal"
+	echo "${0} must be run from terminal"
+	echo error["110"]
+	exti 110
+else
+	if [ "${BASH_VERSINFO}" -lt 4 ]; then
+		log "${error["140"]}"
+		exit 140
+	fi
 fi
 
 function main() {

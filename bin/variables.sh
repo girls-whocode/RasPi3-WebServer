@@ -12,6 +12,8 @@ function variables() {
 	codestatus="a"
 	version="${majversion}.${minversion}.${subversion}${codestatus}"
 	APPNAME="Server Auto Config ${majversion}"
+	minmemoryreq=262144 # 256 Megabytes
+	mindrivereq=665600 # 650 Megabytes
 
 	# define and set the ANSI colors
 	NOCOLOR="\033[0m"
@@ -69,18 +71,134 @@ function variables() {
 
 	# [[ $environment = 'development' ]] && logfile="${logfolder}"raspy3-install.log || logfile="${logfolder}"raspy3-install_`date +'%m-%d-%Y_%H%M%S'`.log
 	
-	configfile="raspconfig.ini"
+	configfile=".ini"
 
 	# Output file name (constructed out of script name)
 	OUTFILE=$0.output
+	returncode=0
 
 	# Set spinner text for progress function
-	spin[0]=$LIGHTRED"-"
-	spin[1]=$WHITE"\\"
-	spin[2]=$YELLOW"|"
-	spin[3]=$LIGHTGREEN"/"
+	spin[0]="${LIGHTRED}-"
+	spin[1]="${WHITE}\\"
+	spin[2]="${YELLOW}|"
+	spin[3]="${LIGHTGREEN}/"
 
-	# If CTRL-C, ESC, or any other quit key combination run the 
-	# quitscript function
+	# If CTRL-C, ESC, or any other quit key combination run the quitscript function
 	trap_with_arg quitscript HUP INT QUIT ILL TRAP ABRT TSTP TERM EXIT
+	
+	( set -o posix ; set ) >logs/variables.log
+}
+function varreset() {
+	webservermenustatus="disabled"
+	sslmenustatus="disabled"
+	
+	# Apache Server Menu Switches Settings that need to be validated:
+	apachestatus="disabled"
+	apachemenustatus="disabled"
+	nginxstatus="disabled"
+	nginxmenustatus="disabled"
+	lightspeedstatus="disabled"
+	lightspeedmenustatus="disabled"
+	cherokeestatus="disabled"
+	cherokeemenustatus="disabled"
+	caddystatus="disabled"
+	caddymenustatus="disabled"
+	monkeystatus="disabled"
+	monkeymenustatus="disabled"
+	hiawathastatus="disabled"
+	hiawathamenustatus="disabled"
+
+	# Database Server Menu
+	databasemenustatus="disabled"
+	mysqlmenustatus="disabled"
+	mariadbmenustatus="disabled"
+	postgresqlmenustatus="disabled"
+
+	# Database Configuration Menu Switches that need to be validated:
+	mysqlstatus="false"
+	mariadbstatus="false"
+	postgresqlstatus="false"
+	sqlitestatus="false"
+	pervasivestatus="false"
+	voltdbstatus="false"
+	gigabase="false"
+	
+	# System Configuration Menu Switches that need to be validated:
+	systeminfostatus="false"
+	filesystemstatus="false"
+	memorystatus="false"
+	fileeditorstatus="false"
+	networkconfigstatus="false"
+	applicationconfigstatus="false"
+
+	
+	# Application Server Menu
+	applicationmenustatus="disabled"
+	phpmenustatus="disabled"
+	javamenustatus="disabled"
+	tomcatmenustatus="disabled"
+	osamenustatus="disabled"
+	mobilemenustatus="disabled"
+	phpappmenustatus="disabled"
+	javaappmenustatus="disabled"
+	tomcatappmenustatus="disabled"
+	osaappmenustatus="disabled"
+	mobileappmenustatus="disabled"
+	bbsappmenustatus="disabled"
+
+	# Email Server Menu
+	emailmenustatus="disabled"
+	postfixmenustatus="disabled"
+	citadelmenustatus="disabled"
+	sendmailmenustatus="disabled"
+	eximmenustatus="disabled"
+	couriermenustatus="disabled"
+
+	# File Server Menu
+	filemenustatus="disabled"
+	ftpmenustatus="disabled"
+	nfsmenustatus="disabled"
+	sambamenustatus="disabled"
+	
+	# Message Server Menu
+	messagemenustatus="disabled"
+	
+	# Proxy Server Menu
+	proxymenustatus="disabled"
+	
+	# System Config Menu
+	systemconfigmenustatus="false"
+	systeminfomenustatus="false"
+	filesystemmenustatus="false"
+	drivespacemenustatus="false"
+	mountpointmenustatus="disabled"
+	raidconfigmenustatus="disabled"
+	usbdrivemenustatus="disabled"
+	memoryconfigmenustatus="false"
+	memoryfreemenustataus="false"
+	swapmemorymenustatus="disabled"
+	fileeditormenustatus="false"
+	hostsfilemenustatus="false"
+	hostnamefilemenustatus="false"
+	networkconfigmenustatus="false"
+	wirelessconfigmenustatus="disabled"
+	networkitemconfigmenustatus="disabled"
+	applicationconfigmenustatus="false"
+	gitconfigmenustatus="disabled"
+	uninstallappmenustatus="false"
+	
+	# Logs Menu
+	logsmenustatus="false"
+	apachelogsmenustatus="disabled"
+	phplogsmenustatus="disabled"
+	accesslogsmenustatus="disabled"
+	errorlogsmenustatus="disabled"
+	installationlogmenustatus="disabled"
+	systemlogsmenustatus="disabled"
+	autoconfigmenustatus="true"
+
+	faileditem=""
+	webserverfailtest=""
+	returncode=0
+	( set -o posix ; set ) >logs/variables.log
 }
