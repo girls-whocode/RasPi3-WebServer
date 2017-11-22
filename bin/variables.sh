@@ -61,7 +61,7 @@ function variables() {
 	meminfo="/proc/meminfo"
 	cpuinfo="/proc/cpuinfo"
 	logfolder="logs/"
-	logfile="${logfolder}raspy3-install.log"
+	logfile="${logfolder}install.log"
 	touch $logfile
 	
 	# System information
@@ -71,7 +71,7 @@ function variables() {
 
 	# [[ $environment = 'development' ]] && logfile="${logfolder}"raspy3-install.log || logfile="${logfolder}"raspy3-install_`date +'%m-%d-%Y_%H%M%S'`.log
 	
-	configfile=".ini"
+	configfile="serverconfig.ini"
 
 	# Output file name (constructed out of script name)
 	OUTFILE=$0.output
