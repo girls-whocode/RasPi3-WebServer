@@ -1,0 +1,364 @@
+APPNAME='Server Auto Config 3'
+APPSERVERTYPE=disabled
+APPSERVERTYPECFG=disabled
+BADSYMB='\Zb\Z1x\Zn'
+BASH=/bin/bash
+BASHOPTS=cmdhist:complete_fullquote:extquote:force_fignore:hostcomplete:interactive_comments:progcomp:promptvars:sourcepath
+BASH_ALIASES=()
+BASH_ARGC=()
+BASH_ARGV=()
+BASH_CMDS=()
+BASH_LINENO=([0]="705" [1]="82" [2]="85" [3]="0")
+BASH_SOURCE=([0]="./bin/functions.sh" [1]="./bin/menu.sh" [2]="./install.sh" [3]="./install.sh")
+BASH_VERSINFO=([0]="4" [1]="4" [2]="12" [3]="1" [4]="release" [5]="x86_64-pc-linux-gnu")
+BASH_VERSION='4.4.12(1)-release'
+BLACK='\033[0;30m'
+BLUE='\033[0;34m'
+BROWN='\033[0;33m'
+CANCELLABEL=Back
+CHOICE=
+CHOICE_HEIGHT=21
+CODENAME=artful
+CODENAMECFG=artful
+COLORTERM=truecolor
+CREDITS='Jessica Brown'
+CYAN='\033[0;36m'
+DARKGRAY='\033[1;30m'
+DATABASESERVERTYPE=disabled
+DIALOG=dialog
+DIALOGRC=./.dialogrc
+DIRSTACK=()
+DISABLEDSYMB='\Z3o\Zn'
+DISPLAY=:1
+DISTRO=Ubuntu
+DISTROCFG=Ubuntu
+DISTVERSION=17.10
+DISTVERSIONCFG=17.10
+EMAIL=disabled
+EMAILCFG=disabled
+EMAILSERVERTYPE=disabled
+EMAILSERVERTYPECFG=disabled
+EUID=0
+FILEERVERTYPE=disabled
+FILEERVERTYPECFG=disabled
+FQDN=securelivetest.com
+FQDNCFG=securelivetest.com
+FUNCNAME=([0]="quitscript" [1]="mainmenu" [2]="main" [3]="main")
+GRAY='\033[0;37m'
+GREEN='\033[0;32m'
+GROUPS=()
+HEIGHT=23
+HOME=/home/jessica
+HOSTNAME=securelivetest.com
+HOSTTYPE=x86_64
+IFS=' 	
+'
+IP=127.0.0.1
+IPCFG=127.0.0.1
+LANG=en_US.UTF-8
+LIGHTBLUE='\033[1;34m'
+LIGHTCYAN='\033[1;36m'
+LIGHTGREEN='\033[1;32m'
+LIGHTMAGENTA='\033[1;35m'
+LIGHTRED='\033[1;31m'
+LOGNAME=root
+LS_COLORS='no=00:fi=00:di=00;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:*.xml=00;31:'
+MACHTYPE=x86_64-pc-linux-gnu
+MAGENTA='\033[0;35m'
+MAIL=/var/mail/root
+MSGSERVERTYPE=disabled
+MSGSERVERTYPECFG=disabled
+NOCOLOR='\033[0m'
+OKLABEL=Submit
+OKSYMB='\Z2✔\Zn'
+OPTERR=1
+OPTIND=1
+OSTYPE=linux-gnu
+OUTFILE=./install.sh.output
+OWNERGROUP=root
+OWNERGROUPCFG=root
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+PIPESTATUS=([0]="0")
+PKGMGR=none
+PKGMGRCFG=none
+POSIXLY_CORRECT=y
+PPID=30729
+PROXYSERVERTYPE=disabled
+PROXYSERVERTYPECFG=disabled
+PS4='+ '
+PWD=/home/jessica/projects/RasPi3-WebServer
+RED='\033[0;31m'
+SCREENTITLE='System Server Auto Configuration'
+SERVERUSER=jessica
+SERVERUSERCFG=jessica
+SERVETYPE=disabled
+SERVETYPECFG=disabled
+SHELL=/bin/bash
+SHELLOPTS=braceexpand:hashall:interactive-comments:posix
+SHLVL=1
+SUDO_COMMAND=./install.sh
+SUDO_GID=1000
+SUDO_UID=1000
+SUDO_USER=jessica
+SYSTEMKEY=3d430f9af713781b92af4a97fc2e6664be7ce8e0
+TERM=xterm-256color
+TZONE=America/New_York
+TZONECFG=America/New_York
+UID=0
+USER=root
+USERNAME=root
+WEBSERVERDIR=/var/www/
+WEBSERVERDIRCFG=/var/www/
+WEBSERVERTYPE=disabled
+WEBSERVERTYPECFG=disabled
+WHITE='\033[1;37m'
+WIDTH=40
+XAUTHORITY=/run/user/1000/gdm/Xauthority
+YELLOW='\033[1;33m'
+_=posix
+accesslogsmenuicon='\Z3o\Zn'
+accesslogsmenustatus=disabled
+apacheconfigmenuicon='\Z3o\Zn'
+apachelogsmenustatus=disabled
+apachemenu=([0]="1" [1]="\\Z3o\\Zn Apache Configuration" [2]="2" [3]="\\Z3o\\Zn Apache Restart" [4]="3" [5]="\\Z3o\\Zn Apache Start" [6]="4" [7]="\\Z3o\\Zn Apache Stop" [8]="5" [9]="\\Z2Enable Server\\Zn")
+apachemenuicon='\Z3o\Zn'
+apachemenustatus=disabled
+apacherestartmenuicon='\Z3o\Zn'
+apachestartmenuicon='\Z3o\Zn'
+apachestatus='\Z2Enable Server\Zn'
+apachestopmenuicon='\Z3o\Zn'
+applicationconfigmenuicon='\Z2✔\Zn'
+applicationconfigmenustatus=true
+applicationconfigstatus=false
+applicationmenu=([0]="1" [1]="\\Z2✔\\Zn Git Configuration" [2]="2" [3]="\\Z2✔\\Zn Uninstall Applications")
+applicationmenuicon='\Z3o\Zn'
+applicationmenustatus=disabled
+applicationservermenu=([0]="1" [1]="\\Z3o\\Zn PHP" [2]="2" [3]="\\Z3o\\Zn Java" [4]="3" [5]="\\Z3o\\Zn Tomcat" [6]="4" [7]="\\Z3o\\Zn Open Source" [8]="5" [9]="\\Z3o\\Zn Mobile Application" [10]="6" [11]="\\Z3o\\Zn BBS Applications")
+autoconfigmenuicon='\Z2✔\Zn'
+autoconfigmenustatus=true
+bbsappmenuicon='\Z3o\Zn'
+bbsappmenustatus=disabled
+bbsappsmenu=([0]="1" [1]="Mystic" [2]="2" [3]="WWIV")
+caddyconfigmenuicon='\Z3o\Zn'
+caddymenuicon='\Z3o\Zn'
+caddymenustatus=disabled
+caddyrestartmenuicon='\Z3o\Zn'
+caddystartmenuicon='\Z3o\Zn'
+caddystatus=disabled
+caddystopmenuicon='\Z3o\Zn'
+cherokeeconfigmenuicon='\Z3o\Zn'
+cherokeemenuicon='\Z3o\Zn'
+cherokeemenustatus=disabled
+cherokeerestartmenuicon='\Z3o\Zn'
+cherokeestartmenuicon='\Z3o\Zn'
+cherokeestatus=disabled
+cherokeestopmenuicon='\Z3o\Zn'
+citadelmenu=([0]="1" [1]="\\Z3o\\Zn Citadel Configuration" [2]="2" [3]="Citadel Restart" [4]="3" [5]="Citadel Start" [6]="4" [7]="Citadel Stop")
+citadelmenuicon='\Z3o\Zn'
+citadelmenustatus=disabled
+codestatus=a
+configfile=raspconfig.ini
+couriermenu=([0]="1" [1]="\\Z3o\\Zn Courier Configuration" [2]="2" [3]="Courier Restart" [4]="3" [5]="Courier Start" [6]="4" [7]="Courier Stop")
+couriermenuicon='\Z3o\Zn'
+couriermenustatus=disabled
+cpucore=12
+cpuinfo=/proc/cpuinfo
+databasemenuicon='\Z3o\Zn'
+databasemenustatus=disabled
+databaseservermenu=([0]="1" [1]="mySQL" [2]="2" [3]="MariaDB" [4]="3" [5]="PostgreSQL" [6]="4" [7]="SQLite" [8]="5" [9]="Pervasive" [10]="6" [11]="VoltDB" [12]="7" [13]="GigaBASE")
+drivespacemenuicon='\Z2✔\Zn'
+drivespacemenustatus=true
+emailmenuicon='\Z3o\Zn'
+emailmenustatus=disabled
+emailservermenu=([0]="1" [1]="Postfix" [2]="2" [3]="Citadel" [4]="3" [5]="Sendmail" [6]="4" [7]="Exim" [8]="5" [9]="Courier")
+environment=production
+error=([100]="Package manager was not found" [105]="Program called from another file" [110]="Early exit status from script" [111]="Log file failed to write" [112]="Hangup signal received" [113]="Script quit script was performed" [114]="Illegal instruction signal received" [115]="Trace trap not reset signal received" [116]="Abort signal received" [117]="Pollable event [XSR] generated, not supported signal received" [118]="Floating point signal received" [119]="Kill signal received" [125]="Internet connection issue" [140]="Bash version is not compatible with this script" [141]="file is missing" [150]="xterm or rxvt was not detected" [151]="tputs column width is less than 150" [180]="Configuration file " [185]="Dependency program installation failed" [190]="Script requires to be run as su" [200]="Failed to write configuration file" [201]="Failed to verify the write of config value" [202]="Failed to remove parameter from configuration file" [203]="Parameter may consist of A-Z, a-z, 0-9, underscores, and dashes (no spaces or special characters)")
+errorlogsmenuicon='\Z3o\Zn'
+errorlogsmenustatus=disabled
+eximmenu=([0]="1" [1]="\\Z3o\\Zn Exim Configuration" [2]="2" [3]="Exim Restart" [4]="3" [5]="Exim Start" [6]="4" [7]="Exim Stop")
+eximmenuicon='\Z3o\Zn'
+eximmenustatus=disabled
+faileditem=
+fileeditormenu=([0]="1" [1]="\\Z2✔\\Zn Hosts file" [2]="2" [3]="\\Z2✔\\Zn Hostname file")
+fileeditormenuicon='\Z2✔\Zn'
+fileeditormenustatus=true
+fileeditorstatus=false
+filemenuicon='\Z3o\Zn'
+filemenustatus=disabled
+fileservermenu=([0]="1" [1]="FTP" [2]="2" [3]="NFS" [4]="3" [5]="Samba")
+filesystemmenu=([0]="1" [1]="\\Z2✔\\Zn Drive Space" [2]="2" [3]="\\Z3o\\Zn Mount Points" [4]="3" [5]="\\Z3o\\Zn Raid Configuration" [6]="4" [7]="\\Z3o\\Zn USB Drive Configuration")
+filesystemmenuicon='\Z2✔\Zn'
+filesystemmenustatus=true
+filesystemstatus=false
+freemem=18404072
+ftpmenu=([0]="1" [1]="\\Z3o\\Zn FTP Configuration" [2]="2" [3]="FTP Restart" [4]="3" [5]="FTP Start" [6]="4" [7]="FTP Stop")
+ftpmenuicon='\Z3o\Zn'
+ftpmenustatus=disabled
+func=quitscript
+gigabase=false
+gitconfigmenuicon='\Z2✔\Zn'
+gitconfigmenustatus=true
+hiawathaconfigmenuicon='\Z3o\Zn'
+hiawathamenuicon='\Z3o\Zn'
+hiawathamenustatus=disabled
+hiawatharestartmenuicon='\Z3o\Zn'
+hiawathastartmenuicon='\Z3o\Zn'
+hiawathastatus=disabled
+hiawathastopmenuicon='\Z3o\Zn'
+hostnamefilemenuicon='\Z2✔\Zn'
+hostnamefilemenustatus=true
+hosts=/etc/hosts
+hostsfilemenuicon='\Z2✔\Zn'
+hostsfilemenustatus=true
+inetchk=true
+installationlogmenustatus=disabled
+installationlogsmenuicon='\Z3o\Zn'
+instructions='Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[\Z2✔\Zn] - \Z2Valid \Znsettings\n[\Zb\Z1x\Zn] - \Zb\Z1Invalid \Znsettings\n[\Z3o\Zn] - \Z3Disabled\Zn settings\n'
+javaappmenuicon='\Z3o\Zn'
+javaappmenustatus=disabled
+javamenu=([0]="1" [1]="\\Z3o\\Zn Java Configuration" [2]="2" [3]="Java Restart" [4]="3" [5]="Java Start" [6]="4" [7]="Java Stop")
+javamenuicon='\Z3o\Zn'
+javamenustatus=disabled
+letsencryptmenu=([0]="1" [1]="Let's Encrypt Settings" [2]="2" [3]="Renew Certification" [4]="3" [5]="Revoke Certification")
+lightspeed=([0]="1" [1]="\\Z3o\\Zn Lightspeed Configuration" [2]="2" [3]="\\Z3o\\Zn Lightspeed Restart" [4]="3" [5]="\\Z3o\\Zn Lightspeed Start" [6]="4" [7]="\\Z3o\\Zn Lightspeed Stop" [8]="5" [9]="\\Z2Enable Server\\Zn")
+lightspeedconfigmenuicon='\Z3o\Zn'
+lightspeedmenuicon='\Z3o\Zn'
+lightspeedmenustatus=disabled
+lightspeedrestartmenuicon='\Z3o\Zn'
+lightspeedstartmenuicon='\Z3o\Zn'
+lightspeedstatus='\Z2Enable Server\Zn'
+lightspeedstopmenuicon='\Z3o\Zn'
+logfile=logs/raspy3-install.log
+logfolder=logs/
+logsmenu=([0]="1" [1]=" Apache Logs" [2]="2" [3]="\\Z3o\\Zn PHP Logs" [4]="3" [5]="\\Z3o\\Zn Access Logs" [6]="4" [7]="\\Z3o\\Zn Error Logs" [8]="5" [9]="\\Z3o\\Zn Installation Logs" [10]="6" [11]="\\Z3o\\Zn System Logs" [12]="7" [13]="\\Z2✔\\Zn Server Auto Config 3 Logs")
+logsmenuicon='\Z2✔\Zn'
+logsmenustatus=true
+mainmenu=([0]="1" [1]="\\Z3o\\Zn Web Server" [2]="2" [3]="\\Z3o\\Zn Database Server" [4]="3" [5]="\\Z3o\\Zn Application Server" [6]="4" [7]="\\Z3o\\Zn Email Server" [8]="5" [9]="\\Z3o\\Zn File Server" [10]="6" [11]="\\Z3o\\Zn Message Server" [12]="7" [13]="\\Z3o\\Zn Proxy Server" [14]="8" [15]="\\Z2✔\\Zn System Configuration" [16]="9" [17]="\\Z2✔\\Zn Logs")
+majversion=3
+mariadbmenuicon='\Z3o\Zn'
+mariadbmenustatus=disabled
+mariadbsqlmenu=([0]="1" [1]="\\Z3o\\Zn MariaDB Configuration" [2]="2" [3]="MariaDB Restart" [4]="3" [5]="MariaDB Start" [6]="4" [7]="MariaDB Stop")
+mariadbstatus=false
+meminfo=/proc/meminfo
+memoryconfigmenuicon='\Z2✔\Zn'
+memoryconfigmenustatus=true
+memoryfreemenuicon='\Z2✔\Zn'
+memoryfreemenustataus=false
+memoryfreemenustatus=true
+memorymenu=([0]="1" [1]="\\Z2✔\\Zn Memory Free" [2]="2" [3]="\\Z2✔\\Zn Swap Memory")
+memorystatus=false
+messagemenuicon='\Z3o\Zn'
+messagemenustatus=disabled
+messageservermenu=([0]="1" [1]="Not set up" [2]="2" [3]="Not set up" [4]="3" [5]="Not set up")
+mindrivereq=665600
+minmemoryreq=262144
+minversion=0
+mobileappmenuicon='\Z3o\Zn'
+mobileappmenustatus=disabled
+mobilemenu=([0]="1" [1]="\\Z3o\\Zn Mobile App Configuration" [2]="2" [3]="Mobile App Restart" [4]="3" [5]="Mobile App Start" [6]="4" [7]="Mobile App Stop")
+mobilemenuicon='\Z3o\Zn'
+mobilemenustatus=disabled
+monkeyconfigmenuicon='\Z3o\Zn'
+monkeymenuicon='\Z3o\Zn'
+monkeymenustatus=disabled
+monkeyrestartmenuicon='\Z3o\Zn'
+monkeystartmenuicon='\Z3o\Zn'
+monkeystatus=disabled
+monkeystopmenuicon='\Z3o\Zn'
+mountpointmenuicon='\Z3o\Zn'
+mountpointmenustatus=disabled
+mysqlmenu=([0]="1" [1]="\\Z3o\\Zn mySQL Configuration" [2]="2" [3]="mySQL Restart" [4]="3" [5]="mySQL Start" [6]="4" [7]="mySQL Stop")
+mysqlmenuicon='\Z3o\Zn'
+mysqlmenustatus=disabled
+mysqlstatus=false
+mysticmenu=([0]="1" [1]="Mystic Configuration" [2]="2" [3]="Mystic Local Mode")
+networkconfigmenu=([0]="1" [1]="\\Z2✔\\Zn Wireless Configuration" [2]="2" [3]="\\Z2✔\\Zn Network Configuration")
+networkconfigmenuicon='\Z2✔\Zn'
+networkconfigmenustatus=true
+networkconfigstatus=false
+networkitemconfigmenuicon='\Z2✔\Zn'
+networkitemconfigmenustatus=true
+nfsmenu=([0]="1" [1]="\\Z3o\\Zn NFS Configuration" [2]="2" [3]="NFS Restart" [4]="3" [5]="NFS Start" [6]="4" [7]="NFS Stop")
+nfsmenuicon='\Z3o\Zn'
+nfsmenustatus=disabled
+nginxconfigmenuicon='\Z3o\Zn'
+nginxmenu=([0]="1" [1]="\\Z3o\\Zn nGinX Configuration" [2]="2" [3]="\\Z3o\\Zn nGinX Restart" [4]="3" [5]="\\Z3o\\Zn nGinX Start" [6]="4" [7]="\\Z3o\\Zn nGinX Stop" [8]="5" [9]="\\Z2Enable Server\\Zn")
+nginxmenuicon='\Z3o\Zn'
+nginxmenustatus=disabled
+nginxrestartmenuicon='\Z3o\Zn'
+nginxstartmenuicon='\Z3o\Zn'
+nginxstatus='\Z2Enable Server\Zn'
+nginxstopmenuicon='\Z3o\Zn'
+opensourcemenu=([0]="1" [1]="\\Z3o\\Zn Open Source Configuration" [2]="2" [3]="Open Source Restart" [4]="3" [5]="Open Source Start" [6]="4" [7]="Open Source Stop")
+osaappmenuicon='\Z3o\Zn'
+osaappmenustatus=disabled
+osamenuicon='\Z3o\Zn'
+osamenustatus=disabled
+pervasivestatus=false
+phpappmenuicon='\Z3o\Zn'
+phpappmenustatus=disabled
+phplogsmenuicon='\Z3o\Zn'
+phplogsmenustatus=disabled
+phpmenu=([0]="1" [1]="\\Z3o\\Zn PHP Configuration" [2]="2" [3]="PHP Restart" [4]="3" [5]="PHP Start" [6]="4" [7]="PHP Stop")
+phpmenuicon='\Z3o\Zn'
+phpmenustatus=disabled
+phymem=32839188
+postfixmenu=([0]="1" [1]="\\Z3o\\Zn Postfix Configuration" [2]="2" [3]="Postfix Restart" [4]="3" [5]="Postfix Start" [6]="4" [7]="Postfix Stop")
+postfixmenuicon='\Z3o\Zn'
+postfixmenustatus=disabled
+postgresqlmenu=([0]="1" [1]="\\Z3o\\Zn PostgreSQL Configuration" [2]="2" [3]="PostgreSQL Restart" [4]="3" [5]="PostgreSQL Start" [6]="4" [7]="PostgreSQL Stop")
+postgresqlmenuicon='\Z3o\Zn'
+postgresqlmenustatus=disabled
+postgresqlstatus=false
+proxymenuicon='\Z3o\Zn'
+proxymenustatus=disabled
+proxyservermenu=([0]="1" [1]="Not set up" [2]="2" [3]="Not set up" [4]="3" [5]="Not set up")
+raidconfigmenuicon='\Z3o\Zn'
+raidconfigmenustatus=disabled
+retval=255
+sambamenu=([0]="1" [1]="\\Z3o\\Zn Samba Configuration" [2]="2" [3]="Samba Restart" [4]="3" [5]="Samba Start" [6]="4" [7]="Samba Stop")
+sambamenuicon='\Z3o\Zn'
+sambamenustatus=disabled
+sendmailmenu=([0]="1" [1]="\\Z3o\\Zn Sendmail Configuration" [2]="2" [3]="Sendmail Restart" [4]="3" [5]="Sendmail Start" [6]="4" [7]="Sendmail Stop")
+sendmailmenuicon='\Z3o\Zn'
+sendmailmenustatus=disabled
+sig=EXIT
+spin=([0]="\\033[1;31m-" [1]="\\033[1;37m\\" [2]="\\033[1;33m|" [3]="\\033[1;32m/")
+sqlitestatus=false
+sslmenuicon='\Z3o\Zn'
+sslmenustatus=disabled
+status=0
+subversion=0
+swapmemorymenuicon='\Z2✔\Zn'
+swapmemorymenustatus=true
+swpmem=2097148
+systemconfigmenu=([0]="1" [1]="\\Z2✔\\Zn System Information" [2]="2" [3]="\\Z2✔\\Zn File System" [4]="3" [5]="\\Z2✔\\Zn Memory" [6]="4" [7]="\\Z2✔\\Zn File Editor" [8]="5" [9]="\\Z2✔\\Zn Network Configuration" [10]="6" [11]="\\Z2✔\\Zn Application Configuration")
+systemconfigmenuicon='\Z2✔\Zn'
+systemconfigmenustatus=true
+systeminfomenuicon='\Z2✔\Zn'
+systeminfomenustatus=true
+systeminfostatus=true
+systemlogsmenuicon='\Z3o\Zn'
+systemlogsmenustatus=disabled
+tempfile=/tmp/filemlDy2n
+title='Main Menu'
+tomcatappmenuicon='\Z3o\Zn'
+tomcatappmenustatus=disabled
+tomcatmenu=([0]="1" [1]="\\Z3o\\Zn Tomcat Configuration" [2]="2" [3]="Tomcat Restart" [4]="3" [5]="Tomcat Start" [6]="4" [7]="Tomcat Stop")
+tomcatmenuicon='\Z3o\Zn'
+tomcatmenustatus=disabled
+uninstallappmenuicon='\Z2✔\Zn'
+uninstallappmenustatus=true
+usbdrivemenuicon='\Z3o\Zn'
+usbdrivemenustatus=disabled
+user=jessica
+version=3.0.0a
+voltdbstatus=false
+webservererror=' \Zb\Z1nGinX Server\Zn - Has not been installed\n'
+webserverfailtest=true
+webservermenu=([0]="1" [1]="\\Z3o\\Zn Apache" [2]="2" [3]="\\Z3o\\Zn nGinX" [4]="3" [5]="\\Z3o\\Zn LightTPD" [6]="4" [7]="\\Z3o\\Zn Cherokee" [8]="5" [9]="\\Z3o\\Zn Caddy" [10]="6" [11]="\\Z3o\\Zn Monkey HTTP" [12]="7" [13]="\\Z3o\\Zn Hiawatha" [14]="8" [15]="\\Z3o\\Zn SSL")
+webservermenuicon='\Z3o\Zn'
+webservermenustatus=disabled
+wirelessconfigmenuicon='\Z2✔\Zn'
+wirelessconfigmenustatus=true
+wwivmenu=([0]="1" [1]="WWIV Configuration" [2]="2" [3]="WWIV Local Mode")

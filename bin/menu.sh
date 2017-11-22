@@ -299,6 +299,7 @@ function menusystem() {
 		hiawathastatus="disabled"
 		hiawathamenustatus="disabled"
 	fi
+	
 
 	if [ "${apachestatus}" == "diasbled" ] && [ "${nginxstatus}" == "disabled" ] && [ "${lightspeedstatus}" == "disabled" ]; then
 		webservermenuicon="${DISABLEDSYMB}"
@@ -306,7 +307,7 @@ function menusystem() {
 		webservermenuicon="${OKSYMB}"
 	fi
 
-	if [ "${apachestatus}" == "false" ] && [ "${nginxstatus}" == "false" ] && [ "${lightspeedstatus}" == "false" ]; then
+	if [ "${apachestatus}" == "false" ] || [ "${nginxstatus}" == "false" ] || [ "${lightspeedstatus}" == "false" ]; then
 		webservermenuicon="${BADSYMB}"
 	else
 		webservermenuicon="${OKSYMB}"
@@ -320,10 +321,12 @@ function menusystem() {
 			apacherestartmenuicon="${OKSYMB}"
 			apachestartmenuicon="${BADSYMB}"
 			apachestopmenuicon="${OKSYMB}"
+			webservermenuicon="${OKSYMB}"
 		else
 			apacherestartmenuicon="${OKSYMB}"
 			apachestartmenuicon="${OKSYMB}"
 			apachestopmenuicon="${BADSYMB}"
+			webservermenuicon="${BADSYMB}"
 		fi
 	fi
 
@@ -459,6 +462,8 @@ function menusystem() {
 
 	if [ "${apachestatus}" == "true" ] || [ "${nginxstatus}" == "true" ] || [ "${lightspeedstatus}" == "true" ] || [ "${cherokeestatus}" == "true" ] || [ "${caddystatus}" == "true" ] || [ "${monkeystatus}" == "true" ] || [ "${hiawathastatus}" == "true" ]; then
 		webservermenuicon="${OKSYMB}"
+	elif [ "${apachestatus}" == "disabled" ] && [ "${nginxstatus}" == "disabled" ] && [ "${lightspeedstatus}" == "disabled" ] && [ "${cherokeestatus}" == "disabled" ] && [ "${caddystatus}" == "disabled" ] && [ "${monkeystatus}" == "disabled" ] && [ "${hiawathastatus}" == "disabled" ]; then
+		webservermenuicon="${DISABLEDSYMB}"
 	fi
 
 	apachestatus="$([ "${WEBSERVERTYPE}" == "apache" ] && echo "\Z3Disable Server\Zn" || echo "\Z2Enable Server\Zn")"
@@ -697,7 +702,7 @@ function mainmenu() {
 			case $? in
 				0) # If Yes was pressed
 					clear
-					exit 0
+					quitscript
 					;;
 				1) # No was pressed, so return back to the form
 					mainmenu
@@ -763,63 +768,29 @@ function databasemenu() {
 	retval=$?
 	CHOICE=`cat $tempfile`
 	log "${CHOICE} from ${title}"
-
 	case $retval in
 		0)
 			case $CHOICE in
 				1) # mySQL
-					CHOICE=$(dialog --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${mysqlmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # mySQL Configuration
-							echo "mySQL Configuration"
-							;;
-						2) # mySQL Restart
-							echo "mySQL Restart"
-							;;
-						3) # mySQL Start
-							echo "mySQL Start"
-							;;
-						4) # mySQL Stop
-							echo "mySQL Stop"
-							;;
-					esac
+					mysqlselectmenu
 					;;
 				2) # MariaDB
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${mariadbsqlmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # MariaDB Configuration
-							echo "MariaDB Configuration"
-							;;
-						2) # MariaDB Restart
-							echo "MariaDB Restart"
-							;;
-						3) # MariaDB Start
-							echo "MariaDB Start"
-							;;
-						4) # MariaDB Stop
-							echo "MariaDB Stop"
-							;;
-					esac
+					mariadbselectmenu
 					;;
 				3) # PostgreSQL
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${postgresqlmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # PostgreSQL Configuration
-							echo "PostgreSQL Configuration"
-							;;
-						2) # PostgreSQL Restart
-							echo "PostgreSQL Restart"
-							;;
-						3) # PostgreSQL Start
-							echo "PostgreSQL Start"
-							;;
-						4) # PostgreSQL Stop
-							echo "PostgreSQL Stop"
-							;;
-					esac
+					postgresqlselectmenu
 					;;
-				4) # Disable Database Server
-					echo "Disable Database Server"
+				4) # SQLite
+					sqliteselectmenu
+					;;
+				5) # Pervasive
+					pervasiveselectmenu
+					;;
+				6) # VoltDB
+					voltdbselectmenu
+					;;
+				7) # GigaBASE
+					gigabaseselectmenu
 					;;
 			esac
 			;;
@@ -850,119 +821,22 @@ function applicationmenu() {
 		0)
 			case $CHOICE in
 				1) # PHP
-					CHOICE=$(dialog --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${phpmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # PHP Configuration
-							echo "PHP Configuration"
-							;;
-						2) # PHP Restart
-							echo "PHP Restart"
-							;;
-						3) # PHP Start
-							echo "PHP Start"
-							;;
-						4) # PHP Stop
-							echo "PHP Stop"
-							;;
-					esac
+					phpselectmenu
 					;;
 				2) # Java
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${javamenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Java Configuration
-							echo "Java Configuration"
-							;;
-						2) # Java Restart
-							echo "Java Restart"
-							;;
-						3) # Java Start
-							echo "Java Start"
-							;;
-						4) # Java Stop
-							echo "Java Stop"
-							;;
-					esac
+					javaselectmenu
 					;;
-				3) # Tomcat
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${tomcatmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Tomcat Configuration
-							echo "Tomcat Configuration"
-							;;
-						2) # Tomcat Restart
-							echo "Tomcat Restart"
-							;;
-						3) # Tomcat Start
-							echo "Tomcat Start"
-							;;
-						4) # Tomcat Stop
-							echo "Tomcat Stop"
-							;;
-					esac
+				3) # Ruby
+					rubyselectmenu
 					;;
-				4) # Open Source
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${opensourcemenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Open Source Configuration
-							echo "Open Source Configuration"
-							;;
-						2) # Open Source Restart
-							echo "Open Source Restart"
-							;;
-						3) # Open Source Start
-							echo "Open Source Start"
-							;;
-						4) # Open Source Stop
-							echo "Open Source Stop"
-							;;
-					esac
+				4) # Perl
+					perlselectmenu
 					;;
-				5) # Open Source
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${mobilemenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Open Source Configuration
-							echo "Mobile App Configuration"
-							;;
-						2) # Open Source Restart
-							echo "Mobile App Restart"
-							;;
-						3) # Open Source Start
-							echo "Mobile App Start"
-							;;
-						4) # Open Source Stop
-							echo "Mobile App Stop"
-							;;
-					esac
+				5) # Python
+					pythonselectmenu
 					;;
 				6) # BBS Applications
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${bbsappsmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Mystic 
-							CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${mysticmenu[@]}" 2>&1 1>&3)
-							case $CHOICE in
-								1) # Mystic Configuration
-									echo "Mystic Configuration"
-									;;
-								2) # Mystic Local Mode
-									echo "Mystic Local Mode"
-									;;
-							esac
-							;;
-						2) # WWIV
-							CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${wwivmenu[@]}" 2>&1 1>&3)
-							case $CHOICE in
-								1) # WWIV Configuration
-									echo "WWIV Configuration"
-									;;
-								2) # WWIV Local Mode
-									echo "WWIV Local Mode"
-									;;
-							esac
-							;;
-					esac
-					;;
-				7) # Disable Application Server
-					echo "Disable Application Server"
+					bbsappselectmenu
 					;;
 			esac
 			;;
@@ -993,92 +867,19 @@ function emailmenu() {
 		0)
 			case $CHOICE in
 				1) # Postfix
-					CHOICE=$(dialog --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${postfixmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Postfix Configuration
-							echo "Postfix Configuration"
-							;;
-						2) # Postfix Restart
-							echo "Postfix Restart"
-							;;
-						3) # Postfix Start
-							echo "Postfix Start"
-							;;
-						4) # Postfix Stop
-							echo "Postfix Stop"
-							;;
-					esac
+					postfixselectmenu
 					;;
 				2) # Citadel
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${citadelmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Citadel Configuration
-							echo "Citadel Configuration"
-							;;
-						2) # Citadel Restart
-							echo "Citadel Restart"
-							;;
-						3) # Citadel Start
-							echo "Citadel Start"
-							;;
-						4) # Citadel Stop
-							echo "Citadel Stop"
-							;;
-					esac
+					citadelselectmenu
 					;;
 				3) # Sendmail
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${sendmailmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Sendmail Configuration
-							echo "Sendmail Configuration"
-							;;
-						2) # Sendmail Restart
-							echo "Sendmail Restart"
-							;;
-						3) # Sendmail Start
-							echo "Sendmail Start"
-							;;
-						4) # Sendmail Stop
-							echo "Sendmail Stop"
-							;;
-					esac
+					sendmailselectmenu
 					;;
 				4) # Exim
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${eximmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Exim Configuration
-							echo "Exim Configuration"
-							;;
-						2) # Exim Restart
-							echo "Exim Restart"
-							;;
-						3) # Exim Start
-							echo "Exim Start"
-							;;
-						4) # Exim Stop
-							echo "Exim Stop"
-							;;
-					esac
+					eximselectmenu
 					;;
-				5) # Sendmail
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${couriermenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Courier Configuration
-							echo "Courier Configuration"
-							;;
-						2) # Courier Restart
-							echo "Courier Restart"
-							;;
-						3) # Courier Start
-							echo "Courier Start"
-							;;
-						4) # Courier Stop
-							echo "Courier Stop"
-							;;
-					esac
-					;;
-				6) # Disable Email Server
-					echo "Disable Email Server"
+				5) # Courier
+					courierselectmenu
 					;;
 			esac
 			;;
@@ -1108,58 +909,13 @@ function filemenu() {
 		0)
 			case $CHOICE in
 				1) # FTP
-					CHOICE=$(dialog --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${ftpmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # FTP Configuration
-							echo "FTP Configuration"
-							;;
-						2) # FTP Restart
-							echo "FTP Restart"
-							;;
-						3) # FTP Start
-							echo "FTP Start"
-							;;
-						4) # FTP Stop
-							echo "FTP Stop"
-							;;
-					esac
+					ftpselectmenu
 					;;
 				2) # NSF
-					CHOICE=$(dialog --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${nfsmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # NFS Configuration
-							echo "NFS Configuration"
-							;;
-						2) # NFS Restart
-							echo "NFS Restart"
-							;;
-						3) # NFS Start
-							echo "NFS Start"
-							;;
-						4) # NFS Stop
-							echo "NFS Stop"
-							;;
-					esac
+					nsfselectmenu
 					;;
 				3) # Samba
-					CHOICE=$(dialog --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${sambamenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Samba Configuration
-							echo "Samba Configuration"
-							;;
-						2) # Samba Restart
-							echo "Samba Restart"
-							;;
-						3) # Samba Start
-							echo "Samba Start"
-							;;
-						4) # Samba Stop
-							echo "Samba Stop"
-							;;
-					esac
-					;;
-				4) # Disable File Server
-					echo "Disable File Server"
+					sambaselectmenu
 					;;
 			esac
 			;;
@@ -1186,7 +942,7 @@ function messagemenu() {
 	log "${CHOICE} from ${title}"
 
 	case $retval in
-		0)
+		0) # Under Construction
 			case $CHOICE in
 				1)
 					echo "Null"
@@ -1216,7 +972,7 @@ function proxymenu() {
 	log "${CHOICE} from ${title}"
 
 	case $retval in
-		0)
+		0) # Under Construction
 			case $CHOICE in
 				1)
 					echo "Null"
@@ -1249,68 +1005,22 @@ function systemconfigmenu() {
 		0)
 			case $CHOICE in
 				1) # System Information
-					echo "System Information"
+					systeminfoselectmenu
 					;;
 				2) # File System
-					CHOICE=$(dialog --colors --nocancel --nook --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${filesystemmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Drive Information
-							echo "Drive Information"
-							;;
-						2) # Mount Points
-							echo "Mount Points"
-							;;
-						3) # Raid Configuration
-							echo "Raid Configuration"
-							;;
-						4) # USB Drive Configuration
-							echo "USB Drive Configuration"
-							;;
-					esac
+					filesystemselectmenu
 					;;
 				3) # Memory
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${memorymenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Free Memory
-							echo "Free Memory"
-							;;
-						2) # Swap Memory
-							echo "Swap Memory"
-							;;
-					esac
+					memoryselectmenu
 					;;
 				4) # File Editor
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${fileeditormenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Host file
-							echo "Host file"
-							;;
-						2) # Hostnames file
-							echo "Hostnames file"
-							;;
-					esac
+					fileeditorselectmenu
 					;;
 				5) # Network Configuration
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${networkconfigmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Exim Configuration
-							echo "Wireless Configuration"
-							;;
-						2) # Exim Restart
-							echo "Network Configuration"
-							;;
-					esac
+					networkselectmenu
 					;;
 				6) # Application Configuration
-					CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${applicationmenu[@]}" 2>&1 1>&3)
-					case $CHOICE in
-						1) # Git Configuration
-							echo "Git Configuration"
-							;;
-						2) # Uninstall Applications
-							echo "Uninstall Applications"
-							;;
-					esac
+					applicationselectmenu
 					;;
 			esac
 			;;
@@ -1340,19 +1050,19 @@ function systemlogsmenu() {
 		0)
 			case $CHOICE in
 				1) # Apache Logs
-					echo "Apache Logs"
+					apachelogsdialog
 					;;
 				2) # PHP Logs
-					echo "PHP Logs"
+					phplogsdialog
 					;;
 				3) # Access Logs
-					echo "Access Logs"
+					accesslogsdialog
 					;;
 				4) # Error Logs
-					echo "Error Logs"
+					errorlogsdialog
 					;;
 				5) # Installation Logs
-					echo "Installation Logs"
+					installationlogsdialog
 					;;
 			esac
 			;;
@@ -1361,7 +1071,7 @@ function systemlogsmenu() {
 			;;
 	esac
 }
-############## WEB SERVER MENU ITEMS 1-4
+############## WEB SERVER MENU ITEMS 1-8
 function apacheselectmenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
@@ -1406,102 +1116,262 @@ function apacheselectmenu() {
 	esac
 }
 function nginxselectmenu() {
-	unset title
-	unset instructions
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	menusystem
+
 	title="nGinX Options Menu"
 	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
-	returncode=0
+	: ${DIALOG=dialog}
+	tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+	trap "rm -f $tempfile" 0 1 2 5 15
 	log "${title} menu called"
-	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
-	loadcfg
-	mainmenusystem
-	while test $returncode != 1 && test $returncode != 250; do
-		# Redirect stream 3 to the stream 1 (STDOUT)
-		exec 3>&1
-		CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${nginxmenu[@]}" 2>&1 1>&3)
-		returncode=$?
-		exec 3>&-
-		case $returncode in
-			1|255) # If back or ESC was pressed
-				dialog --backtitle "$SCREENTITLE" --yesno "Are you sure you want to quit?" 10 30
-				case $? in
-					0) # If Yes was pressed
-						webservermenu
-						;;
-					1) # No was pressed, so return back to the form
-						returncode=99
-						;;
-				esac
-				;;
-		esac
-		case $CHOICE in
-			1) # nGinxX Configuration
-				nginxconfigform
-				;;
-			2) # nGinxX Restart
-				nginxctrlform "restart"
-				;;
-			3) # nGinxX Start
-				nginxctrlform "start"
-				;;
-			4) # nGinxX Stop
-				nginxctrlform "stop"
-				;;
-			5) # Enable/Disable Server
-				switchserver "nginx"
-				returncode=99
-				;;
-		esac
-	done
+
+	$DIALOG --colors --nook --nocancel --hline "ESC to return to Main Menu" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${nginxmenu[@]}" 2>$tempfile
+	retval=$?
+	CHOICE=`cat $tempfile`
+	log "${CHOICE} from ${title}"
+
+	case $retval in
+		0)
+			case $CHOICE in
+				1) # nGinxX Configuration
+					nginxconfigform
+					;;
+				2) # nGinxX Restart
+					nginxctrlform "restart"
+					;;
+				3) # nGinxX Start
+					nginxctrlform "start"
+					;;
+				4) # nGinxX Stop
+					nginxctrlform "stop"
+					;;
+				5) # Enable/Disable Server
+					switchserver "nginx"
+					returncode=99
+					;;
+			esac
+			;;
+		255)
+			webservermenu
+			;;
+	esac
 }
 function lightspeedselectmenu() {
-	unset title
-	unset instructions
-	title="Lightspeed Options Menu"
-	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
-	returncode=0
-	log "${title} menu called"
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
-	mainmenusystem
-	while test $returncode != 1 && test $returncode != 250; do
-		# Redirect stream 3 to the stream 1 (STDOUT)
-		exec 3>&1
-		CHOICE=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --hline "$CREDITS" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${lightspeed[@]}" 2>&1 1>&3)
-		returncode=$?
-		exec 3>&-
-		case $returncode in
-			1|255) # If back or ESC was pressed
-				dialog --backtitle "$SCREENTITLE" --yesno "Are you sure you want to quit?" 10 30
-				case $? in
-					0) # If Yes was pressed
-						webservermenu
-						;;
-					1) # No was pressed, so return back to the form
-						returncode=99
-						;;
-				esac
-				;;
-		esac
-		case $CHOICE in
-			1) # Lightspeed Configuration
-				lightspeedconfigform
-				;;
-			2) # Lightspeed Restart
-				lightspeedctrlform "restart"
-				;;
-			3) # Lightspeed Start
-				lightspeedctrlform "start"
-				;;
-			4) # Lightspeed Stop
-				lightspeedctrlform "stop"
-				;;
-			5) # Enable/Disable Server
-				switchserver "lightspeed"
-				returncode=99
-				;;
-		esac
-	done
+	menusystem
+
+	title="Lightspeed Options Menu"
+	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
+	: ${DIALOG=dialog}
+	tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+	trap "rm -f $tempfile" 0 1 2 5 15
+	log "${title} menu called"
+
+	$DIALOG --colors --nook --nocancel --hline "ESC to return to Main Menu" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${lightspeed[@]}" 2>$tempfile
+	retval=$?
+	CHOICE=`cat $tempfile`
+	log "${CHOICE} from ${title}"
+
+	case $retval in
+		0)
+			case $CHOICE in
+				1) # Lightspeed Configuration
+					lightspeedconfigform
+					;;
+				2) # Lightspeed Restart
+					lightspeedctrlform "restart"
+					;;
+				3) # Lightspeed Start
+					lightspeedctrlform "start"
+					;;
+				4) # Lightspeed Stop
+					lightspeedctrlform "stop"
+					;;
+				5) # Enable/Disable Server
+					switchserver "lightspeed"
+					returncode=99
+					;;
+			esac
+			;;
+		255)
+			webservermenu
+			;;
+	esac
+}
+function cherokeeselectmenu() {
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	menusystem
+
+	title="Lightspeed Options Menu"
+	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
+	: ${DIALOG=dialog}
+	tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+	trap "rm -f $tempfile" 0 1 2 5 15
+	log "${title} menu called"
+
+	$DIALOG --colors --nook --nocancel --hline "ESC to return to Main Menu" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${lightspeed[@]}" 2>$tempfile
+	retval=$?
+	CHOICE=`cat $tempfile`
+	log "${CHOICE} from ${title}"
+
+	case $retval in
+		0)
+			case $CHOICE in
+				1) # Lightspeed Configuration
+					lightspeedconfigform
+					;;
+				2) # Lightspeed Restart
+					lightspeedctrlform "restart"
+					;;
+				3) # Lightspeed Start
+					lightspeedctrlform "start"
+					;;
+				4) # Lightspeed Stop
+					lightspeedctrlform "stop"
+					;;
+				5) # Enable/Disable Server
+					switchserver "lightspeed"
+					returncode=99
+					;;
+			esac
+			;;
+		255)
+			webservermenu
+			;;
+	esac
+}
+function caddyselectmenu() {
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	menusystem
+
+	title="Lightspeed Options Menu"
+	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
+	: ${DIALOG=dialog}
+	tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+	trap "rm -f $tempfile" 0 1 2 5 15
+	log "${title} menu called"
+
+	$DIALOG --colors --nook --nocancel --hline "ESC to return to Main Menu" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${lightspeed[@]}" 2>$tempfile
+	retval=$?
+	CHOICE=`cat $tempfile`
+	log "${CHOICE} from ${title}"
+
+	case $retval in
+		0)
+			case $CHOICE in
+				1) # Lightspeed Configuration
+					lightspeedconfigform
+					;;
+				2) # Lightspeed Restart
+					lightspeedctrlform "restart"
+					;;
+				3) # Lightspeed Start
+					lightspeedctrlform "start"
+					;;
+				4) # Lightspeed Stop
+					lightspeedctrlform "stop"
+					;;
+				5) # Enable/Disable Server
+					switchserver "lightspeed"
+					returncode=99
+					;;
+			esac
+			;;
+		255)
+			webservermenu
+			;;
+	esac
+}
+function monkeyselectmenu() {
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	menusystem
+
+	title="Lightspeed Options Menu"
+	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
+	: ${DIALOG=dialog}
+	tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+	trap "rm -f $tempfile" 0 1 2 5 15
+	log "${title} menu called"
+
+	$DIALOG --colors --nook --nocancel --hline "ESC to return to Main Menu" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${lightspeed[@]}" 2>$tempfile
+	retval=$?
+	CHOICE=`cat $tempfile`
+	log "${CHOICE} from ${title}"
+
+	case $retval in
+		0)
+			case $CHOICE in
+				1) # Lightspeed Configuration
+					lightspeedconfigform
+					;;
+				2) # Lightspeed Restart
+					lightspeedctrlform "restart"
+					;;
+				3) # Lightspeed Start
+					lightspeedctrlform "start"
+					;;
+				4) # Lightspeed Stop
+					lightspeedctrlform "stop"
+					;;
+				5) # Enable/Disable Server
+					switchserver "lightspeed"
+					returncode=99
+					;;
+			esac
+			;;
+		255)
+			webservermenu
+			;;
+	esac
+}
+function hiawathaselectmenu() {
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	menusystem
+
+	title="Lightspeed Options Menu"
+	instructions="Use the arrow keys or press the number to choose one of the following options, press ESC to exit:\n\n[${OKSYMB}] - \Z2Valid \Znsettings\n[${BADSYMB}] - \Zb\Z1Invalid \Znsettings\n[${DISABLEDSYMB}] - \Z3Disabled\Zn settings\n"
+	: ${DIALOG=dialog}
+	tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+	trap "rm -f $tempfile" 0 1 2 5 15
+	log "${title} menu called"
+
+	$DIALOG --colors --nook --nocancel --hline "ESC to return to Main Menu" --backtitle "$SCREENTITLE" --title "$title" --menu "$instructions" $HEIGHT $WIDTH $CHOICE_HEIGHT "${lightspeed[@]}" 2>$tempfile
+	retval=$?
+	CHOICE=`cat $tempfile`
+	log "${CHOICE} from ${title}"
+
+	case $retval in
+		0)
+			case $CHOICE in
+				1) # Lightspeed Configuration
+					lightspeedconfigform
+					;;
+				2) # Lightspeed Restart
+					lightspeedctrlform "restart"
+					;;
+				3) # Lightspeed Start
+					lightspeedctrlform "start"
+					;;
+				4) # Lightspeed Stop
+					lightspeedctrlform "stop"
+					;;
+				5) # Enable/Disable Server
+					switchserver "lightspeed"
+					returncode=99
+					;;
+			esac
+			;;
+		255)
+			webservermenu
+			;;
+	esac
 }
 function sslselectmenu() {
 	unset title
@@ -1786,7 +1656,7 @@ function nginxctrlform() {
 			;;
 	esac
 }
-############## WEB SERVER LIGHTSPEED MENU ITEMS 1-5
+############## WEB SERVER LIGHTTPD MENU ITEMS 1-5
 function lightspeedconfigform() {
 	unset title
 	unset instructions
@@ -1893,31 +1763,538 @@ function lightspeedctrlform() {
 			;;
 	esac
 }
-function emailserverform() {
-	dialogtitle="Email Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
+############## WEB SERVER CHEROKEE MENU ITEMS 1-5
+function cherokeeconfigform() {
+	unset title
+	unset instructions
+	title="Lightspeed Configuration Settings"
+	instructions="Please answer the questions below to configure your Lightspeed server to your specific needs. Some defaults are assumed from the system configuration."
+	if [ "$webmenufailtest" == "true" ]; then
+		instructions="$instructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
+	fi
 	returncode=0
+	log "${title} menu called"
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	mainmenusystem
+	while test $returncode != 1 && test $returncode != 250; do
+		# Redirect stream 3 to the stream 1 (STDOUT)
+		exec 3>&1
+		# Store data to $VALUES variable
+		VALUES=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --menu "$instructions" --form "$dialoginstructions" 20 55 0 \
+			"       Domain Name :"	1 1	"$FQDN"			1 22 27 0 \
+			"         User Name :"	2 1	"$SERVERUSER"	2 22 27 0 \
+			"Public HTML folder :"	3 1	"$WEBSERVERDIR"	3 22 27 0 \
+			"             Email :"	4 1	"$EMAIL"		4 22 27 0 \
+			"    File ownership :"  5 1 "$OWNERGROUP"	5 22 27 0 \
+			"                IP :"	6 1	"$IP"			6 22 27 0 \
+		2>&1 1>&3)
+		returncode=$?
+		exec 3>&-
+
+		# Assign the variables to an array
+		webservervars=($VALUES)
+		show=`echo "$VALUES" |sed -e 's/^/ /'`
+		case $returncode in
+			1|255) # If back or ESC was pressed
+				dialog --backtitle "$SCREENTITLE" --yesno "Return to Lightspeed Options Menu?" 10 30
+				case $? in
+					0)
+						# If Yes was pressed
+						lightspeedselectmenu
+						;;
+					1)
+						# No was pressed, so return back to the form
+						returncode=99
+						;;
+				esac
+				;;
+			0) # If submit or <ENTER> was pressed
+				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
+				case $? in
+					0)
+						# Check that all fields are filled before writing record, or give an error message
+						# Create the record string from $value, deleting the last #
+						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
+
+						# Count the number of fields
+						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
+
+						if [ $NUMFLDS -lt 6 ]; then
+							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
+							case $? in
+								0)
+									return
+									;;
+								255)
+									return
+									;;
+							esac
+						else
+							config "write_value" "fqdn" "${webservervars[0]}"
+							config "write_value" "user" "${webservervars[1]}"
+							config "write_value" "webserverdir" "${webservervars[2]}"
+							config "write_value" "email" "${webservervars[3]}"
+							config "write_value" "ownergroup" "${webservervars[4]}"
+							config "write_value" "ip" "${webservervars[5]}"
+						fi
+						return
+						;;
+					1)
+						return
+						;;
+					255)
+						return
+						;;
+				esac
+				;;
+		esac
+	done
 }
-function databaseserverform(){
-	dialogtitle="Database Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
+function cherokeectrlform() {
+	action=$1
+	# Don't forget to check to see if Lightspeed is even installedappsform
+	
+	case $action in
+		"restart")
+			# Check to see if Lightspeed is running, then restart
+			echo "restart"
+			;;
+		"start")
+			# Check to see if Lightspeed is not running
+			echo "start"
+			;;
+		"stop")
+			# Check to see if Lightspeed is running
+			echo "stop"
+			;;
+	esac
+}
+############## WEB SERVER CADDY MENU ITEMS 1-5
+function caddyconfigform() {
+	unset title
+	unset instructions
+	title="Lightspeed Configuration Settings"
+	instructions="Please answer the questions below to configure your Lightspeed server to your specific needs. Some defaults are assumed from the system configuration."
+	if [ "$webmenufailtest" == "true" ]; then
+		instructions="$instructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
+	fi
 	returncode=0
+	log "${title} menu called"
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	mainmenusystem
+	while test $returncode != 1 && test $returncode != 250; do
+		# Redirect stream 3 to the stream 1 (STDOUT)
+		exec 3>&1
+		# Store data to $VALUES variable
+		VALUES=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --menu "$instructions" --form "$dialoginstructions" 20 55 0 \
+			"       Domain Name :"	1 1	"$FQDN"			1 22 27 0 \
+			"         User Name :"	2 1	"$SERVERUSER"	2 22 27 0 \
+			"Public HTML folder :"	3 1	"$WEBSERVERDIR"	3 22 27 0 \
+			"             Email :"	4 1	"$EMAIL"		4 22 27 0 \
+			"    File ownership :"  5 1 "$OWNERGROUP"	5 22 27 0 \
+			"                IP :"	6 1	"$IP"			6 22 27 0 \
+		2>&1 1>&3)
+		returncode=$?
+		exec 3>&-
+
+		# Assign the variables to an array
+		webservervars=($VALUES)
+		show=`echo "$VALUES" |sed -e 's/^/ /'`
+		case $returncode in
+			1|255) # If back or ESC was pressed
+				dialog --backtitle "$SCREENTITLE" --yesno "Return to Lightspeed Options Menu?" 10 30
+				case $? in
+					0)
+						# If Yes was pressed
+						lightspeedselectmenu
+						;;
+					1)
+						# No was pressed, so return back to the form
+						returncode=99
+						;;
+				esac
+				;;
+			0) # If submit or <ENTER> was pressed
+				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
+				case $? in
+					0)
+						# Check that all fields are filled before writing record, or give an error message
+						# Create the record string from $value, deleting the last #
+						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
+
+						# Count the number of fields
+						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
+
+						if [ $NUMFLDS -lt 6 ]; then
+							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
+							case $? in
+								0)
+									return
+									;;
+								255)
+									return
+									;;
+							esac
+						else
+							config "write_value" "fqdn" "${webservervars[0]}"
+							config "write_value" "user" "${webservervars[1]}"
+							config "write_value" "webserverdir" "${webservervars[2]}"
+							config "write_value" "email" "${webservervars[3]}"
+							config "write_value" "ownergroup" "${webservervars[4]}"
+							config "write_value" "ip" "${webservervars[5]}"
+						fi
+						return
+						;;
+					1)
+						return
+						;;
+					255)
+						return
+						;;
+				esac
+				;;
+		esac
+	done
 }
-function driveserverform(){
-	dialogtitle="File Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
+function caddyctrlform() {
+	action=$1
+	# Don't forget to check to see if Lightspeed is even installedappsform
+	
+	case $action in
+		"restart")
+			# Check to see if Lightspeed is running, then restart
+			echo "restart"
+			;;
+		"start")
+			# Check to see if Lightspeed is not running
+			echo "start"
+			;;
+		"stop")
+			# Check to see if Lightspeed is running
+			echo "stop"
+			;;
+	esac
+}
+############## WEB SERVER MONKEY MENU ITEMS 1-5
+function monkeyconfigform() {
+	unset title
+	unset instructions
+	title="Lightspeed Configuration Settings"
+	instructions="Please answer the questions below to configure your Lightspeed server to your specific needs. Some defaults are assumed from the system configuration."
+	if [ "$webmenufailtest" == "true" ]; then
+		instructions="$instructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
+	fi
 	returncode=0
+	log "${title} menu called"
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	mainmenusystem
+	while test $returncode != 1 && test $returncode != 250; do
+		# Redirect stream 3 to the stream 1 (STDOUT)
+		exec 3>&1
+		# Store data to $VALUES variable
+		VALUES=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --menu "$instructions" --form "$dialoginstructions" 20 55 0 \
+			"       Domain Name :"	1 1	"$FQDN"			1 22 27 0 \
+			"         User Name :"	2 1	"$SERVERUSER"	2 22 27 0 \
+			"Public HTML folder :"	3 1	"$WEBSERVERDIR"	3 22 27 0 \
+			"             Email :"	4 1	"$EMAIL"		4 22 27 0 \
+			"    File ownership :"  5 1 "$OWNERGROUP"	5 22 27 0 \
+			"                IP :"	6 1	"$IP"			6 22 27 0 \
+		2>&1 1>&3)
+		returncode=$?
+		exec 3>&-
+
+		# Assign the variables to an array
+		webservervars=($VALUES)
+		show=`echo "$VALUES" |sed -e 's/^/ /'`
+		case $returncode in
+			1|255) # If back or ESC was pressed
+				dialog --backtitle "$SCREENTITLE" --yesno "Return to Lightspeed Options Menu?" 10 30
+				case $? in
+					0)
+						# If Yes was pressed
+						lightspeedselectmenu
+						;;
+					1)
+						# No was pressed, so return back to the form
+						returncode=99
+						;;
+				esac
+				;;
+			0) # If submit or <ENTER> was pressed
+				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
+				case $? in
+					0)
+						# Check that all fields are filled before writing record, or give an error message
+						# Create the record string from $value, deleting the last #
+						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
+
+						# Count the number of fields
+						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
+
+						if [ $NUMFLDS -lt 6 ]; then
+							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
+							case $? in
+								0)
+									return
+									;;
+								255)
+									return
+									;;
+							esac
+						else
+							config "write_value" "fqdn" "${webservervars[0]}"
+							config "write_value" "user" "${webservervars[1]}"
+							config "write_value" "webserverdir" "${webservervars[2]}"
+							config "write_value" "email" "${webservervars[3]}"
+							config "write_value" "ownergroup" "${webservervars[4]}"
+							config "write_value" "ip" "${webservervars[5]}"
+						fi
+						return
+						;;
+					1)
+						return
+						;;
+					255)
+						return
+						;;
+				esac
+				;;
+		esac
+	done
 }
-function installedappsform() {
-	dialogtitle="Application Server Settings"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
+function monkeyctrlform() {
+	action=$1
+	# Don't forget to check to see if Lightspeed is even installedappsform
+	
+	case $action in
+		"restart")
+			# Check to see if Lightspeed is running, then restart
+			echo "restart"
+			;;
+		"start")
+			# Check to see if Lightspeed is not running
+			echo "start"
+			;;
+		"stop")
+			# Check to see if Lightspeed is running
+			echo "stop"
+			;;
+	esac
+}
+############## WEB SERVER HIAWATHA MENU ITEMS 1-5
+function hiawathaconfigform() {
+	unset title
+	unset instructions
+	title="Lightspeed Configuration Settings"
+	instructions="Please answer the questions below to configure your Lightspeed server to your specific needs. Some defaults are assumed from the system configuration."
+	if [ "$webmenufailtest" == "true" ]; then
+		instructions="$instructions \Zb\Z1INVALID SETTINGS\Zn detected, please correct the following\n\n${faileditems1}"
+	fi
 	returncode=0
+	log "${title} menu called"
+	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
+	loadcfg
+	mainmenusystem
+	while test $returncode != 1 && test $returncode != 250; do
+		# Redirect stream 3 to the stream 1 (STDOUT)
+		exec 3>&1
+		# Store data to $VALUES variable
+		VALUES=$(dialog --colors --ok-label "$OKLABEL" --cancel-label "$CANCELLABEL" --backtitle "$SCREENTITLE" --title "$dialogtitle" --menu "$instructions" --form "$dialoginstructions" 20 55 0 \
+			"       Domain Name :"	1 1	"$FQDN"			1 22 27 0 \
+			"         User Name :"	2 1	"$SERVERUSER"	2 22 27 0 \
+			"Public HTML folder :"	3 1	"$WEBSERVERDIR"	3 22 27 0 \
+			"             Email :"	4 1	"$EMAIL"		4 22 27 0 \
+			"    File ownership :"  5 1 "$OWNERGROUP"	5 22 27 0 \
+			"                IP :"	6 1	"$IP"			6 22 27 0 \
+		2>&1 1>&3)
+		returncode=$?
+		exec 3>&-
+
+		# Assign the variables to an array
+		webservervars=($VALUES)
+		show=`echo "$VALUES" |sed -e 's/^/ /'`
+		case $returncode in
+			1|255) # If back or ESC was pressed
+				dialog --backtitle "$SCREENTITLE" --yesno "Return to Lightspeed Options Menu?" 10 30
+				case $? in
+					0)
+						# If Yes was pressed
+						lightspeedselectmenu
+						;;
+					1)
+						# No was pressed, so return back to the form
+						returncode=99
+						;;
+				esac
+				;;
+			0) # If submit or <ENTER> was pressed
+				dialog --title "POST THIS RECORD ENTRY?" --yesno "$show" 15 40 
+				case $? in
+					0)
+						# Check that all fields are filled before writing record, or give an error message
+						# Create the record string from $value, deleting the last #
+						NRECORD=`echo "$VALUES"|awk 'BEGIN{ORS="#"}{print $0}'|sed -e 's/#$//'`
+
+						# Count the number of fields
+						NUMFLDS=`echo "$NRECORD" | awk -F"#" 'END{print NF}'`
+
+						if [ $NUMFLDS -lt 6 ]; then
+							dialog --title "INPUT ERROR" --clear --msgbox "You must fill in all the fields.\nThis record will not be saved" 10 41
+							case $? in
+								0)
+									return
+									;;
+								255)
+									return
+									;;
+							esac
+						else
+							config "write_value" "fqdn" "${webservervars[0]}"
+							config "write_value" "user" "${webservervars[1]}"
+							config "write_value" "webserverdir" "${webservervars[2]}"
+							config "write_value" "email" "${webservervars[3]}"
+							config "write_value" "ownergroup" "${webservervars[4]}"
+							config "write_value" "ip" "${webservervars[5]}"
+						fi
+						return
+						;;
+					1)
+						return
+						;;
+					255)
+						return
+						;;
+				esac
+				;;
+		esac
+	done
 }
-function servertypemenu() {
+function hiawathactrlform() {
+	action=$1
+	# Don't forget to check to see if Lightspeed is even installedappsform
+	
+	case $action in
+		"restart")
+			# Check to see if Lightspeed is running, then restart
+			echo "restart"
+			;;
+		"start")
+			# Check to see if Lightspeed is not running
+			echo "start"
+			;;
+		"stop")
+			# Check to see if Lightspeed is running
+			echo "stop"
+			;;
+	esac
+}
+############## DATABASE SERVER MENU ITEMS 1-7
+function mysqlselectmenu() {
+	databasemenu
+}
+function mariadbselectmenu () {
+	databasemenu
+}
+function postgresqlselectmenu() {
+	databasemenu
+}
+function sqliteselectmenu() {
+	databasemenu
+}
+function pervasiveselectmenu() {
+	databasemenu
+}
+function voltdbselectmenu() {
+	databasemenu
+}
+function gigabaseselectmenu() {
+	databasemenu
+}
+############## APPLICATION SERVER MENU
+function phpselectmenu() {
+	applicationmenu
+}
+function javaselectmenu() {
+	applicationmenu
+}
+function rubyselectmenu() {
+	applicationmenu
+}
+function perlselectmenu() {
+	applicationmenu
+}
+function pythonselectmenu() {
+	applicationmenu
+}
+function bbsappselectmenu() {
+	applicationmenu
+}
+############## EMAIL SERVER MENU
+function postfixselectmenu() {
+	emailmenu
+}
+function citadelselectmenu() {
+	emailmenu
+}
+function sendmailselectmenu() {
+	emailmenu
+}
+function eximselectmenu() {
+	emailmenu
+}
+function courierselectmenu() {
+	emailmenu
+}
+############## FILE SERVER MENU
+function ftpselectmenu() {
+	filemenu
+}
+function nsfselectmenu() {
+	filemenu
+}
+function sambaselectmenu() {
+	filemenu
+}
+############## SYSTEM CONFIGURATION MENU
+function systeminfoselectmenu() {
+	systemconfigmenu
+}
+function filesystemselectmenu() {
+	systemconfigmenu
+}
+function memoryselectmenu() {
+	systemconfigmenu
+}
+function fileeditorselectmenu() {
+	systemconfigmenu
+}
+function networkselectmenu() {
+	systemconfigmenu
+}
+function applicationselectmenu() {
+	systemconfigmenu
+}
+############## LOGS MENU
+function apachelogsdialog() {
+	systemlogsmenu
+}
+function phplogsdialog() {
+	systemlogsmenu
+}
+function accesslogsdialog() {
+	systemlogsmenu
+}
+function errorlogsdialog() {
+	systemlogsmenu
+}
+function installationlogsdialog() {
+	systemlogsmenu
+}
+
+function OLD-servertypemenu() {
 	# Place the loadcfg and mainmenusystem here so it is rechecked on each menu load
 	loadcfg
 	menusystem
@@ -2216,15 +2593,4 @@ function servertypemenu() {
 			;;
 	esac
 }
-function systeminfomenu() {
-	dialogtitle="System Information Menu"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-}
-function installationlogsdialog() {
-	dialogtitle="Installation Logs"
-	dialoginstructions="Please answer the questions below to configure your web server to your specific needs. Some defaults are assumed from system variables."
-	log "${dialogtitle} Dialog Form called"
-	returncode=0
-}
+

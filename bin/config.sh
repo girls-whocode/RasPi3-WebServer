@@ -290,7 +290,7 @@ function loadcfg() {
 
 	# OWNERGROUP sets the default ower:group for webserver files and folders
 	if [ "${OWNERGROUPCFG}" == "false" ] || [ "${OWNERGROUPCFG}" == "null" ]; then
-		OWNERGROUP="www-data:www-data"
+		OWNERGROUP="root"
 		log "OWNERGROUP parameter or value does not exist - set to default value"
 		config "write_value" "ownergroup" $OWNERGROUP
 	else

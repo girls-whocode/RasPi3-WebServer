@@ -6,8 +6,9 @@ SYSTEMKEY="3d430f9af713781b92af4a97fc2e6664be7ce8e0"
 environment="production"
 
 if [ $environment == "development" ]; then
-	set -xe
+	set -vxe
 fi
+( set -o posix ; set ) >logs/variables.before
 
 # Load the files required for this script
 if [ -f ./bin/errors.sh ]; then source ./bin/errors.sh; else echo "./bin/errors.sh file is missing"; exit 141; fi

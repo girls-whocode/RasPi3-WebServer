@@ -96,6 +96,7 @@ function quitscript() {
 	tput cnorm
 	stty sane
 	log "quit signal: $1"
+	( set -o posix ; set ) >logs/variables.after
 
 	case "$1" in
 		"HUP")
