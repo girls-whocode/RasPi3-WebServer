@@ -925,10 +925,22 @@ function webservermenu() {
 				2) # nGinX
 					nginxselectmenu
 					;;
-				3) # Lightspeed
+				3) # LightTPD
 					lightspeedselectmenu
 					;;
-				4) # SSL
+				4) # Cherokee
+					cherokeeselectmenu
+					;;
+				5) # Caddy
+					caddyselectmenu
+					;;
+				6) # Monkey HTTP
+					monkeyselectmenu
+					;;
+				7) # Hiawatha
+					hiawathaselectmenu
+					;;
+				8) # SSL
 					sslselectmenu
 					;;
 			esac

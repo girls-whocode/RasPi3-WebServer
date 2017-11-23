@@ -5,7 +5,10 @@
 
 NOTICE! THIS SCRIPT IS INCOMPLETE AS I STARTED A NEW BUILD, I DO NOT HAVE A PRIVATE GITHUB ACCOUNT SO IT IS OUT HERE! YOU MAY DOWNLOAD AND PLAY WITH THE CODE. PLEASE LET ME KNOW IF THERE IS ANY CHANGES THAT NEEDS TO BE MADE. THIS NOTICE WILL DISAPPEAR IN THE BETA VERSION
 
-This script is just to help streamline the install process for many Linux distributions on a PC or Raspberry Pi 3 for web, database, file, application, messaging, proxy and email servers.
+This script is just to help streamline the install process for many types of Linux distributions on a PC or Raspberry Pi 3 for web, database, file, application, messaging, proxy and email servers.
+
+Why did I choose BASH Script?
+I wanted to have an application that will allow anyone to download and just run. I get many questions on how to build applications and it is confusing for many newbies. Another reason is it allows beginners to advanced users to see unique command line arguments that may assist them in other areas. Finally the main reason is to prove that BASH can do so much more then just run a batch of commands. I hope others will find the passion I have with this script and join in. I am still learning some of the less popular Web and Database Servers, so any help with that would be great.
 
 With an advanced installation system it will determine what is already installed and configured and allow you to make changes, install or remove any application built into this system.
 
@@ -43,22 +46,47 @@ Server Auto Configuration manages many mundane file changes automatically for yo
 			2. Apache Restart
 			3. Apache Start
 			4. Apache Stop
+			5. Enable or Disable Server
 		2. nGinX
 			1. nGinx Configuration
 			2. nGinX Restart
 			3. nGinX Start
 			4. nGinX Stop
+			5. Enable or Disable Server
 		3. Lightspeed
 			1. Lightspeed Configuration
 			2. Lightspeed Restart
 			3. Lightspeed Start
 			4. Lightspeed Stop
-		4. SSL Setup
+			5. Enable or Disable Server
+		4. Cherokee
+			1. Cherokee Configuration
+			2. Cherokee Restart
+			3. Cherokee Start
+			4. Cherokee Stop
+			5. Enable or Disable Server
+		5. Caddy
+			1. Caddy Configuration
+			2. Caddy Restart
+			3. Caddy Start
+			4. Caddy Stop
+			5. Enable or Disable Server
+		6. Monkey HTTP
+			1. Monkey Configuration
+			2. Monkey Restart
+			3. Monkey Start
+			4. Monkey Stop
+			5. Enable or Disable Server
+		7. Hiawatha
+			1. Hiawatha Configuration
+			2. Hiawatha Restart
+			3. Hiawatha Start
+			4. Hiawatha Stop
+			5. Enable or Disable Server
+		8. SSL Setup
 			1. Let's Encrypt Settings
 			2. Renew Certification
 			3. Revoke Certification
-		5. Disabled
-
 	2. Database Server
 		1. mySQL
 			1. mySQL Configuration
@@ -75,7 +103,26 @@ Server Auto Configuration manages many mundane file changes automatically for yo
 			2. PostgreSQL Restart
 			3. PostgreSQL Start
 			4. PostgreSQL Stop
-
+		4. SQLite
+			1. SQLite Configuration
+			2. SQLite Restart
+			3. SQLite Start
+			4. SQLite Stop
+		5. Pervasive
+			1. Pervasive Configuration
+			2. Pervasive Restart
+			3. Pervasive Start
+			4. Pervasive Stop
+		6. VoltDB
+			1. VoltDB Configuration
+			2. VoltDB Restart
+			3. VoltDB Start
+			4. VoltDB Stop
+		7. GigaBASE
+			1. GigaBASE Configuration
+			2. GigaBASE Restart
+			3. GigaBASE Start
+			4. GigaBASE Stop
 	3. Application Server
 		1. PHP
 			1. PHP Configuration
@@ -107,7 +154,7 @@ Server Auto Configuration manages many mundane file changes automatically for yo
 				1. Mystic Configuration
 			2. WWIV
 				1. WWIV Configuration
-
+		7. Firewall Configuration
 	4. Email Server
 		1. Postfix
 			1. Postfix Configuration
@@ -160,7 +207,6 @@ Server Auto Configuration manages many mundane file changes automatically for yo
 		5. Application Configuration
 			1. Git Configuration
 			2. Uninstall Applications
-
 	9. Logs
 		1. Apache Logs
 		2. PHP Logs
@@ -171,6 +217,8 @@ Server Auto Configuration manages many mundane file changes automatically for yo
 ## Current Tested Systems
 
 Ubuntu 17.10
+Mint Linux 18.2
+CentOS 7
 Raspberian Stretch
 
 ## Contributing
@@ -180,6 +228,9 @@ Raspberian Stretch
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
+
+New variables.log in logs folder so contributers can see the variable changes with tail -f
+New development folder which contains documents to assist with the development of this script
 
 ## History
 
